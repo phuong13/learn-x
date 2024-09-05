@@ -1,0 +1,28 @@
+html {
+    user-select: none;
+    font-family: 'Archivo';
+    background: var(--body);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.5;
+    height: -webkit-fill-available;
+
+    &.no-transition * {
+        transition: none !important;
+    }
+
+    &.no-scroll {
+        overflow: hidden;
+    }
+
+    // better fit for a big screens
+    @media screen and (min-width: 2560px) {
+        &[data-ratio='1'] {
+            zoom: 1.25;
+        }
+    }
+}
+
+body {
+    background: #f1f1f1;
+}
