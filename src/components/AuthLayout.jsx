@@ -19,9 +19,9 @@ import media from '@assets/login.webp';
 import google from '@assets/icons/google.png';
 import { useState } from 'react';
 
-// axios
-import axiosInstance from '../axios';
+// services
 import AuthService from '../services/auth/auth.service';
+
 import { Button } from '@mui/material';
 import { GoogleLogin, GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
