@@ -27,15 +27,16 @@ import { GoogleLogin, GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/g
 
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/auth/useAuth';
+import Loader from './Loader';
 
 const AuthLayout = ({ type = 'login' }) => {
     const { width } = useWindowSize();
     const navigate = useNavigate();
-
+    const [isLoading, setIsLoading] = useState(false);
     const [isLogin, setIsLogin] = useState();
     const [form, setForm] = useState(type);
 
-    const { authUser, setAuthUser, isLoggedIn, setIsLoggedIn } = useAuth();
+    const { authUser, setAuthUser, isAuthenticated, setIsAuthenticated } = useAuth();
 
     const defaultValues = {
         email: '',
@@ -46,25 +47,51 @@ const AuthLayout = ({ type = 'login' }) => {
         handleSubmit,
         formState: { errors },
         control,
+        watch,
     } = useForm({
         mode: 'onChange',
         defaultValues,
     });
 
-    const onSubmit = async ({ email, password }) => {
-        const abortController = new AbortController();
+    const onSubmitLogin = async ({ email, password }) => {
+        setIsLoading(true);
 
-        const result = await AuthService.login(email, password);
-        console.log(result);
-        if (result === undefined) {
-            toast.error('Invalid email or password!');
-            return;
+        try {
+            const result = await AuthService.login(email, password);
+            console.log(result.code);
+            if (result === undefined) {
+                toast.error('Invalid email or password!');
+                return;
+            }
+            if (result.code === 200) {
+                const { email, fullName, avatar, role } = result.data;
+                setAuthUser({ email, fullName, avatar, role });
+                setIsAuthenticated(true);
+                navigate('/profile');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
-        if (result.code === 200) {
-            const { email, fullName, avatar, role } = result.data;
-            setAuthUser({ email, fullName, avatar, role });
-            setIsLoggedIn(true);
-            navigate('/');
+    };
+
+    const onSubmitRegister = async ({ email, password, fullName }) => {
+        setIsLoading(true);
+        try {
+            const result = await AuthService.register(fullName, email, password);
+            console.log(result);
+            if (result === undefined) {
+                toast.error('Invalid email or password!');
+                return;
+            }
+            if (result.status === 200) {
+                navigate(`/register/verify?email=${email}`);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -76,37 +103,49 @@ const AuthLayout = ({ type = 'login' }) => {
         e.preventDefault();
     };
 
-    const googleLogin = useGoogleLogin({
-        flow: 'auth-code',
-        onSuccess: (token) => {
-            console.log(token);
-        },
-        onError: (error) => {
+    const handleGoogleLogin = (res) => {
+        setIsLoading(true);
+        try {
+            const result = AuthService.loginGoogle(res);
+            if (result === undefined) {
+                toast.error('Invalid email or password!');
+                return;
+            }
+            if (result.code === 200) {
+                const { email, fullName, avatar, role } = result.data;
+                setAuthUser({ email, fullName, avatar, role });
+                setIsLoggedIn(true);
+                navigate('/');
+            }
+        } catch (error) {
             console.error(error);
-        },
-    });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="flex w-full h-screen">
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-[minmax(0,_1030px)_minmax(0,_1fr)]">
                 {width >= 1024 && (
                     <div className="lg:flex relative hidden justify-center items-center h-full">
-                        {/* <Logo imgClass="w-[60px]" textClass="text-[28px]" />
-                        <img className="max-w-[512px]" src={media} alt="media" /> */}
                         <div className="w-80 h-80 bg-gradient-to-tr from-emerald-500 to-slate-300  rounded-full animate-bounce" />
                         <div className="w-full absolute bottom-0 h-1/2 bg-white/10 backdrop-blur-lg" />
                     </div>
                 )}
                 <div className="bg-widget flex items-center justify-center w-full py-10 px-4 lg:p-[60px]">
                     <Spring
-                        className="max-h-[650px] max-w-[540px] w-full bg-white px-10 py-20 rounded-3xl border-2 border-gray-red shadow-lg"
+                        className="max-w-[540px] w-full bg-white px-10 py-20 rounded-3xl border-2 border-gray-red shadow-lg"
                         type="slideUp"
                         duration={400}
                         delay={300}>
                         <div className="flex flex-col gap-2.5 text-center">
                             <h1>{form === 'login' ? 'Welcome Back!' : 'Register'}</h1>
                         </div>
-                        <form className="mt-5" onSubmit={handleSubmit(onSubmit)}>
+                        <form
+                            className="mt-5"
+                            onSubmit={handleSubmit(form === 'login' ? onSubmitLogin : onSubmitRegister)}>
+                            {isLoading && <Loader />}
                             <div className="flex flex-col gap-5">
                                 {form === 'register' && (
                                     <div className="field-wrapper">
@@ -136,22 +175,40 @@ const AuthLayout = ({ type = 'login' }) => {
                                         {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
                                     />
                                 </div>
-                                <Controller
-                                    name="password"
-                                    control={control}
-                                    rules={{ required: true }}
-                                    render={({ field }) => (
-                                        <PasswordInput
-                                            id="password"
-                                            placeholder="Your password"
-                                            error={errors.password}
-                                            innerRef={field.ref}
-                                            isInvalid={errors.password}
-                                            value={field.value}
-                                            onChange={field.onChange}
+                                <div className="field-wrapper">
+                                    <label htmlFor="password" className="field-label">
+                                        Password
+                                    </label>
+                                    <input
+                                        className={classNames('field-input', { 'field-input--error': errors.password })}
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        placeholder="Your password"
+                                        {...register('password', { required: true })}
+                                    />
+                                </div>
+                                {form === 'register' && (
+                                    <div className="field-wrapper">
+                                        <label htmlFor="confirmPassword" className="field-label">
+                                            Confirm Password
+                                        </label>
+                                        <input
+                                            className={classNames('field-input', {
+                                                'field-input--error': errors.confirmPassword,
+                                            })}
+                                            id="confirmPassword"
+                                            type="password"
+                                            name="confirmPassword"
+                                            placeholder="Confirm your password"
+                                            {...register('confirmPassword', {
+                                                required: true,
+                                                validate: (value) =>
+                                                    value === watch('password') || 'Passwords do not match',
+                                            })}
                                         />
-                                    )}
-                                />
+                                    </div>
+                                )}
                             </div>
                             <div className="flex flex-col items-center gap-6 mt-4 mb-10">
                                 {form === 'login' && (

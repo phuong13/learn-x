@@ -1,12 +1,13 @@
 import axios from '../../axios/axios';
 import Cookies from 'js-cookie';
 import AuthLoginResponse from './auth.dto';
+
 const BASE_AUTH_URL = '/auth';
 
 class AuthService {
-    static register = async (email, fullName, password) => {
+    static register = async (fullName, email, password) => {
         const routePath = `${BASE_AUTH_URL}/register`;
-        const data = await axios
+        const res = await axios
             .post(
                 routePath,
                 { email, fullName, password },
@@ -18,12 +19,58 @@ class AuthService {
                 },
             )
             .then((res) => {
-                return res.data;
+                return res;
             })
             .catch((err) => {
                 console.log(err);
             });
-        return data;
+        return res;
+    };
+
+    static verifyEmail = async (otp, email) => {
+        const routePath = `${BASE_AUTH_URL}/register/confirm`;
+        const res = await axios
+            .post(
+                routePath,
+                { otp, email },
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                },
+            )
+            .then((res) => {
+                console.log('AXIOS:::', res);
+
+                return res;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        return res;
+    };
+
+    static resendOtp = async (email) => {
+        const routePath = `${BASE_AUTH_URL}/resend-otp`;
+        try {
+            const res = await axios.post(
+                routePath,
+                { email },
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
+            return res;
+        } catch (error) {
+            return {
+                error: true,
+                response: error.response,
+            };
+        }
     };
 
     static login = async (email, password) => {
@@ -43,9 +90,10 @@ class AuthService {
             .then((res) => {
                 // localStorage.setItem('access_token', res.data.data.accessToken);
                 // localStorage.setItem('refresh_token', res.data.refreshToken);
-                const { accessToken, refreshToken } = res.data.data;
+                const { accessToken, refreshToken, ...user } = res.data.data;
                 Cookies.set('access_token', accessToken);
                 Cookies.set('refresh_token', refreshToken);
+                localStorage.setItem('user', JSON.stringify(user));
 
                 return res.data;
             })
@@ -53,13 +101,12 @@ class AuthService {
                 console.log(err);
             });
         return data;
-        // localStorage.setItem('access_token', data.data.access_token);
     };
 
     static async loginGoogle(idToken) {
         const routePath = `${BASE_AUTH_URL}/oauth2/google`;
         console.log(idToken);
-        const { data } =
+        const data =
             (await axios.post) <
             AuthLoginResponse >
             (routePath,
@@ -70,10 +117,17 @@ class AuthService {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                 },
-            });
+            })
+                .then((res) => {
+                    const [accessToken, refreshToken, ...user] = res.data.data;
+                    Cookies.set('access_token', accessToken);
+                    Cookies.set('refresh_token', refreshToken);
+                    localStorage.setItem('user', JSON.stringify(user));
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
 
-        localStorage.setItem('access_token', data.data.access_token);
-        console.log(data);
         return data;
     }
 
