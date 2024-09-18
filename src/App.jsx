@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { Suspense } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 // styles
 import '@styles/index.scss';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { CircularProgress, ThemeProvider, useColorScheme } from '@mui/material';
+import { CircularProgress, CssBaseline, ThemeProvider, useColorScheme } from '@mui/material';
 // fonts
 
 // components
@@ -13,8 +13,9 @@ import ScrollToTop from '@components/ScrollToTop';
 // hooks
 
 // pages
-import Login from '@pages/Login';
-import Home from '@pages/Home';
+const Login = lazy(() => import('@/pages/Login'));
+const Home = lazy(() => import('@/pages/Home'));
+const ConfirmRegister = lazy(() => import('@/pages/ConfirmRegister'));
 
 // utils
 
@@ -23,6 +24,12 @@ import { useWindowSize } from 'react-use';
 
 import theme from './theme/theme';
 import { AuthProvider } from './contexts/auth/AuthContext';
+import { GlobalLoader } from './components/GlobalLoader';
+import Loader from './components/Loader';
+import { useAuth } from './contexts/auth/useAuth';
+import ProtectedRoute from './utils/ProtectedRoute';
+import Profile from './pages/Profile';
+
 function App() {
     // const { mode, setMode } = useColorScheme();
     // if (!mode) {
@@ -33,21 +40,46 @@ function App() {
     const { width } = useWindowSize();
     const path = useLocation().pathname;
     const withSidebar = path !== '/login' && path !== '/404';
+    const navigate = useNavigate();
+    const isLoggedIn = useAuth();
+
+    // useEffect(() => {
+    //     if (!isLoggedIn && path !== '/login') {
+    //         navigate('/login');
+    //     }
+    // }, [isLoggedIn, path, navigate]);
 
     return (
-        <ThemeProvider theme={{ theme: theme }}>
-            <AuthProvider>
-                <ScrollToTop />
-                <Suspense fallback={<CircularProgress />}>
+        <AuthProvider>
+            <ThemeProvider theme={{ theme: theme }}>
+                {/* <CssBaseline /> */}
+                <Suspense fallback={<Loader />}>
+                    <ScrollToTop />
                     <div className="main">
                         <Routes>
-                            <Route path="/" element={<Home />} />
+                            <Route
+                                path="/"
+                                element={
+                                    <ProtectedRoute>
+                                        <Home />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/profile"
+                                element={
+                                    <ProtectedRoute>
+                                        <Profile />
+                                    </ProtectedRoute>
+                                }
+                            />
                             <Route path="/login" element={<Login />} />
+                            <Route path="/register/verify" element={<ConfirmRegister />} />
                         </Routes>
                     </div>
                 </Suspense>
-            </AuthProvider>
-        </ThemeProvider>
+            </ThemeProvider>
+        </AuthProvider>
     );
 }
 

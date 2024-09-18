@@ -4,6 +4,7 @@ import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useEffect, useState } from 'react';
 const Home = () => {
     const { authUser, setAuthUser, isLoggedIn, setIsLoggedIn } = useAuth();
+    console.log(authUser);
     const axiosPrivate = useAxiosPrivate();
 
     const [data, setData] = useState([]);
@@ -11,11 +12,12 @@ const Home = () => {
     useEffect(() => {
         axiosPrivate.get('categories').then((res) => {
             setData(res.data.data);
+            console.log(res.data.data);
         });
-    }, [axiosPrivate, data]);
+    }, [axiosPrivate]);
 
     return (
-        <div>
+        <div className="h-full">
             <h1>Welcome {authUser?.email}</h1>
             {isLoggedIn === true && (
                 <button
@@ -35,6 +37,14 @@ const Home = () => {
                     <h6>{item.name}</h6>
                 </div>
             ))}
+
+            <button
+                className="btn"
+                onClick={() => {
+                    window.location.href = '/profile';
+                }}>
+                Go to Profile
+            </button>
         </div>
     );
 };
