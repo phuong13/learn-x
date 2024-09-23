@@ -70,7 +70,7 @@ export default function ConfirmOTP() {
             const res = await AuthService.verifyEmail(otpValue, email);
             console.log(res);
             if (res && res.status === 200) {
-                setAlert({ show: true, message: 'Verification successful!', severity: 'success' });
+                setAlert({ show: true, message: 'Xác thực thành công!', severity: 'success' });
                 const countdownInterval = setInterval(() => {
                     setCountdown((prevCountdown) => {
                         if (prevCountdown === 1) {
@@ -81,7 +81,7 @@ export default function ConfirmOTP() {
                     });
                 }, 1000);
             } else {
-                setAlert({ show: true, message: 'Verification failed. Please try again.', severity: 'error' });
+                setAlert({ show: true, message: 'Xác thực thất bại. Vui lòng thử lại!', severity: 'error' });
                 setOtp(Array(otp.length).fill(''));
                 inputRefs.current[0].focus();
             }
@@ -119,7 +119,7 @@ export default function ConfirmOTP() {
         try {
             const res = await AuthService.resendOtp(emailFromQuery);
             if (res && res.status === 200) {
-                setAlert({ show: true, message: 'OTP sent successfully!', severity: 'info' });
+                setAlert({ show: true, message: 'Gửi lại mã OTP thành công!', severity: 'info' });
                 setIsResendDisabled(true);
                 setCountdownResend(60);
             } else {
@@ -127,7 +127,7 @@ export default function ConfirmOTP() {
             }
         } catch (error) {
             console.log(error);
-            setAlert({ show: true, message: 'An error occurred!', severity: 'error' });
+            setAlert({ show: true, message: 'Có lỗi xảy ra, vui lòng thử lại sau!', severity: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -142,18 +142,18 @@ export default function ConfirmOTP() {
                     onToggleVisibility={onToggleVisibility}
                     variant={alert.severity}
                     title={alert.message}
-                    message={alert.severity === 'success' ? `Redirect to login in ${countdown}s` : ''}></Alert>
+                    message={alert.severity === 'success' ? `Chuyển hướng về login sau ${countdown}s` : ''}></Alert>
             )}
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
                 <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
                     {isLoading && <Loader />}
-                    <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Confirm Your Email</h2>
+                    <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Xác nhận tài khoản</h2>
                     <form ref={formRef} onSubmit={handleSubmitOTP} className="space-y-6">
                         <div className="space-y-2">
                             <label htmlFor="otp" className="text-sm font-medium text-gray-700">
-                                Enter the 6-digit code
+                                Nhập mã OTP 6 số
                             </label>
-                            <div className="flex justify-between px-8 pt-2" onPaste={handlePaste}>
+                            <div className="flex justify-between px-8 pt-2">
                                 {otp.map((digit, index) => (
                                     <input
                                         key={index}
@@ -170,14 +170,14 @@ export default function ConfirmOTP() {
                         </div>
                         <div className="flex justify-between">
                             <button type="submit" className="flex-auto w-1/2 mt-0 btn btn--outline">
-                                Verify
+                                Xác nhận
                             </button>
                             <button
                                 type="button"
                                 disabled={isResendDisabled}
                                 onClick={handleSendOtp}
                                 className="flex-auto w-1/2 ml-4 mt-0 btn btn--outline">
-                                {isResendDisabled ? `Resend available on ${countdownResend}s` : `Resend OTP`}
+                                {isResendDisabled ? `Gửi lại mã sau ${countdownResend}s` : `Gửi lại mã OTP`}
                             </button>
                         </div>
                     </form>

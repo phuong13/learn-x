@@ -1,7 +1,5 @@
 import axios from '../../axios/axios';
 import Cookies from 'js-cookie';
-import AuthLoginResponse from './auth.dto';
-
 const BASE_AUTH_URL = '/auth';
 
 class AuthService {
@@ -106,33 +104,59 @@ class AuthService {
     static async loginGoogle(idToken) {
         const routePath = `${BASE_AUTH_URL}/oauth2/google`;
         console.log(idToken);
-        const data =
-            (await axios.post) <
-            AuthLoginResponse >
-            (routePath,
-            { idToken: idToken },
-            {
-                withCredentials: true,
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
+        const data = await axios
+            .post(
+                routePath,
+                { idToken: idToken },
+                {
+                    withCredentials: true,
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
                 },
+            )
+            .then((res) => {
+                console.log(res);
+                const { accessToken, refreshToken, ...user } = res.data.data;
+                Cookies.set('access_token', accessToken);
+                Cookies.set('refresh_token', refreshToken);
+                localStorage.setItem('user', JSON.stringify(user));
+                return res.data;
             })
-                .then((res) => {
-                    const [accessToken, refreshToken, ...user] = res.data.data;
-                    Cookies.set('access_token', accessToken);
-                    Cookies.set('refresh_token', refreshToken);
-                    localStorage.setItem('user', JSON.stringify(user));
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+            .catch((err) => {
+                console.log(err);
+            });
+
+        return data;
+    }
+
+    static async sendForgotPasswordEmail(email) {
+        const routePath = `${BASE_AUTH_URL}/forgot-password`;
+        const data = await axios
+            .post(
+                routePath,
+                { email },
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                },
+            )
+            .then((res) => {
+                return res.data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
 
         return data;
     }
 
     static async logout() {
         Cookies.remove('access_token');
+        Cookies.remove('refresh_token');
         localStorage.clear();
     }
 }

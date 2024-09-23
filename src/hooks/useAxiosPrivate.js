@@ -24,6 +24,10 @@ const useAxiosPrivate = () => {
                 if (error?.response?.status === 403 && !originalRequest._retry) {
                     originalRequest._retry = true;
                     const accessToken = await refresh();
+                    if (!accessToken) {
+                        Cookies.remove('access_token');
+                        return Promise.reject(error);
+                    }
                     Cookies.set('access_token', accessToken);
                     originalRequest.withCredentials = true;
                     return axiosPrivate(originalRequest);

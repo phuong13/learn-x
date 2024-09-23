@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useEffect, useState } from 'react';
 const Home = () => {
-    const { authUser, setAuthUser, isLoggedIn, setIsLoggedIn } = useAuth();
+    const { authUser, setAuthUser, isAuthenticated, setIsAuthenticated } = useAuth();
     console.log(authUser);
     const axiosPrivate = useAxiosPrivate();
 
@@ -14,16 +14,16 @@ const Home = () => {
             setData(res.data.data);
             console.log(res.data.data);
         });
-    }, [axiosPrivate]);
+    }, []);
 
     return (
         <div className="h-full">
             <h1>Welcome {authUser?.email}</h1>
-            {isLoggedIn === true && (
+            {isAuthenticated === true && (
                 <button
                     className="btn"
                     onClick={() => {
-                        setIsLoggedIn(false);
+                        setIsAuthenticated(false);
                         setAuthUser(null);
                         Cookies.remove('access_token');
                         Cookies.remove('refresh_token');

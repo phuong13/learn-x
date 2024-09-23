@@ -6,9 +6,10 @@ const AuthContext = createContext();
 export const AuthProvider = (props) => {
     const getAccessTokenFromCookie = () => {
         const accessToken = Cookies.get('access_token');
+
         return accessToken ? true : false;
     };
-    console.log('IS AUTHENTICATED: ', getAccessTokenFromCookie());
+
     const getUserFromLocalStorage = () => {
         const user = localStorage.getItem('user');
         return user ? JSON.parse(user) : null;

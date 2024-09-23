@@ -55,10 +55,29 @@ const AuthLayout = ({ type = 'login' }) => {
 
     const onSubmitLogin = async ({ email, password }) => {
         setIsLoading(true);
-
         try {
             const result = await AuthService.login(email, password);
-            console.log(result.code);
+            if (result === undefined) {
+                toast.error('Invalid email or password!');
+                return;
+            }
+            if (result.code === 200) {
+                const { email, fullName, avatar, role } = result.data;
+                setAuthUser({ email, fullName, avatar, role });
+                setIsAuthenticated(true);
+                navigate('/profile');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async (res) => {
+        setIsLoading(true);
+        try {
+            const result = await AuthService.loginGoogle(res);
             if (result === undefined) {
                 toast.error('Invalid email or password!');
                 return;
@@ -101,27 +120,7 @@ const AuthLayout = ({ type = 'login' }) => {
 
     const handlePasswordReminder = (e) => {
         e.preventDefault();
-    };
-
-    const handleGoogleLogin = (res) => {
-        setIsLoading(true);
-        try {
-            const result = AuthService.loginGoogle(res);
-            if (result === undefined) {
-                toast.error('Invalid email or password!');
-                return;
-            }
-            if (result.code === 200) {
-                const { email, fullName, avatar, role } = result.data;
-                setAuthUser({ email, fullName, avatar, role });
-                setIsLoggedIn(true);
-                navigate('/');
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
+        navigate('/identify');
     };
 
     return (
@@ -140,7 +139,7 @@ const AuthLayout = ({ type = 'login' }) => {
                         duration={400}
                         delay={300}>
                         <div className="flex flex-col gap-2.5 text-center">
-                            <h1>{form === 'login' ? 'Welcome Back!' : 'Register'}</h1>
+                            <h1>{form === 'login' ? 'Đăng nhập' : 'Đăng ký'}</h1>
                         </div>
                         <form
                             className="mt-5"
@@ -150,14 +149,14 @@ const AuthLayout = ({ type = 'login' }) => {
                                 {form === 'register' && (
                                     <div className="field-wrapper">
                                         <label htmlFor="fullName" className="field-label">
-                                            Fullname
+                                            Tên đầy đủ
                                         </label>
                                         <input
                                             className={classNames('field-input')}
                                             id="fullName"
                                             type="text"
                                             name="fullName"
-                                            placeholder="Enter your name"
+                                            placeholder="Nhập tên của bạn"
                                             {...register('fullName', { required: true })}
                                         />
                                     </div>
@@ -171,27 +170,27 @@ const AuthLayout = ({ type = 'login' }) => {
                                         id="email"
                                         type="email"
                                         name="email"
-                                        placeholder="Your E-mail address"
+                                        placeholder="Nhập địa chỉ email"
                                         {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
                                     />
                                 </div>
                                 <div className="field-wrapper">
                                     <label htmlFor="password" className="field-label">
-                                        Password
+                                        Mật khẩu
                                     </label>
                                     <input
                                         className={classNames('field-input', { 'field-input--error': errors.password })}
                                         id="password"
                                         type="password"
                                         name="password"
-                                        placeholder="Your password"
+                                        placeholder="Nhập mật khẩu"
                                         {...register('password', { required: true })}
                                     />
                                 </div>
                                 {form === 'register' && (
                                     <div className="field-wrapper">
                                         <label htmlFor="confirmPassword" className="field-label">
-                                            Confirm Password
+                                            Xác nhận mật khẩu
                                         </label>
                                         <input
                                             className={classNames('field-input', {
@@ -200,7 +199,7 @@ const AuthLayout = ({ type = 'login' }) => {
                                             id="confirmPassword"
                                             type="password"
                                             name="confirmPassword"
-                                            placeholder="Confirm your password"
+                                            placeholder="Nhập lại mật khẩu"
                                             {...register('confirmPassword', {
                                                 required: true,
                                                 validate: (value) =>
@@ -213,14 +212,14 @@ const AuthLayout = ({ type = 'login' }) => {
                             <div className="flex flex-col items-center gap-6 mt-4 mb-10">
                                 {form === 'login' && (
                                     <button className="text-btn" onClick={handlePasswordReminder}>
-                                        Forgot Password?
+                                        Quên mật khẩu?
                                     </button>
                                 )}
                             </div>
                             <input
                                 type="submit"
                                 className="btn btn--primary w-full hover:scale-[1.01] ease-in-out active:scale-[.98] active:duration-75 translate-all"
-                                value={form === 'login' ? 'Login' : 'Register'}
+                                value={form === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                             />
                         </form>
                         <div>
@@ -245,19 +244,19 @@ const AuthLayout = ({ type = 'login' }) => {
                                     active:scale-[.98] active:duration-75 translate-all">
                                     {/* <img className="icon" src={google} alt="Google" />
                                     Login with Google V2 */}
-                                    or
+                                    hoặc
                                     <GoogleLogin
                                         theme="filled_black"
-                                        onSuccess={(res) => console.log(res.credential)}
+                                        onSuccess={(res) => handleGoogleLogin(res.credential)}
                                         onError={(err) => console.log(err)}></GoogleLogin>
                                 </div>
                             </div>
                             <div className="flex justify-center gap-2.5 leading-none">
-                                <p>{form === 'login' ? "Don't have an account?" : 'Already have an account?'}</p>
+                                <p>{form === 'login' ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}</p>
                                 <button
                                     className="text-btn"
                                     onClick={() => setForm(form === 'login' ? 'register' : 'login')}>
-                                    {form === 'login' ? 'Register' : 'Login'}
+                                    {form === 'login' ? 'Đăng ký' : 'Đăng nhập'}
                                 </button>
                             </div>
                         </div>
