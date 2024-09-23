@@ -19,23 +19,24 @@ import media from '@assets/login.webp';
 import google from '@assets/icons/google.png';
 import { useState } from 'react';
 
-// axios
-import axiosInstance from '../axios';
+// services
 import AuthService from '../services/auth/auth.service';
+
 import { Button } from '@mui/material';
 import { GoogleLogin, GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/auth/useAuth';
+import Loader from './Loader';
 
 const AuthLayout = ({ type = 'login' }) => {
     const { width } = useWindowSize();
     const navigate = useNavigate();
-
+    const [isLoading, setIsLoading] = useState(false);
     const [isLogin, setIsLogin] = useState();
     const [form, setForm] = useState(type);
 
-    const { authUser, setAuthUser, isLoggedIn, setIsLoggedIn } = useAuth();
+    const { authUser, setAuthUser, isAuthenticated, setIsAuthenticated } = useAuth();
 
     const defaultValues = {
         email: '',
@@ -46,25 +47,70 @@ const AuthLayout = ({ type = 'login' }) => {
         handleSubmit,
         formState: { errors },
         control,
+        watch,
     } = useForm({
         mode: 'onChange',
         defaultValues,
     });
 
-    const onSubmit = async ({ email, password }) => {
-        const abortController = new AbortController();
-
-        const result = await AuthService.login(email, password);
-        console.log(result);
-        if (result === undefined) {
-            toast.error('Invalid email or password!');
-            return;
+    const onSubmitLogin = async ({ email, password }) => {
+        setIsLoading(true);
+        try {
+            const result = await AuthService.login(email, password);
+            if (result === undefined) {
+                toast.error('Invalid email or password!');
+                return;
+            }
+            if (result.code === 200) {
+                const { email, fullName, avatar, role } = result.data;
+                setAuthUser({ email, fullName, avatar, role });
+                setIsAuthenticated(true);
+                navigate('/profile');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
-        if (result.code === 200) {
-            const { email, fullName, avatar, role } = result.data;
-            setAuthUser({ email, fullName, avatar, role });
-            setIsLoggedIn(true);
-            navigate('/');
+    };
+
+    const handleGoogleLogin = async (res) => {
+        setIsLoading(true);
+        try {
+            const result = await AuthService.loginGoogle(res);
+            if (result === undefined) {
+                toast.error('Invalid email or password!');
+                return;
+            }
+            if (result.code === 200) {
+                const { email, fullName, avatar, role } = result.data;
+                setAuthUser({ email, fullName, avatar, role });
+                setIsAuthenticated(true);
+                navigate('/profile');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const onSubmitRegister = async ({ email, password, fullName }) => {
+        setIsLoading(true);
+        try {
+            const result = await AuthService.register(fullName, email, password);
+            console.log(result);
+            if (result === undefined) {
+                toast.error('Invalid email or password!');
+                return;
+            }
+            if (result.status === 200) {
+                navigate(`/register/verify?email=${email}`);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -74,51 +120,43 @@ const AuthLayout = ({ type = 'login' }) => {
 
     const handlePasswordReminder = (e) => {
         e.preventDefault();
+        navigate('/identify');
     };
-
-    const googleLogin = useGoogleLogin({
-        flow: 'auth-code',
-        onSuccess: (token) => {
-            console.log(token);
-        },
-        onError: (error) => {
-            console.error(error);
-        },
-    });
 
     return (
         <div className="flex w-full h-screen">
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-[minmax(0,_1030px)_minmax(0,_1fr)]">
                 {width >= 1024 && (
                     <div className="lg:flex relative hidden justify-center items-center h-full">
-                        {/* <Logo imgClass="w-[60px]" textClass="text-[28px]" />
-                        <img className="max-w-[512px]" src={media} alt="media" /> */}
                         <div className="w-80 h-80 bg-gradient-to-tr from-emerald-500 to-slate-300  rounded-full animate-bounce" />
                         <div className="w-full absolute bottom-0 h-1/2 bg-white/10 backdrop-blur-lg" />
                     </div>
                 )}
                 <div className="bg-widget flex items-center justify-center w-full py-10 px-4 lg:p-[60px]">
                     <Spring
-                        className="max-h-[650px] max-w-[540px] w-full bg-white px-10 py-20 rounded-3xl border-2 border-gray-red shadow-lg"
+                        className="max-w-[540px] w-full bg-white px-10 py-20 rounded-3xl border-2 border-gray-red shadow-lg"
                         type="slideUp"
                         duration={400}
                         delay={300}>
                         <div className="flex flex-col gap-2.5 text-center">
-                            <h1>{form === 'login' ? 'Welcome Back!' : 'Register'}</h1>
+                            <h1>{form === 'login' ? 'Đăng nhập' : 'Đăng ký'}</h1>
                         </div>
-                        <form className="mt-5" onSubmit={handleSubmit(onSubmit)}>
+                        <form
+                            className="mt-5"
+                            onSubmit={handleSubmit(form === 'login' ? onSubmitLogin : onSubmitRegister)}>
+                            {isLoading && <Loader />}
                             <div className="flex flex-col gap-5">
                                 {form === 'register' && (
                                     <div className="field-wrapper">
                                         <label htmlFor="fullName" className="field-label">
-                                            Fullname
+                                            Tên đầy đủ
                                         </label>
                                         <input
                                             className={classNames('field-input')}
                                             id="fullName"
                                             type="text"
                                             name="fullName"
-                                            placeholder="Enter your name"
+                                            placeholder="Nhập tên của bạn"
                                             {...register('fullName', { required: true })}
                                         />
                                     </div>
@@ -132,38 +170,56 @@ const AuthLayout = ({ type = 'login' }) => {
                                         id="email"
                                         type="email"
                                         name="email"
-                                        placeholder="Your E-mail address"
+                                        placeholder="Nhập địa chỉ email"
                                         {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
                                     />
                                 </div>
-                                <Controller
-                                    name="password"
-                                    control={control}
-                                    rules={{ required: true }}
-                                    render={({ field }) => (
-                                        <PasswordInput
-                                            id="password"
-                                            placeholder="Your password"
-                                            error={errors.password}
-                                            innerRef={field.ref}
-                                            isInvalid={errors.password}
-                                            value={field.value}
-                                            onChange={field.onChange}
+                                <div className="field-wrapper">
+                                    <label htmlFor="password" className="field-label">
+                                        Mật khẩu
+                                    </label>
+                                    <input
+                                        className={classNames('field-input', { 'field-input--error': errors.password })}
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        placeholder="Nhập mật khẩu"
+                                        {...register('password', { required: true })}
+                                    />
+                                </div>
+                                {form === 'register' && (
+                                    <div className="field-wrapper">
+                                        <label htmlFor="confirmPassword" className="field-label">
+                                            Xác nhận mật khẩu
+                                        </label>
+                                        <input
+                                            className={classNames('field-input', {
+                                                'field-input--error': errors.confirmPassword,
+                                            })}
+                                            id="confirmPassword"
+                                            type="password"
+                                            name="confirmPassword"
+                                            placeholder="Nhập lại mật khẩu"
+                                            {...register('confirmPassword', {
+                                                required: true,
+                                                validate: (value) =>
+                                                    value === watch('password') || 'Passwords do not match',
+                                            })}
                                         />
-                                    )}
-                                />
+                                    </div>
+                                )}
                             </div>
                             <div className="flex flex-col items-center gap-6 mt-4 mb-10">
                                 {form === 'login' && (
                                     <button className="text-btn" onClick={handlePasswordReminder}>
-                                        Forgot Password?
+                                        Quên mật khẩu?
                                     </button>
                                 )}
                             </div>
                             <input
                                 type="submit"
                                 className="btn btn--primary w-full hover:scale-[1.01] ease-in-out active:scale-[.98] active:duration-75 translate-all"
-                                value={form === 'login' ? 'Login' : 'Register'}
+                                value={form === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                             />
                         </form>
                         <div>
@@ -188,19 +244,19 @@ const AuthLayout = ({ type = 'login' }) => {
                                     active:scale-[.98] active:duration-75 translate-all">
                                     {/* <img className="icon" src={google} alt="Google" />
                                     Login with Google V2 */}
-                                    or
+                                    hoặc
                                     <GoogleLogin
                                         theme="filled_black"
-                                        onSuccess={(res) => console.log(res.credential)}
+                                        onSuccess={(res) => handleGoogleLogin(res.credential)}
                                         onError={(err) => console.log(err)}></GoogleLogin>
                                 </div>
                             </div>
                             <div className="flex justify-center gap-2.5 leading-none">
-                                <p>{form === 'login' ? "Don't have an account?" : 'Already have an account?'}</p>
+                                <p>{form === 'login' ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}</p>
                                 <button
                                     className="text-btn"
                                     onClick={() => setForm(form === 'login' ? 'register' : 'login')}>
-                                    {form === 'login' ? 'Register' : 'Login'}
+                                    {form === 'login' ? 'Đăng ký' : 'Đăng nhập'}
                                 </button>
                             </div>
                         </div>

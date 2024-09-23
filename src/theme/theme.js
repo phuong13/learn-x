@@ -3,8 +3,8 @@ import Archivo from '../fonts/archivo/Archivo-Regular.woff2';
 import Archivo_SemiExpanded from '../fonts/archivo/Archivo_SemiExpanded-Medium.woff2';
 const theme = createTheme({
     colorSchemes: {
-        light: true,
-        dark: true,
+        // light: true,
+        // dark: true,
     },
     typography: {
         fontFamily: 'Archivo, sans-serif',
