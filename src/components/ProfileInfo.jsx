@@ -12,7 +12,6 @@ const ProfileInfo = () => {
     const [errors, setErrors] = useState({});
 
     const { authUser, setAuthUser, isAuthenticated, setIsAuthenticated } = useAuth();
-    console.log(isAuthenticated);
 
     useEffect(() => {
         if (authUser) {
