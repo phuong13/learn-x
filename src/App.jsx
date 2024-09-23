@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
+
 import { Suspense, lazy, useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+
 import { useTheme } from 'styled-components';
 // styles
 import '@styles/index.scss';
@@ -13,6 +15,9 @@ import ScrollToTop from '@components/ScrollToTop';
 // hooks
 
 // pages
+const MyCourse = lazy(() => import('./pages/MyCourse'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const DetailCourse = lazy(() => import('./pages/DetailCourse'));
 const Login = lazy(() => import('@/pages/Login'));
 const Home = lazy(() => import('@/pages/Home'));
 const ConfirmRegister = lazy(() => import('@/pages/ConfirmRegister'));
@@ -60,6 +65,30 @@ function App() {
                             path="/"
                             element={
                                 <ProtectedRoute>
+                                    <HomePage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/myCourse"
+                            element={
+                                <ProtectedRoute>
+                                    <MyCourse />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                        path="/detailCourse"
+                        element={
+                            <ProtectedRoute>
+                                <DetailCourse />
+                            </ProtectedRoute>
+                        }
+                        />
+                        <Route
+                            path="/"
+                            element={
+                                <ProtectedRoute>
                                     <Home />
                                 </ProtectedRoute>
                             }
@@ -72,6 +101,9 @@ function App() {
                                 </ProtectedRoute>
                             }
                         />
+//                         <Route path="/" element={<HomePage/>} />        
+//                         <Route path="/myCourse" element={<MyCourse/>} />  
+//                         <Route path="/detailCourse" element={<DetailCourse/>} />
                         <Route path="/identify" element={<IdentifyAccount />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register/verify" element={<ConfirmRegister />} />

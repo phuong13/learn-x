@@ -17,6 +17,7 @@ const Home = () => {
     }, []);
 
     return (
+
         <div className="h-full">
             <h1>Welcome {authUser?.email}</h1>
             {isAuthenticated === true && (
@@ -32,6 +33,7 @@ const Home = () => {
                 </button>
             )}
 
+
             {data.map((item, index) => (
                 <div className="max-w-[200]" key={index}>
                     <h6>{item.name}</h6>
@@ -46,6 +48,7 @@ const Home = () => {
                 Go to Profile
             </button>
         </div>
+        
     );
 };
 
