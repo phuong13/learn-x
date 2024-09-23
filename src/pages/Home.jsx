@@ -5,7 +5,7 @@ const Home = () => {
 
     return (
         <div>
-            <h1>Welcome {authUser?.email}</h1>
+            <h1>Welcome{authUser?.email}</h1>
             {isLoggedIn === true && (
                 <button
                     className="btn"
@@ -17,7 +17,9 @@ const Home = () => {
                     Logout
                 </button>
             )}
+            
         </div>
+        
     );
 };
 

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Suspense } from 'react';
+import { Suspense,lazy } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 // styles
@@ -14,8 +14,9 @@ import ScrollToTop from '@components/ScrollToTop';
 
 // pages
 import Login from '@pages/Login';
-import Home from '@pages/Home';
-
+const MyCourse = lazy(() => import('./pages/MyCourse'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const DetailCourse = lazy(() => import('./pages/DetailCourse'));
 // utils
 
 // contexts
@@ -41,8 +42,11 @@ function App() {
                 <Suspense fallback={<CircularProgress />}>
                     <div className="main">
                         <Routes>
-                            <Route path="/" element={<Home />} />
+                            <Route path="/" element={<HomePage/>} />
                             <Route path="/login" element={<Login />} />
+                            <Route path="/homePage" element={<HomePage />} />
+                            <Route path="/myCourse" element={<MyCourse />} />
+                            <Route path="/detailCourse" element={<DetailCourse/>} />
                         </Routes>
                     </div>
                 </Suspense>
