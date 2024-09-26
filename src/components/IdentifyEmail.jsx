@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { FaEnvelope } from 'react-icons/fa';
 import AuthService from '../services/auth/auth.service';
 import Alert from './Alert';
+import Loader from './Loader';
 
 const IdentifyEmail = () => {
     const [email, setEmail] = useState('');
-    const [alert, setAlert] = useState({ show: false, message: '', severity: '' });
+    const [alert, setAlert] = useState({ show: false, title: '', message: '', severity: '' });
 
     const [countdownResend, setCountdownResend] = useState(60);
     const [isResendDisabled, setIsResendDisabled] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         if (isResendDisabled) {
             const timer = setInterval(() => {
@@ -29,19 +31,28 @@ const IdentifyEmail = () => {
         setAlert({ ...alert, show: isVisible });
     };
 
-    const handleSendCode = (e) => {
+    const handleSendCode = async (e) => {
         e.preventDefault();
-
+        setIsResendDisabled(true);
         console.log(email);
         try {
-            const res = AuthService.sendForgotPasswordEmail(email);
+            const res = await AuthService.sendForgotPasswordEmail(email);
+            console.log(res);
+
             if (res.code === 200) {
-                setAlert({ show: true, message: 'Gửi thành công!', severity: 'success' });
+                setAlert({
+                    show: true,
+                    title: 'Gửi thành công!',
+                    severity: 'success',
+                    message: 'Vui lòng kiểm tra hòm thư của bạn!',
+                });
             } else {
-                setAlert({ show: true, message: 'Gửi thất bại', severity: 'error' });
+                setAlert({ show: true, title: 'Gửi thất bại', severity: 'error', message: 'Vui lòng thử lại sau!' });
             }
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -53,11 +64,10 @@ const IdentifyEmail = () => {
                     isVisible={alert.show}
                     onToggleVisibility={onToggleVisibility}
                     variant={alert.severity}
-                    title={alert.message}
-                    message={
-                        alert.severity === 'success' ? `Vui lòng kiểm tra hòm thư của bạn!` : 'Vui lòng thử lại sau!'
-                    }></Alert>
+                    title={alert.title}
+                    message={alert.message}></Alert>
             )}
+            {isLoading && <Loader />}
             <div className="bg-white p-8 rounded-lg shadow-md w-96">
                 <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Quên mật khẩu</h2>
                 <form onSubmit={handleSendCode} className="space-y-4">
