@@ -154,6 +154,29 @@ class AuthService {
         return data;
     }
 
+    static async resetPassword(token, password) {
+        const routePath = `${BASE_AUTH_URL}/forgot-password/confirm`;
+        const data = await axios
+            .post(
+                routePath,
+                { token, password },
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                },
+            )
+            .then((res) => {
+                return res.data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        return data;
+    }
+
     static async logout() {
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');

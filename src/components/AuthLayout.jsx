@@ -203,7 +203,7 @@ const AuthLayout = ({ type = 'login' }) => {
                                             {...register('confirmPassword', {
                                                 required: true,
                                                 validate: (value) =>
-                                                    value === watch('password') || 'Passwords do not match',
+                                                    value === watch('password') || 'Mật khẩu không khớp',
                                             })}
                                         />
                                     </div>
