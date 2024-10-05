@@ -119,6 +119,8 @@ class AuthService {
             .then((res) => {
                 console.log(res);
                 const { accessToken, refreshToken, ...user } = res.data.data;
+                Cookies.remove('access_token');
+                Cookies.remove('refresh_token');
                 Cookies.set('access_token', accessToken);
                 Cookies.set('refresh_token', refreshToken);
                 localStorage.setItem('user', JSON.stringify(user));

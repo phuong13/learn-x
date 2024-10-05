@@ -78,7 +78,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/detailCourse"
+                            path="/detailCourse/:id"
                             element={
                                 <ProtectedRoute>
                                     <DetailCourse />
@@ -108,6 +108,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register/verify" element={<ConfirmRegister />} />
                         <Route path="reset-password" element={<ResetPassword />} />
+                        
                     </Routes>
                 </div>
             </Suspense>
