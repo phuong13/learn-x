@@ -1,9 +1,16 @@
 import DocumentTitle from '@components/DocumentTitle';
 import ProfileInfo from '../components/ProfileInfo';
+import Header from '../components/Header'
+import Navbar from '../components/NavBar'
+
 const Profile = () => {
     return (
         <>
-            <DocumentTitle title="Profile" />
+            <div className="sticky top-0 z-50">
+                <Header />
+            </div>
+            <Navbar />
+            <DocumentTitle title="Hồ sơ" />
             <ProfileInfo />
         </>
     );

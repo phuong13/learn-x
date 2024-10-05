@@ -35,6 +35,8 @@ import { GlobalLoader } from './components/GlobalLoader';
 import Loader from './components/Loader';
 import { useAuth } from './contexts/auth/useAuth';
 import ProtectedRoute from './utils/ProtectedRoute';
+import DashBoard from './pages/DashBoard';
+import Submission from './pages/Submission';
 
 function App() {
     // const { mode, setMode } = useColorScheme();
@@ -61,7 +63,7 @@ function App() {
                 <ScrollToTop />
                 <div className="main">
                     <Routes>
-                        <Route
+                        {/* <Route
                             path="/"
                             element={
                                 <ProtectedRoute>
@@ -100,10 +102,17 @@ function App() {
                                     <Profile />
                                 </ProtectedRoute>
                             }
-                        />
-//                         <Route path="/" element={<HomePage/>} />        
-//                         <Route path="/myCourse" element={<MyCourse/>} />  
-//                         <Route path="/detailCourse" element={<DetailCourse/>} />
+                        /> */}
+                        
+
+                        <Route path="/" element={<HomePage/>} />        
+                        <Route path="/myCourse" element={<MyCourse/>} /> 
+                        <Route path="/dashboard" element={<DashBoard/>} />
+                        <Route path="/profile" element={<Profile/>} /> 
+                        <Route path="/detailCourse" element={<DetailCourse/>} /> 
+                        <Route path="/submission" element={<Submission/>} /> 
+
+
                         <Route path="/identify" element={<IdentifyAccount />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register/verify" element={<ConfirmRegister />} />
