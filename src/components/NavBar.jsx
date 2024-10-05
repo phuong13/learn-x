@@ -17,7 +17,7 @@ function Navbar() {
         
         {/* Menu bên phải */}
         <div className="space-x-6">
-          <a href="/homePage" className="font-medium hover:text-gray-200 text-base">Trang chủ</a>
+          <a href="/" className="font-medium hover:text-gray-200 text-base">Trang chủ</a>
           <a href="/myCourse" className="font-medium hover:text-gray-200 text-base">Khoá học của tôi</a>
           <a href="/dashboard" className="font-medium hover:text-gray-200 text-base">Bảng điều khiển</a>
         </div>

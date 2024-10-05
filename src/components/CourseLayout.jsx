@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, MoreVertical } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import CourseContent from './CourseContent';
 export default function CoursePageLayout() {
-  const [expandedSections, setExpandedSections] = useState(['chung']);
   const [selectedTab, setSelectedTab] = useState(0); // Quản lý trạng thái tab được chọn
 
-  const toggleSection = (section) => {
-    setExpandedSections(prev =>
-      prev.includes(section)
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
-    );
-  };
 
   const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số', 'Năng lực'];
 

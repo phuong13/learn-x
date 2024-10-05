@@ -5,7 +5,7 @@ import AuthLayout from '@components/AuthLayout';
 const Login = () => {
     return (
         <>
-            <DocumentTitle title="Login" />
+            <DocumentTitle title="Đăng nhập" />
             <AuthLayout type="login" />
         </>
     );

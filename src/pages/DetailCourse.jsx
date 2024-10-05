@@ -1,9 +1,17 @@
+import React from 'react'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
+import Navbar from '../components/NavBar'
+import CourseLayout from '../components/CourseLayout'
+import SideBar from '../layout/SideBar'
+
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Navbar from '../components/NavBar';
 import CourseLayout from '../components/CourseLayout';
 import { useParams } from 'react-router-dom';
+
 
 const DetailCourse = () => {
     const { id } = useParams();
@@ -15,11 +23,13 @@ const DetailCourse = () => {
             <Navbar />
 
             {/* Nội dung chính */}
-            <div className="flex-grow">
-                <CourseLayout />
+            <div className="flex-grow pr-6 pl-6">
+                <SideBar>
+                    <CourseLayout></CourseLayout>
+                </SideBar>               
             </div>
-
             <Footer />
+            
         </div>
     );
 };
