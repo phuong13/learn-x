@@ -2,9 +2,9 @@
 // components
 import Logo from '@components/Logo';
 import { LoginSocialGoogle } from 'reactjs-social-login';
-import { toast } from 'react-toastify';
 import Spring from '@components/Spring';
 import PasswordInput from '@components/PasswordInput';
+import { Toaster, toast } from 'sonner';
 
 // hooks
 import { useForm, Controller, set } from 'react-hook-form';
@@ -58,7 +58,7 @@ const AuthLayout = ({ type = 'login' }) => {
         try {
             const result = await AuthService.login(email, password);
             if (result === undefined) {
-                toast.error('Invalid email or password!');
+                toast.error('Error from server, please try again later!');
                 return;
             }
             if (result.code === 200) {
@@ -66,9 +66,12 @@ const AuthLayout = ({ type = 'login' }) => {
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
                 navigate('/profile');
+            } else {
+                toast.error('Invalid email or password!');
             }
         } catch (error) {
             console.error(error);
+            toast.error('Invalid email or password!');
         } finally {
             setIsLoading(false);
         }
@@ -78,10 +81,7 @@ const AuthLayout = ({ type = 'login' }) => {
         setIsLoading(true);
         try {
             const result = await AuthService.loginGoogle(res);
-            if (result === undefined) {
-                toast.error('Invalid email or password!');
-                return;
-            }
+
             if (result.code === 200) {
                 const { email, fullName, avatar, role } = result.data;
                 setAuthUser({ email, fullName, avatar, role });

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import { FaUser, FaEnvelope, FaBriefcase, FaEdit, FaLock } from 'react-icons/fa';
+import { useEffect, useState, useMemo } from 'react';
+import { FaUser, FaEnvelope, FaBriefcase, FaEdit, FaLock, FaKey } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/auth/useAuth';
-import { set } from 'react-hook-form';
-
+import { ChangePasswordModal } from './ChangePasswordModal';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import { Toaster, toast } from 'sonner';
 const ProfileInfo = () => {
     const [avatar, setAvatar] = useState('');
     const [email, setEmail] = useState('');
@@ -11,7 +12,9 @@ const ProfileInfo = () => {
     const [role, setRole] = useState('');
     const [errors, setErrors] = useState({});
 
-    const { authUser, setAuthUser, isAuthenticated, setIsAuthenticated } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
+
+    const { authUser, setAuthUser } = useAuth();
 
     useEffect(() => {
         if (authUser) {
@@ -33,11 +36,6 @@ const ProfileInfo = () => {
         }
     };
 
-    const validateEmail = (email) => {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return re.test(String(email).toLowerCase());
-    };
-
     // const handleEmailChange = (e) => {
     //     const newEmail = e.target.value;
     //     setEmail(newEmail);
@@ -52,18 +50,59 @@ const ProfileInfo = () => {
         setter(e.target.value);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Profile updated:', { avatar, email, fullName, role });
+
+        let formData = new FormData();
+        formData.append('user', new Blob([JSON.stringify({ email, fullName })], { type: 'application/json' }));
+        const avatar = document.getElementById('avatar-upload').files[0];
+        if (avatar) {
+            formData.append('avatar', avatar);
+        }
+
+        try {
+            const response = await axiosPrivate.patch('/user', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.status === 200) {
+                console.log(response.data);
+                setAuthUser(response.data.data);
+                toast.success('Profile updated successfully');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('An error occurred. Please try again later');
+        }
     };
 
+    const [showChangePassword, setShowChangePassword] = useState(false);
+
     const handleChangePassword = () => {
-        console.log('Change password clicked');
+        setShowChangePassword(true);
     };
 
     const handleUpgradeRole = () => {
         console.log('Upgrade role clicked');
     };
+
+    let response = useMemo(() => ({}), []);
+
+    const getReponse = (res) => {
+        response = res.data;
+    };
+
+    useEffect(() => {
+        console.log(response);
+        if (response.code === 200) {
+            toast.success('Password changed successfully');
+        } else if (response.code === 500) {
+            toast.error('Invalid password');
+        } else if (response === undefined) {
+            toast.error('An error occurred. Please try again later');
+        }
+    }, [response]);
 
     return (
         <motion.div
@@ -71,6 +110,12 @@ const ProfileInfo = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+            <ChangePasswordModal
+                visible={showChangePassword}
+                onClose={() => setShowChangePassword(false)}
+                getResponse={getReponse}
+            />
+            <Toaster position="top-right" richColors />
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
@@ -108,8 +153,10 @@ const ProfileInfo = () => {
                                         </label>
                                     </div>
                                     <div className="ml-5 flex-1">
-                                        <h3 className="text-2xl font-bold leading-6 text-gray-900">{fullName}</h3>
-                                        <p className="mt-1 max-w-2xl text-sm text-gray-500">{role}</p>
+                                        <h3 className="text-2xl font-bold leading-6 text-gray-900">
+                                            {authUser.fullName}
+                                        </h3>
+                                        <p className="mt-1 max-w-2xl text-sm text-gray-500">{authUser.role}</p>
                                     </div>
                                 </div>
                             </div>
@@ -171,7 +218,8 @@ const ProfileInfo = () => {
                                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                                 <input
                                                     type="text"
-                                                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d]"
+                                                    disabled
+                                                    className="w-full disabled:opacity-60 px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d]"
                                                     value={role}
                                                     onChange={handleInputChange(setRole)}
                                                     aria-label="Role or job title"
@@ -189,7 +237,7 @@ const ProfileInfo = () => {
                                                 type="button"
                                                 onClick={handleChangePassword}
                                                 className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 mr-3">
-                                                <FaLock className="mr-2" />
+                                                <FaKey className="mr-2" />
                                                 Change Password
                                             </button>
                                             <button
