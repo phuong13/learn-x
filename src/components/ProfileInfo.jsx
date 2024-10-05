@@ -2,30 +2,23 @@ import { useEffect, useState, useMemo } from 'react';
 import { FaUser, FaEnvelope, FaBriefcase, FaEdit, FaLock, FaKey } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/auth/useAuth';
-
 import { ChangePasswordModal } from './ChangePasswordModal';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { Toaster, toast } from 'sonner';
-
 const ProfileInfo = () => {
-    const [avatar, setAvatar] = useState(''); // Avatar URL
+    const [avatar, setAvatar] = useState('');
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
     const [role, setRole] = useState('');
     const [errors, setErrors] = useState({});
 
-
-    const { authUser } = useAuth(); // Lấy dữ liệu người dùng từ context
-
     const axiosPrivate = useAxiosPrivate();
 
     const { authUser, setAuthUser } = useAuth();
 
-
     useEffect(() => {
         if (authUser) {
-            console.log('AuthUser Data:', authUser); // Kiểm tra dữ liệu trả về
-            setAvatar(authUser.avatar || 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAMAAzAMBIgACEQEDEQH/xAAbAAEBAAMBAQEAAAAAAAAAAAAAAQIFBgQDB//EAC0QAQABAwIFAgUEAwAAAAAAAAABAgMRBCEFEjFBURNhFSJTgZEjMjSxQkNS/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAEC/8QAFhEBAQEAAAAAAAAAAAAAAAAAABEB/9oADAMBAAIRAxEAPwD9EAaZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAInmq5aYmZ9nrtcN1FzeqOSPcHkMtnHB6u96PwlXB6/8btMlGtmR6L+hv2M5pzHs89O8TmYyAAAAAAAAAAAAAAAAAAAytW6r12m3RG892Ld8J0/p2vUq/dJqvtpNHb01MYjNc9ZevCQyZVjyUrywoDHENZxDh8VxNyxERV4bVMKjk52nExMT3Hv4tp4t3fUpj5aurwLgACAAAAAAAAAAAABISBRTNd2inzLqrdOKKY8Oc4dETrbcT0dLT0RcUBFAAE8qA8XFLXqaOr23c/1iPZ1F+nns10z3hy+MTMRPdcTQBUAAAAAAAAAAAAABXo4f/Ntulhy1i5Fq/brntLp6aomEGQQIoAAAD53NrdUz4ly0dap8y6LiNyLelrnOJnZzkZjee64mqAqAAAAAAAAAAAAAAJMZmW/4VqPW08U1fuoaF9dNfq09+m5TM47wauOnicxlXx0+ot37cV0Tt/TPm3ZVmIoDGei53eHiGsp09M00z+pPT2B4eMajmuU2aJzEdWu37kzVVXNVU7z1VpNABAAAAAAAAAAAAAAAkzBmPIrOxfuaa5FduZ947Nvp+K2bkfq/JLS9e8ExHkMdLTq7FUZi7TP3Y16zT0RmbtP2lzfLHiCIxGMpFbXUcXjE0WKd/8Apq65rrqmq5XmRJE0hUjouYa0AEQAAAAAAAAAADKxFU1RTTEzVO0QCVTh9dPpb+o/ZR8vmWz0fDKKOWu9vV4bKKcRimIiPYqtVb4PHW7c+0PTTwrSxG9My9vLOFjozVeT4ZpPowfDNJ9GPy9gDx/DNJ9GPyfDNJ9GPy9gDx/DNJ9GPyxnheln/VH5e4KNbXwjTT0iqPu817g9dOZtV59pbrCcs+Vo5a9auWKsXKZhi6i7aouRiuIlptdw+bGblrM0T1hamvAETkEAAAAAACegdQKd5iIjMz2b3huiptUc9cfPPns8PCNN6l2btcbUzs3kSmquCCZTMorIY5kyDITKZBkJkyCjHK5BRjmTMgssao2x1jwuZAaXiWh9P9a1GInrDXdcTHSXU10xXTNMxmJc5rLPoaiqiI+Wd4XE18RUVAAAAFSYmcRHWZH000c2ptR75Fb/AElr0dPTTjtmX1idyZ3RItZZkzKZMkSrmTMpkyRauZMymTJEq5kzKZMkKuZMymTJCrmTMpkyRauZMpkyRKrW8aozZi5EbxLY5fDW0xc01yPYg5+ZyiQqoAAAAr78P/l0fd8H20H8y39wb6Z3MpO35MgsyrHJkGQwAZplMmQXO6scnMC5MpkyC5MpkyC5MpkyC5Sve3VHtJlKt6Kt+0g5zAqAAA//2Q=='); // Dùng ảnh mặc định nếu không có avatar
+            setAvatar(authUser.avatar);
             setEmail(authUser.email);
             setFullName(authUser.fullName);
             setRole(authUser.role);
@@ -37,12 +30,11 @@ const ProfileInfo = () => {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setAvatar(reader.result); // Đọc file mới và set avatar
+                setAvatar(reader.result);
             };
             reader.readAsDataURL(file);
         }
     };
-
 
     // const handleEmailChange = (e) => {
     //     const newEmail = e.target.value;
@@ -103,6 +95,7 @@ const ProfileInfo = () => {
 
     useEffect(() => {
         console.log(response);
+
         if (response.code === 200) {
             toast.success('Password changed successfully');
         } else if (response.code === 500) {
@@ -126,7 +119,7 @@ const ProfileInfo = () => {
             <Toaster position="top-right" richColors />
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
                 </div>
             </header>
             <main>
@@ -143,7 +136,7 @@ const ProfileInfo = () => {
                                         <motion.img
                                             whileHover={{ scale: 1.05 }}
                                             className="h-24 w-24 rounded-full object-cover"
-                                            src={avatar} // Hiển thị avatar
+                                            src={avatar}
                                             alt="User avatar"
                                         />
                                         <label
@@ -183,11 +176,16 @@ const ProfileInfo = () => {
                                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                                 <input
                                                     type="email"
-                                                    className="w-full disabled:opacity-60 px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d]"
+                                                    className={`w-full disabled:opacity-60 px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d] ${
+                                                        errors.email ? 'border-red-500' : ''
+                                                    }`}
                                                     value={email}
                                                     disabled
                                                     aria-label="Email address"
                                                 />
+                                                {errors.email && (
+                                                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                                                )}
                                             </dd>
                                         </motion.div>
                                         <motion.div
