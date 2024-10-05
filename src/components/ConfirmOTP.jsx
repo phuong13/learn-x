@@ -1,15 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import { Toaster, toast } from 'sonner';
 import AuthService from '../services/auth/auth.service';
-import Alert from './Alert';
 import Loader from './Loader';
 
 export default function ConfirmOTP() {
     const location = useLocation();
     const navigate = useNavigate();
     const query = new URLSearchParams(location.search);
-    const emailFromQuery = query.get('email');
+    const emailFromQuery = query.get('email')?.replace(/\s/g, '+');
 
     const [otp, setOtp] = useState(new Array(6).fill(''));
     const inputRefs = useRef([]);
@@ -39,7 +38,6 @@ export default function ConfirmOTP() {
         }
     };
 
-    const [alert, setAlert] = useState({ show: false, message: '', severity: '' });
     const [countdown, setCountdown] = useState(5);
 
     const [countdownResend, setCountdownResend] = useState(60);
@@ -70,32 +68,37 @@ export default function ConfirmOTP() {
             const res = await AuthService.verifyEmail(otpValue, email);
             console.log(res);
             if (res && res.status === 200) {
-                setAlert({ show: true, message: 'Xác thực thành công!', severity: 'success' });
+                toast.success(<div>Xác thực thành công! Chuyển hướng về trang đăng nhập sau {countdown}s</div>, {
+                    duration: 5000,
+                });
                 const countdownInterval = setInterval(() => {
                     setCountdown((prevCountdown) => {
                         if (prevCountdown === 1) {
                             clearInterval(countdownInterval);
                             navigate('/login');
+                        } else {
+                            toast.dismiss();
+                            toast.success(
+                                `Xác thực thành công! Chuyển hướng về trang đăng nhập sau ${prevCountdown - 1}s`,
+                                {
+                                    duration: 5000,
+                                },
+                            );
                         }
                         return prevCountdown - 1;
                     });
                 }, 1000);
             } else {
-                setAlert({ show: true, message: 'Xác thực thất bại. Vui lòng thử lại!', severity: 'error' });
+                toast.error('Xác thực thất bại. Vui lòng thử lại!', { duration: 5000 });
                 setOtp(Array(otp.length).fill(''));
                 inputRefs.current[0].focus();
             }
         } catch (error) {
             console.log(error);
-
-            setAlert({ show: true, message: 'An error occurred!', severity: 'error' });
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau!', { duration: 5000 });
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const onToggleVisibility = (isVisible) => {
-        setAlert({ ...alert, show: isVisible });
     };
 
     const handlePaste = (e) => {
@@ -107,9 +110,9 @@ export default function ConfirmOTP() {
                 inputRefs.current[index].value = value;
             });
             inputRefs.current[5].focus();
-            if (newOtp.every((digit) => digit !== '')) {
-                handleSubmitOTP();
-            }
+            // if (newOtp.every((digit) => digit !== '')) {
+            //     handleSubmitOTP();
+            // }
         }
         e.preventDefault();
     };
@@ -119,15 +122,15 @@ export default function ConfirmOTP() {
         try {
             const res = await AuthService.resendOtp(emailFromQuery);
             if (res && res.status === 200) {
-                setAlert({ show: true, message: 'Gửi lại mã OTP thành công!', severity: 'info' });
+                toast.success('Mã OTP đã được gửi lại. Vui lòng kiểm tra hòm thư của bạn!', { duration: 5000 });
                 setIsResendDisabled(true);
                 setCountdownResend(60);
             } else {
-                setAlert({ show: true, message: res.response.data.message, severity: 'error' });
+                toast.error('Gửi mã OTP thất bại. Vui lòng thử lại sau!', { duration: 5000 });
             }
         } catch (error) {
             console.log(error);
-            setAlert({ show: true, message: 'Có lỗi xảy ra, vui lòng thử lại sau!', severity: 'error' });
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau!', { duration: 5000 });
         } finally {
             setIsLoading(false);
         }
@@ -135,15 +138,7 @@ export default function ConfirmOTP() {
 
     return (
         <>
-            {alert.show && (
-                <Alert
-                    hideAfter={3000}
-                    isVisible={alert.show}
-                    onToggleVisibility={onToggleVisibility}
-                    variant={alert.severity}
-                    title={alert.message}
-                    message={alert.severity === 'success' ? `Chuyển hướng về login sau ${countdown}s` : ''}></Alert>
-            )}
+            <Toaster position="top-right" richColors />
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
                 <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
                     {isLoading && <Loader />}
@@ -153,7 +148,7 @@ export default function ConfirmOTP() {
                             <label htmlFor="otp" className="text-sm font-medium text-gray-700">
                                 Nhập mã OTP 6 số
                             </label>
-                            <div className="flex justify-between px-8 pt-2">
+                            <div className="flex justify-between px-8 pt-2" onPaste={handlePaste}>
                                 {otp.map((digit, index) => (
                                     <input
                                         key={index}

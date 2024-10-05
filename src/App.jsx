@@ -23,7 +23,7 @@ const Home = lazy(() => import('@/pages/Home'));
 const ConfirmRegister = lazy(() => import('@/pages/ConfirmRegister'));
 const IdentifyAccount = lazy(() => import('@/pages/IdentifyAccount'));
 const Profile = lazy(() => import('@/pages/Profile'));
-
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 // utils
 
 // contexts
@@ -80,12 +80,12 @@ function App() {
                             }
                         />
                         <Route
-                        path="/detailCourse"
-                        element={
-                            <ProtectedRoute>
-                                <DetailCourse />
-                            </ProtectedRoute>
-                        }
+                            path="/detailCourse/:id"
+                            element={
+                                <ProtectedRoute>
+                                    <DetailCourse />
+                                </ProtectedRoute>
+                            }
                         />
                         <Route
                             path="/"
@@ -112,10 +112,14 @@ function App() {
                         <Route path="/detailCourse" element={<DetailCourse/>} /> 
                         <Route path="/submission" element={<Submission/>} /> 
 
-
+                        {/*                         <Route path="/" element={<HomePage/>} />        
+                         <Route path="/myCourse" element={<MyCourse/>} />  
+                     <Route path="/detailCourse" element={<DetailCourse/>} /> */}
                         <Route path="/identify" element={<IdentifyAccount />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register/verify" element={<ConfirmRegister />} />
+                        <Route path="reset-password" element={<ResetPassword />} />
+                        
                     </Routes>
                 </div>
             </Suspense>
