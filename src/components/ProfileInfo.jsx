@@ -128,7 +128,7 @@ const ProfileInfo = () => {
             </header>
             <main>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    {isLoading && <Loader />}
+                    <Loader isLoading={isLoading} />
                     <motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}

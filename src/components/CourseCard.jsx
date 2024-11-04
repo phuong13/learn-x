@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 export default function Component({ id, name, description, thumbnail }) {
     return (
         <div key={id} className="max-w-sm rounded-lg overflow-hidden shadow-md bg-white hover:shadow-xl">
-            <a href={`/detailCourse/${id}`}>
+            <a href={`/course-detail/${id}`}>
                 <div className="relative h-36 bg-green-100">
                     <img src={thumbnail} alt="Online learning illustration" className="w-full h-full object-cover" />
                 </div>

@@ -29,6 +29,20 @@ class CourseService {
             return response;
         }
     }
+
+    static async getModulesByCourseId(courseId) {
+        const response = await axiosPrivate
+            .get(`${BASE_AUTH_URL}/${courseId}/modules`, {
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then((res) => {
+                return res.data.data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        return response;
+    }
 }
 
 export default CourseService;

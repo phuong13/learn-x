@@ -65,7 +65,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 const { email, fullName, avatar, role } = result.data;
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
-                navigate('/myCourse');
+                navigate('/my-course');
             } else {
                 toast.error('Invalid email or password!');
             }

@@ -67,7 +67,7 @@ const IdentifyEmail = () => {
                     title={alert.title}
                     message={alert.message}></Alert>
             )}
-            {isLoading && <Loader />}
+            <Loader isLoading={isLoading} />
             <div className="bg-white p-8 rounded-lg shadow-md w-96">
                 <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Quên mật khẩu</h2>
                 <form onSubmit={handleSendCode} className="space-y-4">

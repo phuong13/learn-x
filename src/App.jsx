@@ -1,13 +1,9 @@
-/* eslint-disable no-unused-vars */
-
 import { Suspense, lazy, useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
-import { useTheme } from 'styled-components';
 // styles
 import '@styles/index.scss';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { CircularProgress, CssBaseline, ThemeProvider, useColorScheme } from '@mui/material';
 // fonts
 
 // components
@@ -19,7 +15,6 @@ const MyCourse = lazy(() => import('./pages/MyCourse'));
 const HomePage = lazy(() => import('./pages/HomePage'));
 const DetailCourse = lazy(() => import('@/pages/DetailCourse'));
 const Login = lazy(() => import('@/pages/Login'));
-const Home = lazy(() => import('@/pages/Home'));
 const ConfirmRegister = lazy(() => import('@/pages/ConfirmRegister'));
 const IdentifyAccount = lazy(() => import('@/pages/IdentifyAccount'));
 const Profile = lazy(() => import('@/pages/Profile'));
@@ -61,7 +56,7 @@ function App() {
 
     return (
         <AuthProvider>
-            <Suspense fallback={<Loader />}>
+            <Suspense fallback={<Loader isLoading />}>
                 <ScrollToTop />
                 <div className="main">
                     <Routes>
@@ -71,10 +66,10 @@ function App() {
                         <Route path="/identify" element={<IdentifyAccount />} />
 
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/myCourse" element={<MyCourse />} />
+                        <Route path="/my-course" element={<MyCourse />} />
                         <Route path="/dashboard" element={<DashBoard />} />
                         <Route path="/profile" element={<Profile />} />
-                        <Route path="/detailCourse" element={<DetailCourse />} />
+                        <Route path="/course-detail/:courseId" element={<DetailCourse />} />
                         <Route path="/submission" element={<Submission />} />
                         <Route path="/logout" element={<Logout />} />
                         <Route path="/add-course" element={<AddCourse />} />
