@@ -1,27 +1,26 @@
+import CreateCourseForm from '../components/CreateCourseForm';
+import DocumentTitle from '../components/DocumentTitle';
 import Header from '../layout/Header';
 import Footer from '../components/Footer';
-import CourseFilter from '../components/CourseFilter';
 import Navbar from '../components/NavBar';
-import AssignmentControlPanel from '../components/AssignmentControlPanel';
-import DocumentTitle from '../components/DocumentTitle';
-const DashBoard = () => {
+
+const AddCourse = () => {
     return (
         <div className="flex flex-col min-h-screen">
-            <DocumentTitle title="Bảng điều khiển" />
-
+            <DocumentTitle title="Add Course" />
             <div className="sticky top-0 z-50">
                 <Header />
             </div>
             <Navbar />
             <div>
-                <h2 className="text-2xl font-bold text-gray-900 pl-6 pt-6">Bảng điều khiển</h2>
+                <h2 className="text-2xl font-bold text-gray-900 pl-6 pt-6">Thêm khóa học</h2>
             </div>
             <div className="flex-grow p-6 bg-white shadow-sm mx-4 my-4 round-">
-                <AssignmentControlPanel />
+                <CreateCourseForm />
             </div>
             <Footer />
         </div>
     );
 };
 
-export default DashBoard;
+export default AddCourse;

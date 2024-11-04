@@ -101,6 +101,19 @@ class AuthService {
         return data;
     };
 
+    static logout = async () => {
+        const routePath = `${BASE_AUTH_URL}/logout`;
+        const data = await axios.post(routePath).then((res) => {
+            console.log(res);
+            Cookies.remove('access_token');
+            Cookies.remove('refresh_token');
+            localStorage.removeItem('user');
+            return res.data;
+        });
+
+        return data;
+    };
+
     static async loginGoogle(idToken) {
         const routePath = `${BASE_AUTH_URL}/oauth2/google`;
         console.log(idToken);
@@ -179,11 +192,11 @@ class AuthService {
         return data;
     }
 
-    static async logout() {
-        Cookies.remove('access_token');
-        Cookies.remove('refresh_token');
-        localStorage.clear();
-    }
+    // static async logout() {
+    //     Cookies.remove('access_token');
+    //     Cookies.remove('refresh_token');
+    //     localStorage.clear();
+    // }
 }
 
 export default AuthService;

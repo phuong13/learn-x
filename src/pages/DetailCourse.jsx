@@ -1,5 +1,4 @@
-import React from 'react';
-import Header from '../components/Header';
+import Header from '../layout/Header';
 import Footer from '../components/Footer';
 import Navbar from '../components/NavBar';
 import CourseLayout from '../components/CourseLayout';

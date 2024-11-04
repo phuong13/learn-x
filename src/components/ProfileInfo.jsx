@@ -5,12 +5,14 @@ import { useAuth } from '../contexts/auth/useAuth';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { Toaster, toast } from 'sonner';
+import Loader from './Loader';
 const ProfileInfo = () => {
     const [avatar, setAvatar] = useState('');
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
     const [role, setRole] = useState('');
-    const [errors, setErrors] = useState({});
+    const [errors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
 
     const axiosPrivate = useAxiosPrivate();
 
@@ -60,6 +62,8 @@ const ProfileInfo = () => {
             formData.append('avatar', avatar);
         }
 
+        setIsLoading(true);
+
         try {
             const response = await axiosPrivate.patch('/user', formData, {
                 headers: {
@@ -74,6 +78,8 @@ const ProfileInfo = () => {
         } catch (error) {
             console.error(error);
             toast.error('An error occurred. Please try again later');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -94,8 +100,6 @@ const ProfileInfo = () => {
     };
 
     useEffect(() => {
-        console.log(response);
-
         if (response.code === 200) {
             toast.success('Password changed successfully');
         } else if (response.code === 500) {
@@ -124,6 +128,7 @@ const ProfileInfo = () => {
             </header>
             <main>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                    {isLoading && <Loader />}
                     <motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -183,9 +188,6 @@ const ProfileInfo = () => {
                                                     disabled
                                                     aria-label="Email address"
                                                 />
-                                                {errors.email && (
-                                                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                                                )}
                                             </dd>
                                         </motion.div>
                                         <motion.div

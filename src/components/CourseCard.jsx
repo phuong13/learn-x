@@ -25,7 +25,7 @@ export default function Component({ id, name, description, thumbnail }) {
 }
 
 Component.propTypes = {
-    id: PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     thumbnail: PropTypes.string.isRequired,
