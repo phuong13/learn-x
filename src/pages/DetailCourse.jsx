@@ -1,7 +1,7 @@
 import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Navbar from '../components/NavBar';
+import Header from '../layout/Header';
+import Footer from '@layout/Footer.jsx';
+import Navbar from '@layout/NavBar.jsx';
 import CourseLayout from '../components/CourseLayout';
 import SideBar from '../layout/Sidebar';
 const DetailCourse = () => {

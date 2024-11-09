@@ -1,8 +1,7 @@
-import React from 'react'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import Header from '../layout/Header'
+import Footer from '@layout/Footer.jsx'
 import SideBar from '../layout/Sidebar'
-import Navbar from '../components/NavBar'
+import Navbar from '@layout/NavBar.jsx'
 import SubmissionLayout from '../components/SubmissionLayout'
 const Submission = () => {
   return (

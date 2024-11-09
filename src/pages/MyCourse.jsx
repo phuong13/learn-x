@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import Header from '../layout/Header';
-import Footer from '../components/Footer';
+import Footer from '@layout/Footer.jsx';
 import CourseCard from '../components/CourseCard';
 import CourseFilter from '../components/CourseFilter';
-import Navbar from '../components/NavBar';
+import Navbar from '@layout/NavBar.jsx';
 import CourseService from '../services/courses/course.service';
 import { useAuth } from '../contexts/auth/useAuth';
 import DocumentTitle from '@components/DocumentTitle';

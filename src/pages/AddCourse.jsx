@@ -1,8 +1,8 @@
 import CreateCourseForm from '../components/CreateCourseForm';
 import DocumentTitle from '../components/DocumentTitle';
 import Header from '../layout/Header';
-import Footer from '../components/Footer';
-import Navbar from '../components/NavBar';
+import Footer from '@layout/Footer.jsx';
+import Navbar from '@layout/NavBar.jsx';
 
 const AddCourse = () => {
     return (

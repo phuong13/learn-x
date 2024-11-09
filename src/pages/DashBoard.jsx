@@ -1,7 +1,7 @@
 import Header from '../layout/Header';
-import Footer from '../components/Footer';
+import Footer from '@layout/Footer.jsx';
 import CourseFilter from '../components/CourseFilter';
-import Navbar from '../components/NavBar';
+import Navbar from '@layout/NavBar.jsx';
 import AssignmentControlPanel from '../components/AssignmentControlPanel';
 import DocumentTitle from '../components/DocumentTitle';
 const DashBoard = () => {

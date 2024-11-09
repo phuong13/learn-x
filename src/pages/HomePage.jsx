@@ -1,8 +1,8 @@
 import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../layout/Header';
+import Footer from '@layout/Footer.jsx';
 import IntroBackround from '../components/IntroBackround';
-import Navbar from '../components/NavBar';
+import Navbar from '@layout/NavBar.jsx';
 import DocumentTitle from '../components/DocumentTitle';  
 
 const MyCourse = () => {
