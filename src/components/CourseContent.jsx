@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import SubmissionHeader from '../components/SubmissionHeader';
 
 function CourseContent() {
-  const [expandedSections, setExpandedSections] = useState(['chung']); // Trạng thái lưu trữ các phần đang mở
+  const [expandedSections, setExpandedSections] = useState(['chung']);
 
   const toggleSection = (section) => {
     setExpandedSections(prev =>
       prev.includes(section)
-        ? prev.filter(s => s !== section) // Nếu section đã được mở, đóng nó
-        : [...prev, section] // Nếu section chưa được mở, thêm nó vào danh sách
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
     );
   };
 
@@ -34,9 +35,13 @@ function CourseContent() {
             </button>
             {expandedSections.includes(section) && (
               <div className="px-4 py-3 bg-gray-50">
-                <p className="text-sm text-gray-600">
-                  {index === 0 ? 'Nội dung phần Chung' : `Nội dung cho Section ${index + 1}`}
-                </p>
+                {index === 0 ? (
+                  <SubmissionHeader /> // Component được hiển thị khi section 'Chung' mở
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    {`Nội dung cho Section ${index + 1}`}
+                  </p>
+                )}
               </div>
             )}
           </div>
