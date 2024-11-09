@@ -65,10 +65,9 @@ const AuthLayout = ({ type = 'login' }) => {
                 const { email, fullName, avatar, role } = result.data;
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
-                navigate('/');
+                navigate('/my-course');
             } else {
                 toast.error('Invalid email or password!');
-
             }
         } catch (error) {
             console.error(error);
@@ -78,10 +77,10 @@ const AuthLayout = ({ type = 'login' }) => {
         }
     };
 
-    const handleGoogleLogin = async (res) => {
+    const handleGoogleLogin = async (req) => {
         setIsLoading(true);
         try {
-            const result = await AuthService.loginGoogle(res);
+            const result = await AuthService.loginGoogle(req);
 
             if (result.code === 200) {
                 const { email, fullName, avatar, role } = result.data;
@@ -145,7 +144,7 @@ const AuthLayout = ({ type = 'login' }) => {
                         <form
                             className="mt-5"
                             onSubmit={handleSubmit(form === 'login' ? onSubmitLogin : onSubmitRegister)}>
-                            {isLoading && <Loader />}
+                            <Loader isLoading={isLoading} />
                             <div className="flex flex-col gap-5">
                                 {form === 'register' && (
                                     <div className="field-wrapper">

@@ -1,7 +1,7 @@
 import DocumentTitle from '@components/DocumentTitle';
 import ProfileInfo from '../components/ProfileInfo';
-import Header from '../components/Header'
-import Navbar from '../components/NavBar'
+import Header from '../layout/Header';
+import Navbar from '../components/NavBar';
 
 const Profile = () => {
     return (

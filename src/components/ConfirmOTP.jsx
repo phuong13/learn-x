@@ -141,7 +141,7 @@ export default function ConfirmOTP() {
             <Toaster position="top-right" richColors />
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
                 <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
-                    {isLoading && <Loader />}
+                    <Loader isLoading={isLoading} />
                     <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Xác nhận tài khoản</h2>
                     <form ref={formRef} onSubmit={handleSubmitOTP} className="space-y-6">
                         <div className="space-y-2">

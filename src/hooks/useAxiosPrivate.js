@@ -31,6 +31,10 @@ const useAxiosPrivate = () => {
                     Cookies.set('access_token', accessToken);
                     originalRequest.withCredentials = true;
                     return axiosPrivate(originalRequest);
+                } else if (error?.response?.status === 403) {
+                    Cookies.remove('access_token');
+                    Cookies.remove('refresh_token');
+                    localStorage.removeItem('user');
                 }
                 return Promise.reject(error);
             },

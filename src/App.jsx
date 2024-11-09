@@ -1,42 +1,38 @@
-/* eslint-disable no-unused-vars */
-
 import { Suspense, lazy, useEffect } from 'react';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 
-import { useTheme } from 'styled-components';
 // styles
 import '@styles/index.scss';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { CircularProgress, CssBaseline, ThemeProvider, useColorScheme } from '@mui/material';
 // fonts
 
 // components
-import ScrollToTop from '@components/ScrollToTop';
+import ScrollToTop from './components/ScrollToTop';
 // hooks
 
 // pages
 const MyCourse = lazy(() => import('./pages/MyCourse'));
 const HomePage = lazy(() => import('./pages/HomePage'));
 const DetailCourse = lazy(() => import('./pages/DetailCourse'));
-const Login = lazy(() => import('@/pages/Login'));
-const Home = lazy(() => import('@/pages/Home'));
-const ConfirmRegister = lazy(() => import('@/pages/ConfirmRegister'));
-const IdentifyAccount = lazy(() => import('@/pages/IdentifyAccount'));
-const Profile = lazy(() => import('@/pages/Profile'));
-const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const Login = lazy(() => import('./pages/Login'));
+const ConfirmRegister = lazy(() => import('./pages/ConfirmRegister'));
+const IdentifyAccount = lazy(() => import('./pages/IdentifyAccount'));
+const Profile = lazy(() => import('./pages/Profile'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const DashBoard = lazy(() => import('./pages/DashBoard'));
+const Submission = lazy(() => import('./pages/Submission'));
+const AddCourse = lazy(() => import('./pages/AddCourse'));
+
 // utils
+// eslint-disable-next-line no-unused-vars
+import ProtectedRoute from './utils/ProtectedRoute';
 
 // contexts
-import { useWindowSize } from 'react-use';
-
-import theme from './theme/theme';
 import { AuthProvider } from './contexts/auth/AuthContext';
-import { GlobalLoader } from './components/GlobalLoader';
+
+// services
 import Loader from './components/Loader';
-import { useAuth } from './contexts/auth/useAuth';
-import ProtectedRoute from './utils/ProtectedRoute';
-import DashBoard from './pages/DashBoard';
-import Submission from './pages/Submission';
+import AuthService from './services/auth/auth.service';
 
 function App() {
     // const { mode, setMode } = useColorScheme();
@@ -44,12 +40,7 @@ function App() {
     //     return null;
     // }
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { width } = useWindowSize();
-    const path = useLocation().pathname;
-    const withSidebar = path !== '/login' && path !== '/404';
     const navigate = useNavigate();
-    const isLoggedIn = useAuth();
 
     // useEffect(() => {
     //     if (!isLoggedIn && path !== '/login') {
@@ -59,72 +50,40 @@ function App() {
 
     return (
         <AuthProvider>
-            <Suspense fallback={<Loader />}>
+            <Suspense fallback={<Loader isLoading />}>
                 <ScrollToTop />
                 <div className="main">
                     <Routes>
-                        {/* <Route
-                            path="/"
-                            element={
-                                <ProtectedRoute>
-                                    <HomePage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/myCourse"
-                            element={
-                                <ProtectedRoute>
-                                    <MyCourse />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/detailCourse/:id"
-                            element={
-                                <ProtectedRoute>
-                                    <DetailCourse />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/"
-                            element={
-                                <ProtectedRoute>
-                                    <Home />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/profile"
-                            element={
-                                <ProtectedRoute>
-                                    <Profile />
-                                </ProtectedRoute>
-                            }
-                        /> */}
-                        
-
-                        <Route path="/" element={<HomePage/>} />        
-                        <Route path="/myCourse" element={<MyCourse/>} /> 
-                        <Route path="/dashboard" element={<DashBoard/>} />
-                        <Route path="/profile" element={<Profile/>} /> 
-                        <Route path="/detailCourse" element={<DetailCourse/>} /> 
-                        <Route path="/submission" element={<Submission/>} /> 
-
-                        {/*                         <Route path="/" element={<HomePage/>} />        
-                         <Route path="/myCourse" element={<MyCourse/>} />  
-                     <Route path="/detailCourse" element={<DetailCourse/>} /> */}
-                        <Route path="/identify" element={<IdentifyAccount />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register/verify" element={<ConfirmRegister />} />
                         <Route path="reset-password" element={<ResetPassword />} />
-                        
+                        <Route path="/identify" element={<IdentifyAccount />} />
+
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/my-course" element={<MyCourse />} />
+                        <Route path="/dashboard" element={<DashBoard />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/course-detail/:courseId" element={<DetailCourse />} />
+                        <Route path="/submission" element={<Submission />} />
+                        <Route path="/logout" element={<Logout />} />
+                        <Route path="/add-course" element={<AddCourse />} />
                     </Routes>
                 </div>
             </Suspense>
         </AuthProvider>
     );
+
+    function Logout() {
+        useEffect(() => {
+            const logout = async () => {
+                await AuthService.logout();
+            }
+            logout().then(r => console.log("Logout successfully!"));
+            navigate('/login');
+        }, []);
+
+        return null;
+    }
 }
 
 export default App;
