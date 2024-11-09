@@ -1,5 +1,6 @@
 import axios from '../../axios/axios';
 import Cookies from 'js-cookie';
+
 const BASE_AUTH_URL = '/auth';
 
 class AuthService {
@@ -103,15 +104,13 @@ class AuthService {
 
     static logout = async () => {
         const routePath = `${BASE_AUTH_URL}/logout`;
-        const data = await axios.post(routePath).then((res) => {
+        return await axios.post(routePath).then((res) => {
             console.log(res);
             Cookies.remove('access_token');
             Cookies.remove('refresh_token');
             localStorage.removeItem('user');
             return res.data;
         });
-
-        return data;
     };
 
     static async loginGoogle(idToken) {

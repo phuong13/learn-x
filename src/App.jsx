@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 
 // styles
 import '@styles/index.scss';
@@ -7,32 +7,31 @@ import 'react-toastify/dist/ReactToastify.min.css';
 // fonts
 
 // components
-import ScrollToTop from '@components/ScrollToTop';
+import ScrollToTop from './components/ScrollToTop';
 // hooks
 
 // pages
 const MyCourse = lazy(() => import('./pages/MyCourse'));
 const HomePage = lazy(() => import('./pages/HomePage'));
-const DetailCourse = lazy(() => import('@/pages/DetailCourse'));
-const Login = lazy(() => import('@/pages/Login'));
-const ConfirmRegister = lazy(() => import('@/pages/ConfirmRegister'));
-const IdentifyAccount = lazy(() => import('@/pages/IdentifyAccount'));
-const Profile = lazy(() => import('@/pages/Profile'));
-const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
-const DashBoard = lazy(() => import('@/pages/DashBoard'));
-const Submission = lazy(() => import('@/pages/Submission'));
-const AddCourse = lazy(() => import('@/pages/AddCourse'));
+const DetailCourse = lazy(() => import('./pages/DetailCourse'));
+const Login = lazy(() => import('./pages/Login'));
+const ConfirmRegister = lazy(() => import('./pages/ConfirmRegister'));
+const IdentifyAccount = lazy(() => import('./pages/IdentifyAccount'));
+const Profile = lazy(() => import('./pages/Profile'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const DashBoard = lazy(() => import('./pages/DashBoard'));
+const Submission = lazy(() => import('./pages/Submission'));
+const AddCourse = lazy(() => import('./pages/AddCourse'));
+
 // utils
+// eslint-disable-next-line no-unused-vars
+import ProtectedRoute from './utils/ProtectedRoute';
 
 // contexts
-import { useWindowSize } from 'react-use';
-
-import theme from './theme/theme';
 import { AuthProvider } from './contexts/auth/AuthContext';
-import { GlobalLoader } from './components/GlobalLoader';
+
+// services
 import Loader from './components/Loader';
-import { useAuth } from './contexts/auth/useAuth';
-import ProtectedRoute from './utils/ProtectedRoute';
 import AuthService from './services/auth/auth.service';
 
 function App() {
@@ -41,12 +40,7 @@ function App() {
     //     return null;
     // }
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { width } = useWindowSize();
-    const path = useLocation().pathname;
-    const withSidebar = path !== '/login' && path !== '/404';
     const navigate = useNavigate();
-    const isLoggedIn = useAuth();
 
     // useEffect(() => {
     //     if (!isLoggedIn && path !== '/login') {
@@ -81,7 +75,10 @@ function App() {
 
     function Logout() {
         useEffect(() => {
-            AuthService.logout();
+            const logout = async () => {
+                await AuthService.logout();
+            }
+            logout().then(r => console.log("Logout successfully!"));
             navigate('/login');
         }, []);
 
