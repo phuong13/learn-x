@@ -6,7 +6,6 @@ import SideBar from '../layout/SideBar';
 import { useParams } from 'react-router-dom';
 
 const DetailCourse = () => {
-    const { courseId } = useParams();
 
     return (
         <div className="flex flex-col min-h-screen">
