@@ -13,8 +13,8 @@ const MyCourse = () => {
 
       <div className="sticky top-0 z-50">
         <Header /> {/* Header gồm các navbar */}
-        <Navbar/>
       </div>
+        <Navbar/>
 
       {/* Các thành phần khác của trang */}
       <div className="flex-1">

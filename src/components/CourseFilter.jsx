@@ -54,12 +54,14 @@ export default function Component() {
 
             {authUser?.role === 'TEACHER' && (
                 <div className="relative">
+                    <a href="/add-course">
                     <button
                         onClick={() => handleAddCourse()}
                         className="appearance-none border rounded-md py-2 px-3 leading-tight focus:outline-none focus:shadow-outline hover:bg-[#14919B]">
                         Thêm khóa học
                         {/* Add more sorting options as needed */}
                     </button>
+                    </a>
                 </div>
             )}
         </div>
