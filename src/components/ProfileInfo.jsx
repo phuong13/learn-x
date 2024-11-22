@@ -72,7 +72,7 @@ const ProfileInfo = () => {
             });
             if (response.status === 200) {
                 console.log(response.data);
-                setAuthUser(response.data.data);
+                localStorage.setItem('user', JSON.stringify(response.data.data));
                 toast.success('Profile updated successfully');
             }
         } catch (error) {
@@ -120,7 +120,7 @@ const ProfileInfo = () => {
                 onClose={() => setShowChangePassword(false)}
                 getResponse={getReponse}
             />
-            <Toaster position="top-right" richColors />
+            <Toaster position="top-right" richColors duration={5000} />
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
