@@ -58,6 +58,8 @@ function App() {
                         <Route path="/register/verify" element={<ConfirmRegister />} />
                         <Route path="reset-password" element={<ResetPassword />} />
                         <Route path="/identify" element={<IdentifyAccount />} />
+
+
                         <Route path="/" element={<HomePage />} />
                         <Route path="/public" element={<HomePage />} />
                         <Route path="/my-course" element={<MyCourse />} />

@@ -115,8 +115,7 @@ class AuthService {
 
     static async loginGoogle(idToken) {
         const routePath = `${BASE_AUTH_URL}/oauth2/google`;
-        console.log(idToken);
-        const data = await axios
+        return await axios
             .post(
                 routePath,
                 { idToken: idToken },
@@ -139,10 +138,11 @@ class AuthService {
                 return res.data;
             })
             .catch((err) => {
-                console.log(err);
+                return {
+                    error: true,
+                    response: err.response,
+                }
             });
-
-        return data;
     }
 
     static async sendForgotPasswordEmail(email) {

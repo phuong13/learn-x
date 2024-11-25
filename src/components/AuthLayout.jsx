@@ -82,11 +82,15 @@ const AuthLayout = ({ type = 'login' }) => {
         try {
             const result = await AuthService.loginGoogle(req);
 
+            console.log(result);
+
             if (result.code === 200) {
                 const { email, fullName, avatar, role } = result.data;
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
                 navigate('/profile');
+            } else if (result.error === true) {
+                toast.error('Email đã dùng để đăng ký tài khoản khác!');
             }
         } catch (error) {
             console.error(error);
@@ -101,7 +105,7 @@ const AuthLayout = ({ type = 'login' }) => {
             const result = await AuthService.register(fullName, email, password);
             console.log(result);
             if (result === undefined) {
-                toast.error('Invalid email or password!');
+                toast.error('Có lỗi xảy ra, vui lòng thử lại sau!');
                 return;
             }
             if (result.status === 200) {
@@ -125,6 +129,7 @@ const AuthLayout = ({ type = 'login' }) => {
 
     return (
         <div className="flex w-full h-screen">
+            <Toaster duration={5000} richColors position={'top-right'}/>
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-[minmax(0,_1030px)_minmax(0,_1fr)]">
                 {width >= 1024 && (
                     <div className="lg:flex relative hidden justify-center items-center h-full">
