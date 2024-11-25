@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Calendar, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import PropTypes from 'prop-types';
 
-export default function SubmissionLayout() {
+export default function SubmissionLayout({ title, content, startDate, endDate }) {
   const [isFolderVisible, setIsFolderVisible] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null); // Trạng thái cho tệp đã tải lên
-
+  const formattedStartDate = format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
+  const formattedEndDate = format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
   const toggleFolderVisibility = () => {
     setIsFolderVisible(!isFolderVisible);
+  };
+
+  const calculateRemainingTime = (endDate) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    const diff = end - now;
+
+    if (diff <= 0) return "Đã hết hạn";
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    return `Còn lại ${days} ngày ${hours} giờ`;
   };
 
   const toggleStatusDropdown = () => {
@@ -15,7 +31,7 @@ export default function SubmissionLayout() {
   };
 
   const handleFileChange = (event) => {
-    setUploadedFile(event.target.files[0]); 
+    setUploadedFile(event.target.files[0]);
   };
 
   const handleFileDelete = () => {
@@ -37,7 +53,7 @@ export default function SubmissionLayout() {
           <div className="flex items-center">
             <div className="bg-[#14919B] text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md">
               <i className="fa-solid fa-file-arrow-up text-white text-xl mr-2"></i>
-              Title Assignment
+              {title}
             </div>
           </div>
         </div>
@@ -50,20 +66,19 @@ export default function SubmissionLayout() {
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold mb-2 text-gray-800">Thời gian</h2>
             <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-600">
-              <p className="mb-2 sm:mb-0"><Calendar className="inline mr-2" size={16} /> Opened: Thứ Năm, 15 tháng 8 2024, 5:54 AM</p>
-              <p><Calendar className="inline mr-2" size={16} /> Due: Thứ Sáu, 11 tháng 10 2024, 12:30 PM</p>
+              <p className="mb-2 sm:mb-0">
+                <Calendar className="inline mr-2" size={16} /> Opened: {formattedStartDate}
+              </p>
+              <p>
+                <Calendar className="inline mr-2" size={16} /> Due: {formattedEndDate}
+              </p>
             </div>
           </div>
 
           {/* Submission Instructions */}
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold mb-4 text-gray-800">Hướng dẫn nộp bài</h2>
-            <p className="text-gray-600 mb-4">
-              Nộp file nén chứa mã nguồn chương trình Calculator đã sửa lỗi + File EXE chương trình + File word chứa các nội dung ghi chú như trong BT nhóm 04b.
-            </p>
-            <p className="text-gray-600 mb-4">
-              Tên file: Nhomxx_A04b_FixBugs.RAR/ZIP
-            </p>
+            <div className="p-4" dangerouslySetInnerHTML={{ __html: content }} />
             <button
               className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
               onClick={toggleFolderVisibility}
@@ -124,7 +139,7 @@ export default function SubmissionLayout() {
                     <td className="py-3 font-medium text-gray-700">Thời gian còn lại</td>
                     <td className="py-3 text-gray-600 flex items-center">
                       <Clock className="mr-2" size={16} />
-                      Còn lại 5 ngày 23 giờ
+                      {calculateRemainingTime(endDate)}
                     </td>
                   </tr>
                   <tr className="border-b">
@@ -139,4 +154,11 @@ export default function SubmissionLayout() {
       </div>
     </div>
   );
+}
+
+SubmissionLayout.propTypes = {
+    title: PropTypes.string.isRequired,
+    content: PropTypes.string.isRequired,
+    startDate: PropTypes.string.isRequired,
+    endDate: PropTypes.string.isRequired,
 }

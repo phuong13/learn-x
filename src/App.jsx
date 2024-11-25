@@ -66,7 +66,7 @@ function App() {
                         <Route path="/dashboard" element={<DashBoard />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/course-detail/:courseId" element={<DetailCourse />} />
-                        <Route path="/submission" element={<Submission />} />
+                        <Route path="/submission/:assignmentId" element={<Submission />} />
                         <Route path="/logout" element={<Logout />} />
                         <Route path="/add-course" element={<AddCourse />} />
                     </Routes>
