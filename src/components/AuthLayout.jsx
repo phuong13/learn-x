@@ -90,7 +90,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 setIsAuthenticated(true);
                 navigate('/profile');
             } else if (result.error === true) {
-                toast.error('Email already registered by another method!');
+                toast.error('Email đã dùng để đăng ký tài khoản khác!');
             }
         } catch (error) {
             console.error(error);
@@ -105,7 +105,7 @@ const AuthLayout = ({ type = 'login' }) => {
             const result = await AuthService.register(fullName, email, password);
             console.log(result);
             if (result === undefined) {
-                toast.error('Invalid email or password!');
+                toast.error('Có lỗi xảy ra, vui lòng thử lại sau!');
                 return;
             }
             if (result.status === 200) {
