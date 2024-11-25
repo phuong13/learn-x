@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 
 export default function SubmissionHeader() {
   return (
-    <div className="flex items-start gap-4 p-4 border-t">
+    <div className="flex items-start gap-4 mt-2 pt-2 border-t border-slate-400">
       {/* Icon */}
       <div className="text-pink-500 mt-1">
         <i className="fa-solid fa-file-arrow-up text-2xl"></i>
@@ -17,11 +17,13 @@ export default function SubmissionHeader() {
           <div className="flex gap-1">
             <span className="font-medium">Opened:</span>
             <span>Thứ Năm, 29 tháng 8 2024, 12:00 AM</span>
+          </div>
+          <div className="flex gap-1">
             <span className="font-medium">Due:</span>
-            <span>Thứ Tư, 4 tháng 9 2024, 11:00 PM</span>
+            <span>Thứ Sáu, 30 tháng 8 2024, 11:59 PM</span>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

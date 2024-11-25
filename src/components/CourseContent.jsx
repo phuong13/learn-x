@@ -4,38 +4,40 @@ import SubmissionHeader from '../components/SubmissionHeader';
 import CourseService from '@/services/courses/course.service.js';
 import Loader from './Loader';
 import { useParams } from 'react-router-dom';
+import Lecture from './LectureComponent';
+import Resource from './ResourceComponent';
 
 function CourseContent() {
   const [expandedSections, setExpandedSections] = useState(['chung']);
-    const { courseId } = useParams();
-    const [modules, setModules] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const convertToSlug = (text) => {
-        const slug = text
-            .toLowerCase()
-            .normalize('NFD') // Normalize to decompose accented characters
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9\s-]/g, '')
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-');
-        return slug;
+  const { courseId } = useParams();
+  const [modules, setModules] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const convertToSlug = (text) => {
+    const slug = text
+      .toLowerCase()
+      .normalize('NFD') // Normalize to decompose accented characters
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+    return slug;
+  };
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchModules = async () => {
+      try {
+        const response = await CourseService.getModulesByCourseId(courseId);
+        // Reponse return an array of modules Array(n) [ {…}, {…}, {…} ]
+        setModules(response);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    useEffect(() => {
-        setIsLoading(true);
-        const fetchModules = async () => {
-            try {
-                const response = await CourseService.getModulesByCourseId(courseId);
-                // Reponse return an array of modules Array(n) [ {…}, {…}, {…} ]
-                setModules(response);
-            } catch (err) {
-                console.log(err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchModules();
-    }, [courseId]);
+    fetchModules();
+  }, [courseId]);
   const toggleSection = (section) => {
     setExpandedSections(prev =>
       prev.includes(section)
@@ -46,7 +48,7 @@ function CourseContent() {
 
   return (
     <div className="container mx-auto mt-6 px-4">
-        <Loader isLoading={isLoading} />
+      <Loader isLoading={isLoading} />
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {modules.map((module, index) => (
           <div key={module.id} className="border-b last:border-b-0">
@@ -66,12 +68,18 @@ function CourseContent() {
               </div>
             </button>
             {expandedSections.includes(module) && (
-              <div className="px-4 py-3 bg-gray-50">
+              <div className="px-4 py-2 bg-gray-50">
                 {index === 0 ? (
-                  <SubmissionHeader /> // Component được hiển thị khi module 'Chung' mở
+                  <Lecture /> // Component được hiển thị khi module 'Chung' mở
                 ) : (
                   <p className="text-sm text-gray-600">
-                    {`${module.description}`}
+                    <div>
+                    {module.description && <span>{module.description}</span>}
+                    <SubmissionHeader /> 
+                    <Resource type="ppt" title="ppt" link="https://www.google.com" />
+                    <Resource type="word" title="word" link="https://www.google.com" />
+                    <Resource type="excel" title="exel" link="https://www.google.com" />
+                    </div>
                   </p>
                 )}
               </div>

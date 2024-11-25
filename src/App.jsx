@@ -59,7 +59,9 @@ function App() {
                         <Route path="reset-password" element={<ResetPassword />} />
                         <Route path="/identify" element={<IdentifyAccount />} />
 
+
                         <Route path="/" element={<HomePage />} />
+                        <Route path="/public" element={<HomePage />} />
                         <Route path="/my-course" element={<MyCourse />} />
                         <Route path="/dashboard" element={<DashBoard />} />
                         <Route path="/profile" element={<Profile />} />

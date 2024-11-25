@@ -35,7 +35,7 @@ export default function CoursePageLayout() {
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Nội dung Khóa học</h2>
-                        <CourseContent />
+                        <span><CourseContent /></span>
                     </div>
                 );
             case 1:
