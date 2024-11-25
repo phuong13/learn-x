@@ -1,21 +1,17 @@
 import { createContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Cookies from 'js-cookie';
+
 
 const AuthContext = createContext();
 
 export const AuthProvider = (props) => {
     const getAccessTokenFromCookie = () => {
-        const accessToken = Cookies.get('access_token');
-        console.log('Cookies: ', Cookies.get());
-        console.log('Document Cookies: ', document.cookie);
-        console.log('getAccessTokenFromCookie: ' + accessToken);
+        const accessToken = localStorage.getItem('access_token');
         return !!accessToken;
     };
 
     const getUserFromLocalStorage = () => {
         const user = localStorage.getItem('user');
-        console.log('getUserFromLocalStorage: ' + user);
         return user ? JSON.parse(user) : null;
     };
 
@@ -24,6 +20,8 @@ export const AuthProvider = (props) => {
 
     useEffect(() => {
         if (!authUser) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');
         }
     }, [authUser]);
