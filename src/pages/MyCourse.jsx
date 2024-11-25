@@ -31,7 +31,6 @@ const MyCourse = () => {
         const fetchCourses = async () => {
             try {
                 const res = await CourseService.getMyCourses(authUser.role, pageable);
-                console.log(res);
 
                 setCourses(res.content);
                 setPage(res.number);

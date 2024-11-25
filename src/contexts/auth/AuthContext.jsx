@@ -7,11 +7,15 @@ const AuthContext = createContext();
 export const AuthProvider = (props) => {
     const getAccessTokenFromCookie = () => {
         const accessToken = Cookies.get('access_token');
+        console.log('Cookies: ', Cookies.get());
+        console.log('Document Cookies: ', document.cookie);
+        console.log('getAccessTokenFromCookie: ' + accessToken);
         return !!accessToken;
     };
 
     const getUserFromLocalStorage = () => {
         const user = localStorage.getItem('user');
+        console.log('getUserFromLocalStorage: ' + user);
         return user ? JSON.parse(user) : null;
     };
 

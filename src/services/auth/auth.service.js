@@ -90,8 +90,10 @@ class AuthService {
                 // localStorage.setItem('access_token', res.data.data.accessToken);
                 // localStorage.setItem('refresh_token', res.data.refreshToken);
                 const { accessToken, refreshToken, ...user } = res.data.data;
-                Cookies.set('access_token', accessToken);
-                Cookies.set('refresh_token', refreshToken);
+                Cookies.remove('access_token');
+                Cookies.remove('refresh_token');
+                Cookies.set('access_token', accessToken, { expires: 1 / 24, path: '/' });
+                Cookies.set('refresh_token', refreshToken, { expires: 1 / 24, path: '/' });
                 localStorage.setItem('user', JSON.stringify(user));
 
                 return res.data;
@@ -120,7 +122,6 @@ class AuthService {
                 routePath,
                 { idToken: idToken },
                 {
-                    withCredentials: true,
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
@@ -132,8 +133,8 @@ class AuthService {
                 const { accessToken, refreshToken, ...user } = res.data.data;
                 Cookies.remove('access_token');
                 Cookies.remove('refresh_token');
-                Cookies.set('access_token', accessToken);
-                Cookies.set('refresh_token', refreshToken);
+                Cookies.set('access_token', accessToken, { expires: 1 / 24, path: '/' });
+                Cookies.set('refresh_token', refreshToken, { expires: 1 / 24, path: '/' });
                 localStorage.setItem('user', JSON.stringify(user));
                 return res.data;
             })

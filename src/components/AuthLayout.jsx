@@ -86,11 +86,12 @@ const AuthLayout = ({ type = 'login' }) => {
 
             if (result.code === 200) {
                 const { email, fullName, avatar, role } = result.data;
+
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
-                navigate('/profile');
+                navigate('/my-course');
             } else if (result.error === true) {
-                toast.error('Email đã dùng để đăng ký tài khoản khác!');
+                toast.error('Có lỗi xảy ra, vui lòng thử lại sau!');
             }
         } catch (error) {
             console.error(error);
