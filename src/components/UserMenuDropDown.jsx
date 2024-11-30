@@ -10,7 +10,7 @@ export default function UserMenuDropdown() {
 
     const navigate = useNavigate();
 
-    const { authUser, isAuthenticated } = useAuth(); // Lấy dữ liệu người dùng từ context
+    const { authUser, isAuthenticated } = useAuth();
 
     useEffect(() => {
         if (authUser) {

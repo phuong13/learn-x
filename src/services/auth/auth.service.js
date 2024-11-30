@@ -1,12 +1,11 @@
 import axios from '../../axios/axios';
-import Cookies from 'js-cookie';
 
 const BASE_AUTH_URL = '/auth';
 
 class AuthService {
     static register = async (fullName, email, password) => {
         const routePath = `${BASE_AUTH_URL}/register`;
-        const res = await axios
+        return await axios
             .post(
                 routePath,
                 { email, fullName, password },
@@ -23,7 +22,6 @@ class AuthService {
             .catch((err) => {
                 console.log(err);
             });
-        return res;
     };
 
     static verifyEmail = async (otp, email) => {
@@ -74,7 +72,7 @@ class AuthService {
 
     static login = async (email, password) => {
         const routePath = `${BASE_AUTH_URL}/authenticate`;
-        const data = await axios
+        return await axios
             .post(
                 routePath,
                 { email, password },
@@ -90,8 +88,8 @@ class AuthService {
                 // localStorage.setItem('access_token', res.data.data.accessToken);
                 // localStorage.setItem('refresh_token', res.data.refreshToken);
                 const { accessToken, refreshToken, ...user } = res.data.data;
-                Cookies.set('access_token', accessToken);
-                Cookies.set('refresh_token', refreshToken);
+                localStorage.setItem('access_token', accessToken);
+                localStorage.setItem('refresh_token', refreshToken);
                 localStorage.setItem('user', JSON.stringify(user));
 
                 return res.data;
@@ -99,15 +97,14 @@ class AuthService {
             .catch((err) => {
                 console.log(err);
             });
-        return data;
     };
 
     static logout = async () => {
         const routePath = `${BASE_AUTH_URL}/logout`;
         return await axios.post(routePath).then((res) => {
             console.log(res);
-            Cookies.remove('access_token');
-            Cookies.remove('refresh_token');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');
             return res.data;
         });
@@ -115,13 +112,11 @@ class AuthService {
 
     static async loginGoogle(idToken) {
         const routePath = `${BASE_AUTH_URL}/oauth2/google`;
-        console.log(idToken);
-        const data = await axios
+        return await axios
             .post(
                 routePath,
                 { idToken: idToken },
                 {
-                    withCredentials: true,
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
@@ -131,18 +126,17 @@ class AuthService {
             .then((res) => {
                 console.log(res);
                 const { accessToken, refreshToken, ...user } = res.data.data;
-                Cookies.remove('access_token');
-                Cookies.remove('refresh_token');
-                Cookies.set('access_token', accessToken);
-                Cookies.set('refresh_token', refreshToken);
+                localStorage.setItem('access_token', accessToken);
+                localStorage.setItem('refresh_token', refreshToken);
                 localStorage.setItem('user', JSON.stringify(user));
                 return res.data;
             })
             .catch((err) => {
-                console.log(err);
+                return {
+                    error: true,
+                    response: err.response,
+                }
             });
-
-        return data;
     }
 
     static async sendForgotPasswordEmail(email) {
@@ -170,7 +164,7 @@ class AuthService {
 
     static async resetPassword(token, password) {
         const routePath = `${BASE_AUTH_URL}/forgot-password/confirm`;
-        const data = await axios
+        return await axios
             .post(
                 routePath,
                 { token, password },
@@ -187,15 +181,8 @@ class AuthService {
             .catch((err) => {
                 console.log(err);
             });
-
-        return data;
     }
 
-    // static async logout() {
-    //     Cookies.remove('access_token');
-    //     Cookies.remove('refresh_token');
-    //     localStorage.clear();
-    // }
 }
 
 export default AuthService;

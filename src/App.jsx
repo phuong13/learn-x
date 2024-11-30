@@ -58,13 +58,15 @@ function App() {
                         <Route path="/register/verify" element={<ConfirmRegister />} />
                         <Route path="reset-password" element={<ResetPassword />} />
                         <Route path="/identify" element={<IdentifyAccount />} />
+
+
                         <Route path="/" element={<HomePage />} />
                         <Route path="/public" element={<HomePage />} />
                         <Route path="/my-course" element={<MyCourse />} />
                         <Route path="/dashboard" element={<DashBoard />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/course-detail/:courseId" element={<DetailCourse />} />
-                        <Route path="/submission" element={<Submission />} />
+                        <Route path="/submission/:assignmentId" element={<Submission />} />
                         <Route path="/logout" element={<Logout />} />
                         <Route path="/add-course" element={<AddCourse />} />
                     </Routes>

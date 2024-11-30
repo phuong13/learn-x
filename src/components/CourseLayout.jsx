@@ -1,10 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MoreVertical } from 'lucide-react';
 import CourseContent from './CourseContent';
+import StudentRegisteredLayout from './StudentRegisteredLayout.jsx';
+import { useParams } from 'react-router-dom';
+import { axiosPrivate} from '@/axios/axios.js';
+
 export default function CoursePageLayout() {
     const [selectedTab, setSelectedTab] = useState(0); // Quản lý trạng thái tab được chọn
-
+    const [course, setCourse] = useState(null);
     const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số', 'Năng lực'];
+
+
+
+    const { courseId } = useParams();
+
+    useEffect( () => {
+        const fetchData = async () => {
+            const response = await axiosPrivate.get(`courses/${courseId}`);
+            const data = response.status === 200 ? response.data : null;
+            if (data.success) {
+                setCourse(data.data);
+                console.log(course);
+            } else {
+                console.error('Failed to fetch course:', data.message);
+            }
+        }
+        fetchData();
+    }, [courseId]);
 
     // Nội dung cho mỗi tab
     const renderContentForTab = () => {
@@ -21,6 +43,7 @@ export default function CoursePageLayout() {
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Danh sách thành viên</h2>
                         <p>Đây là danh sách các thành viên trong khóa học.</p>
+                        <StudentRegisteredLayout />
                     </div>
                 );
             case 2:
@@ -47,14 +70,14 @@ export default function CoursePageLayout() {
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
-                    src="/src/assets/backround.jpg"
+                    src={course?.thumbnail}
                     alt="Online learning illustration"
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
                     <div>
                         <div className="bg-[#14919B] text-white px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                            Title Course
+                            {course?.name}
                         </div>
                     </div>
                     <button className="text-white">

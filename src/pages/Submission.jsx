@@ -3,25 +3,50 @@ import Footer from '@layout/Footer.jsx'
 import SideBar from '../layout/Sidebar'
 import Navbar from '@layout/NavBar.jsx'
 import SubmissionLayout from '../components/SubmissionLayout'
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { axiosPrivate } from '@/axios/axios.js';
 const Submission = () => {
-  return (
-    <div className="flex flex-col min-h-screen">
-            <div className="sticky top-0 z-50">
-                <Header />
-                <Navbar />
-            </div>
+      const { assignmentId } = useParams();
+      const [assignment, setAssignment] = useState(null);
+      // const [isLoading, setIsLoading] = useState(false);
 
-            {/* Nội dung chính */}
-            <div className="flex-grow pr-6 pl-6">
-                <SideBar>
-                    <SubmissionLayout/>
-                </SideBar>               
-            </div>
-            <div className="sticky">
-                <Footer />
-            </div>
-        </div>
-  );
+    useEffect( () => {
+        const fetchData = async () => {
+            const response = await axiosPrivate
+                .get(`/assignments/${assignmentId}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then((res) => {
+                    return res.data.data;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            setAssignment(response);
+        }
+        fetchData();
+    }, [assignmentId]);
+
+      return (
+            <div className="flex flex-col min-h-screen">
+                    <div className="sticky top-0 z-50">
+                        <Header />
+                        <Navbar />
+                    </div>
+
+                    {/* Nội dung chính */}
+                    <div className="flex-grow pr-6 pl-6">
+                        <SideBar>
+                            {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}
+                                                             startDate={assignment.startDate} endDate={assignment.endDate}/>}
+                        </SideBar>
+                    </div>
+                    <div className="sticky">
+                        <Footer />
+                    </div>
+                </div>
+      );
 };
 
 export default Submission;
