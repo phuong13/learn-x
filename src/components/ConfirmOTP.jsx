@@ -59,7 +59,8 @@ export default function ConfirmOTP() {
     }, [isResendDisabled]);
 
     const handleSubmitOTP = async (e) => {
-        if (e) e.preventDefault();
+        if (e) 
+            e.preventDefault();
         const otpValue = otp.join('');
         const email = emailFromQuery;
         setIsLoading(true);

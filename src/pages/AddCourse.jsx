@@ -3,7 +3,7 @@ import DocumentTitle from '../components/DocumentTitle';
 import Header from '../layout/Header';
 import Footer from '@layout/Footer.jsx';
 import Navbar from '@layout/NavBar.jsx';
-
+import InteractiveStepProgress from '@components/StepProgress.jsx';
 const AddCourse = () => {
     return (
         <div className="flex flex-col min-h-screen">
@@ -12,11 +12,9 @@ const AddCourse = () => {
                 <Header />
             </div>
             <Navbar />
-            <div>
+            <div className="flex-grow bg-white shadow-sm mx-4 my-4">
                 <h2 className="text-2xl font-bold text-gray-900 pl-6 pt-6">Thêm khóa học</h2>
-            </div>
-            <div className="flex-grow p-6 bg-white shadow-sm mx-4 my-4 round-">
-                <CreateCourseForm />
+                <InteractiveStepProgress/>
             </div>
             <Footer />
         </div>
