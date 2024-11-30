@@ -4,6 +4,7 @@ import CourseFilter from '../components/CourseFilter';
 import Navbar from '@layout/NavBar.jsx';
 import AssignmentControlPanel from '../components/AssignmentControlPanel';
 import DocumentTitle from '../components/DocumentTitle';
+import Calendar from '../components/CalendarAssignment';
 const DashBoard = () => {
     return (
         <div className="flex flex-col min-h-screen">
@@ -16,8 +17,11 @@ const DashBoard = () => {
             <div>
                 <h2 className="text-2xl font-bold text-gray-900 pl-6 pt-6">Bảng điều khiển</h2>
             </div>
-            <div className="flex-grow p-6 bg-white shadow-sm mx-4 my-4 round-">
+            <div className="flex-grow bg-white shadow-sm mx-4 my-4 round-">
                 <AssignmentControlPanel />
+            </div>
+            <div className="flex-grow bg-white shadow-sm mx-4 my-4 round-">
+                <Calendar />
             </div>
             <Footer />
         </div>
