@@ -1,4 +1,3 @@
-import CreateCourseForm from '../components/CreateCourseForm';
 import DocumentTitle from '../components/DocumentTitle';
 import Header from '../layout/Header';
 import Footer from '@layout/Footer.jsx';
@@ -7,7 +6,7 @@ import InteractiveStepProgress from '@components/StepProgress.jsx';
 const AddCourse = () => {
     return (
         <div className="flex flex-col min-h-screen">
-            <DocumentTitle title="Add Course" />
+            <DocumentTitle title="Thêm khóa học" />
             <div className="sticky top-0 z-50">
                 <Header />
             </div>

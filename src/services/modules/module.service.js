@@ -55,6 +55,8 @@ class ModuleService {
                 console.log(err);
             });
     }
+
+
 }
 
 export default ModuleService;

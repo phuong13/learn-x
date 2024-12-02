@@ -78,7 +78,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
           {/* Submission Instructions */}
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold mb-4 text-gray-800">Hướng dẫn nộp bài</h2>
-            <div className="p-4" dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="pb-4" dangerouslySetInnerHTML={{ __html: content }} />
             <button
               className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
               onClick={toggleFolderVisibility}

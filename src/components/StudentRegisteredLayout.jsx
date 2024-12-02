@@ -3,6 +3,10 @@ import StudentRegisteredList from '@components/StudentRegisteredList.jsx';
 import { axiosPrivate } from '../axios/axios.js';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@contexts/auth/useAuth.js';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { X } from 'lucide-react';
+import readXlsxFile from 'read-excel-file';
+import { toast, Toaster } from 'sonner';
 
 const StudentRegisteredLayout = () => {
     const [students, setStudents] = useState([]);
@@ -14,19 +18,22 @@ const StudentRegisteredLayout = () => {
         pageSize: 0,
     });
 
+    const [emailList, setEmailList] = useState([]);
+
     const { authUser } = useAuth();
 
     const [ showModal, setShowModal ] = useState(false);
+    const handleOpen = () => setShowModal(true)
+    const handleClose = () => setShowModal(false)
 
     const { courseId } = useParams();
 
     const fetchStudents = async (page) => {
         try {
-
-            const pageable ={
+            const pageable = {
                 page: page,
-                size: 10,
-            }
+                size: 5,
+            };
             const response = await axiosPrivate.get(`course-registrations/course/${courseId}?page=${pageable.page}&size=${pageable.size}`);
             const data = response.status === 200 ? response.data : null;
             if (data.success) {
@@ -54,8 +61,59 @@ const StudentRegisteredLayout = () => {
         fetchStudents(newPage);
     };
 
+    const handleReadFile = (e) => {
+        const file = e.target.files[0];
+        const emails = [];
+
+        readXlsxFile(file).then((rows) => {
+            const headers = rows[0];
+            const emailIndex = headers.indexOf('Email');
+            const mssvIndex = headers.indexOf('MSSV');
+
+            if (emailIndex !== -1 && mssvIndex !== -1) {
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i];
+                    if (columns[emailIndex]) {
+                        emails.push(columns[emailIndex].toString().trim());
+                    } else if (columns[mssvIndex]) {
+                        emails.push(`${columns[mssvIndex].toString().trim()}@student.hcmute.edu.vn`);
+                    }
+                }
+            }
+            setEmailList((prevEmailList) => [...prevEmailList, ...emails]);
+        }).catch((error) => {
+            console.error('Error reading file:', error);
+        });
+    };
+
+    const handleTextareaChange = (e) => {
+        const value = e.target.value;
+        setEmailList(value.split('\n'));
+    };
+
+    const handleSumbit = async () => {
+        const textArea = document.querySelector('textarea');
+        const value = textArea.value;
+        const emails = value.split('\n').map(email => email.trim()).filter(email => email);
+        setEmailList(emails);
+        const uniqueEmails = [...new Set(emailList)];
+        setEmailList(uniqueEmails);
+        console.log(uniqueEmails);
+        const response = await axiosPrivate.post(`/course-registrations/register/${courseId}/list-email`,
+            { emails: uniqueEmails });
+        console.log(response);
+        if (response.status === 200) {
+            await fetchStudents(0);
+            handleClose();
+            toast.info(response.data.message);
+        } else {
+            toast.error(response.data.message);
+        }
+    };
+
     return (
         <div className="container mx-auto px-4 py-8">
+            <Toaster richColors={true} position={'top-right'} />
             <StudentRegisteredList
                 students={students}
                 paginationInfo={paginationInfo}
@@ -65,31 +123,57 @@ const StudentRegisteredLayout = () => {
             {
                 authUser.role === 'TEACHER' && (
                     <button
-                        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                        onClick={() => setShowModal(true)}
+                        className="btn btn--primary mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+                        onClick={handleOpen}
                     >
                         Add Student
                     </button>
                 )
             }
-            {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-4 rounded">
-                        <h2 className="text-xl mb-4">Add Student</h2>
-                        {/* Add form fields here */}
-                        <button
-                            className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-                            onClick={() => setShowModal(false)}
-                        >
-                            Close
-                        </button>
-                    </div>
+            <Dialog
+                open={showModal}
+                onClose={handleClose}
+                maxWidth="sm"
+                fullWidth
+                hideBackdrop={false}
+            >
+                <div className="relative bg-white rounded-lg shadow-xl">
+                    <DialogTitle className="text-xl font-bold mb-4">
+                        Add Student
+                    </DialogTitle>
+                    <button
+                        onClick={handleClose}
+                        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                    >
+                        <X className="h-6 w-6" />
+                        <span className="sr-only">Close</span>
+                    </button>
+                    <DialogContent>
+                        <div className="mt-2 space-y-4">
+                            <input
+                                type="file"
+                                onChange={handleReadFile}
+                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <textarea
+                                placeholder="Student Details"
+                                className="w-full p-2 border border-gray-300 rounded resize-none h-32"
+                                value={emailList.join('\n')}
+                                onChange={handleTextareaChange}
+                            ></textarea>
+                            <button
+                                onClick={handleSumbit}
+                                className="btn btn--outline w-full bg- hover:bg-[#02a189] font-bold py-2 px-4 rounded"
+                            >
+                                Submit
+                            </button>
+                        </div>
+                    </DialogContent>
                 </div>
-            )}
+            </Dialog>
         </div>
-)
-    ;
+    );
 };
 
 export default StudentRegisteredLayout;
-

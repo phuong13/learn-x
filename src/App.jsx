@@ -59,16 +59,16 @@ function App() {
                         <Route path="reset-password" element={<ResetPassword />} />
                         <Route path="/identify" element={<IdentifyAccount />} />
 
+                        <Route path="/" element={<ProtectedRoute><HomePage/></ProtectedRoute>} />
+                        <Route path="/public" element={<ProtectedRoute><HomePage/></ProtectedRoute>} />
+                        <Route path="/my-course" element={<ProtectedRoute><MyCourse/></ProtectedRoute>} />
+                        <Route path="/dashboard" element={<ProtectedRoute><DashBoard/></ProtectedRoute>} />
+                        <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
+                        <Route path="/course-detail/:courseId" element={<ProtectedRoute><DetailCourse/></ProtectedRoute>} />
+                        <Route path="/submission/:assignmentId" element={<ProtectedRoute><Submission/></ProtectedRoute>} />
+                        <Route path="/add-course" element={<ProtectedRoute><AddCourse/></ProtectedRoute>} />
+                        <Route path="/logout" element={<ProtectedRoute><Logout/></ProtectedRoute>} />
 
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/public" element={<HomePage />} />
-                        <Route path="/my-course" element={<MyCourse />} />
-                        <Route path="/dashboard" element={<DashBoard />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/course-detail/:courseId" element={<DetailCourse />} />
-                        <Route path="/submission/:assignmentId" element={<Submission />} />
-                        <Route path="/logout" element={<Logout />} />
-                        <Route path="/add-course" element={<AddCourse />} />
                     </Routes>
                 </div>
             </Suspense>

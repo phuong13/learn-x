@@ -7,9 +7,11 @@ export default function Lecture({ name, content }) {
       <div className="flex-1">
         <div className="text-sm text-gray-600">
           <div className="flex gap-1">
-            <span className="font-medium">{name}</span>
-            <span>{content}</span>
+            <span className="text-lg">{name}</span>
           </div>
+            <div className="mt-2">
+              <div dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
         </div>
       </div>
     </div>

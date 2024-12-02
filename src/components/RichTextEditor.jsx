@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import PropTypes from 'prop-types';
 
-const RichTextEditor = () => {
-    const [editorContent, setEditorContent] = useState('');
+const RichTextEditor = ({ onContentChange, initialContent }) => {
+    const [editorContent, setEditorContent] = useState(initialContent);
+
+    useEffect(() => {
+        setEditorContent(initialContent);
+    }, [initialContent]);
 
     const modules = {
         toolbar: [
@@ -25,10 +30,7 @@ const RichTextEditor = () => {
 
     const handleChange = (content) => {
         setEditorContent(content);
-    };
-
-    const logContent = () => {
-        console.log(editorContent);
+        onContentChange(content);
     };
 
     return (
@@ -42,15 +44,14 @@ const RichTextEditor = () => {
                     onChange={handleChange}
                     className="bg-white mb-28 h-32"
                 />
-                <button
-                    onClick={logContent}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    Log Content
-                </button>
             </div>
         </div>
     );
 };
+
+RichTextEditor.propTypes = {
+    onContentChange: PropTypes.func.isRequired,
+    initialContent: PropTypes.string,
+}
 
 export default RichTextEditor;
