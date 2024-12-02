@@ -36,6 +36,7 @@ export default function Curriculum() {
     const response = await axiosPrivate.post(`/modules`, moduleData);
     let moduleId;
     if (response.status === 200) {
+      toast.info(response.data.message);
       moduleId = response.data.data.id;
       console.log(response);
       section.items.map(async item => {
@@ -49,7 +50,8 @@ export default function Curriculum() {
             console.log(lectureData);
             await axiosPrivate.post(`/lectures`, lectureData)
                 .then(r => {
-                  console.log(r.data.data.message);
+                  console.log(r.data.message);
+                  toast.info(r.data.message, { duration: 2000 });
                 })
                 .catch(e => {
                   console.error(e.response.data.message);
@@ -79,9 +81,10 @@ export default function Curriculum() {
             })
                 .then(r => {
                   console.log(r);
+                  toast.info(r.data.message, { duration: 2000 });
                 })
                 .catch(e => {
-                  console.error(e.response.data.message);
+                  console.error(e.response.message);
                   toast.error(e.response.data.message, { duration: 5000 });
                 });
             break;
@@ -102,6 +105,7 @@ export default function Curriculum() {
             })
                 .then(r => {
                   console.log(r);
+                  toast.info(r.data.message, { duration: 2000 });
                 })
                 .catch(e => {
                   console.error(e.response.data.message);

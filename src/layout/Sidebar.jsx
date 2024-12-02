@@ -6,7 +6,7 @@ CollapsibleSidebarMenu.propTypes = {
     children: PropTypes.node.isRequired,
 };
 
-export default function CollapsibleSidebarMenu({ children }) {
+export default function CollapsibleSidebarMenu({ children, modules }) {
     const [isOpen, setIsOpen] = useState(false);
     const [sections, setSections] = useState([
         { id: 'chung', title: 'Chung', isExpanded: false },

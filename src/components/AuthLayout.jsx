@@ -91,7 +91,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 setIsAuthenticated(true);
                 navigate('/my-course');
             } else if (result.error === true) {
-                toast.error('Có lỗi xảy ra, vui lòng thử lại sau!');
+                toast.error(result.response.data.message);
             }
         } catch (error) {
             console.error(error);
