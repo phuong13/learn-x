@@ -22,7 +22,7 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const DashBoard = lazy(() => import('./pages/DashBoard'));
 const Submission = lazy(() => import('./pages/Submission'));
 const AddCourse = lazy(() => import('./pages/AddCourse'));
-
+const EditCourseContent = lazy(() => import('./components/EditCourseContent'));
 // utils
 // eslint-disable-next-line no-unused-vars
 import ProtectedRoute from './utils/ProtectedRoute';
@@ -33,6 +33,7 @@ import { AuthProvider } from './contexts/auth/AuthContext';
 // services
 import Loader from './components/Loader';
 import AuthService from './services/auth/auth.service';
+// import EditCourseContent from '@components/EditCourseContent.jsx';
 
 function App() {
     // const { mode, setMode } = useColorScheme();
@@ -65,6 +66,7 @@ function App() {
                         <Route path="/dashboard" element={<ProtectedRoute><DashBoard/></ProtectedRoute>} />
                         <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
                         <Route path="/course-detail/:courseId" element={<ProtectedRoute><DetailCourse/></ProtectedRoute>} />
+                        <Route path="/course-detail/:courseId/edit" element={<ProtectedRoute><EditCourseContent/></ProtectedRoute>} />
                         <Route path="/submission/:assignmentId" element={<ProtectedRoute><Submission/></ProtectedRoute>} />
                         <Route path="/add-course" element={<ProtectedRoute><AddCourse/></ProtectedRoute>} />
                         <Route path="/logout" element={<ProtectedRoute><Logout/></ProtectedRoute>} />

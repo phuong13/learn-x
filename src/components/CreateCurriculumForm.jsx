@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
-import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, CalendarIcon } from 'lucide-react';
+import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { Toaster, toast } from 'sonner';
@@ -23,6 +23,13 @@ export default function Curriculum() {
   });
 
   const handlePostModule = async (sectionId) => {
+    setIsConfirmDialogOpen(true);
+    setConfirmingSectionId(sectionId);
+  };
+
+  const confirmAndPostModule = async () => {
+    setIsConfirmDialogOpen(false);
+    const sectionId = confirmingSectionId;
     const section = sections.find(section => section.id === sectionId);
 
     const courseInfo = localStorage.getItem('courseInfo');
@@ -39,12 +46,12 @@ export default function Curriculum() {
       toast.info(response.data.message);
       moduleId = response.data.data.id;
       console.log(response);
-      section.items.map(async item => {
+      await Promise.all(section.items.map(async item => {
         switch (item.type) {
           case 'lecture': {
             let lectureData = {
               moduleId,
-              name: item.title,
+              title: item.title,
               content: item.content
             };
             console.log(lectureData);
@@ -114,7 +121,9 @@ export default function Curriculum() {
             break;
           }
         }
-      });
+      }));
+      // Mark this section as saved
+      setSavedSections(prev => ({...prev, [sectionId]: true}));
     }
   };
 
@@ -125,6 +134,9 @@ export default function Curriculum() {
   const datePickerRef_starDay = useRef(null);
   const datePickerRef_endDay = useRef(null);
   const [itemContents, setItemContents] = useState({});
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [confirmingSectionId, setConfirmingSectionId] = useState(null);
+  const [savedSections, setSavedSections] = useState({});
 
   useEffect(() => {
     localStorage.setItem('sections', JSON.stringify(sections));
@@ -254,7 +266,7 @@ export default function Curriculum() {
             </h1>
             <button
                 onClick={addSection}
-                className="bg-[#02a189] text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+                className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
             >
               New Section
             </button>
@@ -267,7 +279,7 @@ export default function Curriculum() {
                       <div className="flex items-center space-x-2">
                         <input
                             type="text"
-                            value={tempTitle}
+                            value={tempTitle || ''}
                             onChange={(e) => setTempTitle(e.target.value)}
                             className="border border-gray-300 p-1 rounded"
                         />
@@ -287,20 +299,22 @@ export default function Curriculum() {
                       </h2>
                   )}
 
-                  <div>
-                    <button
-                        onClick={() => startEditingSection(section.id, section.title)}
-                        className="p-1 bg-cyan-400 text-green-500 hover:text-green-700 rounded-full mr-2"
-                    >
-                      <Edit2 size={18} />
-                    </button>
-                    <button
-                        onClick={() => deleteSection(section.id)}
-                        className="p-1 bg-rose-400 text-green-500 hover:text-green-700 rounded-full mr-2"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
+                    {!savedSections[section.id] && (
+                        <div>
+                          <button
+                              onClick={() => startEditingSection(section.id, section.title)}
+                              className="p-1 bg-cyan-400 text-green-500 hover:text-green-700 rounded-full mr-2"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button
+                              onClick={() => deleteSection(section.id)}
+                              className="p-1 bg-rose-400 text-green-500 hover:text-green-700 rounded-full mr-2"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                    )}
                 </div>
 
                 {section.items.map(item => (
@@ -332,12 +346,14 @@ export default function Curriculum() {
                                     className="hidden"
                                     id={`upload-${item.id}`}
                                 />
-                                <button
-                                    onClick={() => document.getElementById(`upload-${item.id}`).click()}
-                                    className="text-blue-500 hover:text-blue-700 hidden group-hover:flex items-center"
-                                >
-                                  <Plus size={20} className="absolute right-8 " />
-                                </button>
+                                {!savedSections[section.id] && (
+                                    <button
+                                        onClick={() => document.getElementById(`upload-${item.id}`).click()}
+                                        className="text-blue-500 hover:text-blue-700 hidden group-hover:flex items-center"
+                                    >
+                                      <Plus size={20} className="absolute right-8 " />
+                                    </button>
+                                )}
                               </div>
                           ) : (
                               editingItemId === item.id ? (
@@ -352,31 +368,33 @@ export default function Curriculum() {
                               )
                           )}
                         </div>
+                        {!savedSections[section.id] && (
 
-                        <div className="hidden group-hover:flex space-x-2">
-                          {item.type !== 'resource' && (
-                              <button
-                                  onClick={() => startEditingItem(item.id, item.title)}
-                                  className="text-gray-500 hover:text-gray-700"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                          )}
-                          <button
-                              onClick={() => deleteItem(section.id, item.id)}
-                              className="text-gray-500 hover:text-gray-700"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          <div className="hidden group-hover:flex space-x-2">
+                            {item.type !== 'resource' && (
+                                <button
+                                    onClick={() => startEditingItem(item.id, item.title)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                  <Edit2 size={16} />
+                                </button>
+                            )}
+                            <button
+                                onClick={() => deleteItem(section.id, item.id)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                              <Trash2 size={16} />
+                            </button>
 
-                          {editingItemId === item.id && (
-                              <button onClick={() => saveItem(section.id)}
-                                      className="text-green-500 hover:text-green-700">
-                                <Check size={18} />
-                              </button>
-                          )}
+                            {editingItemId === item.id && (
+                                <button onClick={() => saveItem(section.id)}
+                                        className="text-green-500 hover:text-green-700">
+                                  <Check size={18} />
+                                </button>
+                            )}
 
-                        </div>
+                          </div>
+                        )}
                       </div>
 
                       {item.type === 'lecture' && editingItemId === item.id && (
@@ -405,7 +423,7 @@ export default function Curriculum() {
                                     onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                  <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                  <Calendar className="h-5 w-5 text-gray-400" />
                                 </div>
                               </div>
                             </div>
@@ -422,7 +440,7 @@ export default function Curriculum() {
                                     onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                  <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                  <Calendar className="h-5 w-5 text-gray-400" />
                                 </div>
                               </div>
                             </div>
@@ -444,47 +462,56 @@ export default function Curriculum() {
                 ))}
 
 
-                <div className="bg-[#02a189] p-4 rounded-lg flex justify-around mt-4">
-                  <button
-                      onClick={() => addItem(section.id, 'lecture')}
-                      className="text-white flex items-center justify-between"
-                  >
-                    Lecture <Plus size={18} className="ml-1" />
-                  </button>
-                  <button
-                      onClick={() => addItem(section.id, 'quiz')}
-                      className="text-white flex items-center justify-between"
-                  >
-                    Quiz <Plus size={18} className="ml-1" />
-                  </button>
-                  <button
-                      onClick={() => addItem(section.id, 'assignment')}
-                      className="text-white flex items-center justify-between"
-                  >
-                    Assignment <Plus size={18} className="ml-1" />
-                  </button>
-                  <button
-                      onClick={() => addItem(section.id, 'resource')}
-                      className="text-white flex items-center justify-between"
-                  >
-                    Resource <Plus size={18} className="ml-1" />
-                  </button>
-                  <button
-                      onClick={() => handlePostModule(section.id)}
-                      className="p-2 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg">
-                    <Check size={24} />
-                  </button>
-                </div>
+                {!savedSections[section.id] && (
+                    <div className="bg-[#02a189] p-4 rounded-lg flex justify-around mt-4">
+                      <button
+                          onClick={() => addItem(section.id, 'lecture')}
+                          className="text-white flex items-center justify-between"
+                      >
+                        Lecture <Plus size={18} className="ml-1" />
+                      </button>
+                      <button
+                          onClick={() => addItem(section.id, 'quiz')}
+                          className="text-white flex items-center justify-between"
+                      >
+                        Quiz <Plus size={18} className="ml-1" />
+                      </button>
+                      <button
+                          onClick={() => addItem(section.id, 'assignment')}
+                          className="text-white flex items-center justify-between"
+                      >
+                        Assignment <Plus size={18} className="ml-1" />
+                      </button>
+                      <button
+                          onClick={() => addItem(section.id, 'resource')}
+                          className="text-white flex items-center justify-between"
+                      >
+                        Resource <Plus size={18} className="ml-1" />
+                      </button>
+                      <button
+                          onClick={() => handlePostModule(section.id)}
+                          className="p-2 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg"
+                      >
+                        <Check size={24} />
+                      </button>
+                    </div>
+                )}
               </div>
           ))}
-
-          {/*<button*/}
-          {/*    onClick={getAllItemsData}*/}
-          {/*    className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-700 transition-colors"*/}
-          {/*>*/}
-          {/*  Get All Items Data*/}
-          {/*</button>*/}
         </div>
+        {isConfirmDialogOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white p-6 rounded-lg">
+                <h2 className="text-xl font-bold mb-4">Xác nhận lưu chương</h2>
+                <p className="mb-4">Bạn có muốn lưu chương này? (Nội dung chương có thể thay đổi sau hành động này)</p>
+                <div className="flex justify-end space-x-2">
+                  <button className="btn btn--secondary text-btn hover:bg-emerald-400" onClick={() => setIsConfirmDialogOpen(false)}>Không</button>
+                  <button className="btn btn--primary hover:bg-emerald-400" onClick={confirmAndPostModule}>Có</button>
+                </div>
+              </div>
+            </div>
+        )}
       </>
   );
 }
+

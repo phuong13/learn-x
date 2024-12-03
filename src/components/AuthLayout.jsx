@@ -26,7 +26,7 @@ import { Button } from '@mui/material';
 import { GoogleLogin, GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 import PropTypes from 'prop-types';
-import { useAuth } from '../contexts/auth/useAuth';
+import { useAuth } from '@hooks/useAuth.js';
 import Loader from './Loader';
 
 const AuthLayout = ({ type = 'login' }) => {

@@ -1,11 +1,11 @@
 import { ChevronDown, Search } from 'lucide-react';
-import { useAuth } from '../contexts/auth/useAuth';
+import { useAuth } from '@hooks/useAuth.js';
 
 export default function Component() {
     const { authUser } = useAuth();
 
     const handleAddCourse = () => {
-        
+
     };
 
     return (

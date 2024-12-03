@@ -5,7 +5,7 @@ import CourseCard from '../components/CourseCard';
 import CourseFilter from '../components/CourseFilter';
 import Navbar from '@layout/NavBar.jsx';
 import CourseService from '../services/courses/course.service';
-import { useAuth } from '../contexts/auth/useAuth';
+import { useAuth } from '@hooks/useAuth.js';
 import DocumentTitle from '@components/DocumentTitle';
 import Loader from '../components/Loader';
 import { Pagination } from '@mui/material';

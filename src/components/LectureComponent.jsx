@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 export default function Lecture({ name, content }) {
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex items-start gap-4 select-text">
       {/* Content */}
       <div className="flex-1">
         <div className="text-sm text-gray-600">

@@ -1,4 +1,4 @@
-import { useAuth } from '../contexts/auth/useAuth';
+import { useAuth } from '@hooks/useAuth.js';
 import Cookies from 'js-cookie';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useEffect, useState } from 'react';
@@ -48,7 +48,7 @@ const Home = () => {
                 Go to Profile
             </button>
         </div>
-        
+
     );
 };
 

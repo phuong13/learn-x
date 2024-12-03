@@ -37,10 +37,12 @@ const Submission = () => {
 
                     {/* Nội dung chính */}
                     <div className="flex-grow pr-6 pl-6">
-                        <SideBar>
-                            {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}
-                                                             startDate={assignment.startDate} endDate={assignment.endDate}/>}
-                        </SideBar>
+                        {/*<SideBar>*/}
+                        {/*    {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}*/}
+                        {/*                                     startDate={assignment.startDate} endDate={assignment.endDate}/>}*/}
+                        {/*</SideBar>*/}
+                        {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}
+                                                         startDate={assignment.startDate} endDate={assignment.endDate}/>}
                     </div>
                     <div className="sticky">
                         <Footer />

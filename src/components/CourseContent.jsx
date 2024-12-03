@@ -8,6 +8,7 @@ import Lecture from './LectureComponent';
 import Resource from './ResourceComponent';
 import ModuleService from '@/services/modules/module.service.js';
 import CourseSidebar from './CourseSidebar.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const CourseContent = () => {
   const [expandedSections, setExpandedSections] = useState([]);
@@ -16,6 +17,7 @@ const CourseContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [moduleData, setModuleData] = useState({});
   const moduleRefs = useRef({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsLoading(true);
@@ -24,7 +26,7 @@ const CourseContent = () => {
         const response = await CourseService.getModulesByCourseId(courseId);
         setModules(response);
         if (response.length > 0) {
-          setExpandedSections([response[0].id]);
+          setExpandedSections([modules[0].id]);
         }
       } catch (err) {
         console.log(err);
@@ -84,7 +86,19 @@ const CourseContent = () => {
   }
 
   const scrollToModule = (moduleId) => {
-    moduleRefs.current[moduleId]?.scrollIntoView({ behavior: 'smooth' });
+    const element = moduleRefs.current[moduleId];
+    if (element) {
+      const offset = -120;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition + offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const expandAll = () => {
@@ -106,6 +120,12 @@ const CourseContent = () => {
             collapseAll={collapseAll}
         />
         <div className="flex-1 p-6">
+          <button
+              onClick={() => navigate(`/course-detail/${courseId}/edit`)}
+              className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Chỉnh sửa
+          </button>
           <Loader isLoading={isLoading} />
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             {modules.map((module, index) => (
@@ -118,7 +138,7 @@ const CourseContent = () => {
                       onClick={() => toggleSection(module)}
                       className="w-full px-4 py-3 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
                   >
-                <span className="font-medium text-gray-700">
+                <span className="text-xl bold font-extrabold text-gray-700">
                   {`${module.name}`}
                 </span>
                     <div className="flex items-center">
@@ -135,7 +155,7 @@ const CourseContent = () => {
                         {moduleData[module.id] && (
                             <>
                               {moduleData[module.id].lectures.map((lecture) => (
-                                  <Lecture key={lecture.id} name={lecture.name} content={lecture.content} />
+                                  <Lecture key={lecture.id} name={lecture.title} content={lecture.content} />
                               ))}
                               {moduleData[module.id].resources.map((resource) => {
                                 const resourceType = resource.urlDocument.endsWith('.pdf') ? 'word' :

@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { FaUser, FaEnvelope, FaBriefcase, FaEdit, FaLock, FaKey } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { useAuth } from '../contexts/auth/useAuth';
+import { useAuth } from '@hooks/useAuth.js';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { Toaster, toast } from 'sonner';

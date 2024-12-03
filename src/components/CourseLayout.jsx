@@ -18,12 +18,9 @@ export default function CoursePageLayout() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await axiosPrivate.get(`courses/${courseId}`);
-            const data = response.status === 200 ? response.data : null;
-            if (data.success) {
-                setCourse(data.data);
+            if (response.status === 200) {
+                setCourse(response.data.data);
                 console.log(course);
-            } else {
-                console.error('Failed to fetch course:', data.message);
             }
         };
         fetchData();

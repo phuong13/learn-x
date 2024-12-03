@@ -1,11 +1,17 @@
-import { useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-
+import { useState, useEffect } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon, CheckIcon, XIcon, TrashIcon } from 'lucide-react';
 import PropTypes from 'prop-types';
-import { Button } from '@mui/material';
+import { useAuth } from '@hooks/useAuth.js';
 
-const StudentRegisteredList = ({ students, paginationInfo, onPageChange }) => {
+const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDeleteStudents }) => {
     const [currentPage, setCurrentPage] = useState(paginationInfo.pageNumber);
+    const [selectedStudents, setSelectedStudents] = useState([]);
+    const { authUser } = useAuth();
+    const isTeacher = authUser?.role === 'TEACHER';
+
+    useEffect(() => {
+        setSelectedStudents([]);
+    }, [students]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 0 && newPage < paginationInfo.totalPages) {
@@ -14,45 +20,88 @@ const StudentRegisteredList = ({ students, paginationInfo, onPageChange }) => {
         }
     };
 
+    const toggleStudentSelection = (studentEmail) => {
+        setSelectedStudents(prev =>
+            prev.includes(studentEmail)
+                ? prev.filter(id => id !== studentEmail)
+                : [...prev, studentEmail]
+        );
+    };
+
+    const handleDeleteSelected = () => {
+        onDeleteStudents(selectedStudents);
+        setSelectedStudents([]);
+    };
+
+    const handleDeleteStudent = (studentEmail) => {
+        onDeleteStudents([studentEmail]);
+    };
+
     return (
         <div className="w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            {isTeacher && (
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                    <button
+                        onClick={handleDeleteSelected}
+                        disabled={selectedStudents.length === 0}
+                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <TrashIcon className="inline-block w-4 h-4 mr-2" />
+                        Xóa đã chọn
+                    </button>
+                </div>
+            )}
             <ul className="divide-y divide-gray-200">
                 {students.map((student) => (
-                    <li key={student.id} className="px-6 py-4 hover:bg-gray-50">
-                        <div className="flex items-center space-x-4">
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">{student.fullName}</p>
-                                <p className="text-sm text-gray-500 truncate">{student.email}</p>
+                    <li key={student.id} className="px-6 py-4 hover:bg-gray-50 flex items-center">
+                        {isTeacher && (
+                            <div className="flex items-center mr-4">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedStudents.includes(student.email)}
+                                    onChange={() => toggleStudentSelection(student.email)}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
                             </div>
-                            <div className="inline-flex items-center text-xs font-semibold text-gray-500 bg-gray-100 rounded-full px-2 py-1">
-                                {student.role}
-                            </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{student.fullName}</p>
+                            <p className="text-sm text-gray-500 truncate">{student.email}</p>
                         </div>
+                        <div className="inline-flex items-center text-xs font-semibold text-gray-500 bg-gray-100 rounded-full px-2 py-1 mr-2">
+                            {student.role}
+                        </div>
+                        {isTeacher && (
+                            <button
+                                onClick={() => handleDeleteStudent(student.email)}
+                                className="p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                            >
+                                <XIcon className="w-4 h-4" />
+                            </button>
+                        )}
                     </li>
                 ))}
             </ul>
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                <Button
+                <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 0}
-                    variant="outline"
-                    size="sm"
+                    className="px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <ChevronLeftIcon className="h-4 w-4 mr-2" />
+                    <ChevronLeftIcon className="h-4 w-4 mr-2 inline-block" />
                     Previous
-                </Button>
+                </button>
                 <span className="text-sm text-gray-700">
-          Page {currentPage + 1} of {paginationInfo.totalPages}
-        </span>
-                <Button
+                    Page {currentPage + 1} of {paginationInfo.totalPages}
+                </span>
+                <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === paginationInfo.totalPages - 1}
-                    variant="outline"
-                    size="sm"
+                    className="px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Next
-                    <ChevronRightIcon className="h-4 w-4 ml-2" />
-                </Button>
+                    <ChevronRightIcon className="h-4 w-4 ml-2 inline-block" />
+                </button>
             </div>
         </div>
     );
@@ -70,6 +119,7 @@ StudentRegisteredList.propTypes = {
         totalPages: PropTypes.number.isRequired,
     }).isRequired,
     onPageChange: PropTypes.func.isRequired,
+    onDeleteStudents: PropTypes.func.isRequired,
 };
 
 export default StudentRegisteredList;
