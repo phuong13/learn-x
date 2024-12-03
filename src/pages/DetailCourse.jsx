@@ -14,9 +14,7 @@ const DetailCourse = () => {
 
             {/* Nội dung chính */}
             <div className="flex-grow pr-6 pl-6">
-                <SideBar>
                     <CourseLayout/>
-                </SideBar>
             </div>
             <Footer />
         </div>

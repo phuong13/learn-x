@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import SubmissionHeader from '../components/SubmissionHeader';
 import CourseService from '@/services/courses/course.service.js';
@@ -7,13 +7,17 @@ import { useParams } from 'react-router-dom';
 import Lecture from './LectureComponent';
 import Resource from './ResourceComponent';
 import ModuleService from '@/services/modules/module.service.js';
+import CourseSidebar from './CourseSidebar.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const CourseContent = () => {
-  const [expandedSections, setExpandedSections] = useState(['chung']);
+  const [expandedSections, setExpandedSections] = useState([]);
   const { courseId } = useParams();
   const [modules, setModules] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [moduleData, setModuleData] = useState({});
+  const moduleRefs = useRef({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsLoading(true);
@@ -21,6 +25,9 @@ const CourseContent = () => {
       try {
         const response = await CourseService.getModulesByCourseId(courseId);
         setModules(response);
+        if (response.length > 0) {
+          setExpandedSections([modules[0].id]);
+        }
       } catch (err) {
         console.log(err);
       } finally {
@@ -78,85 +85,100 @@ const CourseContent = () => {
     }
   }
 
+  const scrollToModule = (moduleId) => {
+    const element = moduleRefs.current[moduleId];
+    if (element) {
+      const offset = -120;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition + offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const expandAll = () => {
+    setExpandedSections(modules.map(module => module.id));
+  };
+
+  const collapseAll = () => {
+    setExpandedSections([]);
+  };
+
   return (
-      <div className="container mx-auto mt-6 px-4">
-        <Loader isLoading={isLoading} />
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {modules.map((module, index) => (
-              <div key={module.id} className="border-b last:border-b-0">
-                <button
-                    onClick={() => toggleSection(module)}
-                    className="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 focus:outline-none"
+      <div className="flex">
+        <CourseSidebar
+            modules={modules}
+            expandedSections={expandedSections}
+            toggleSection={toggleSection}
+            scrollToModule={scrollToModule}
+            expandAll={expandAll}
+            collapseAll={collapseAll}
+        />
+        <div className="flex-1 p-6">
+          <button
+              onClick={() => navigate(`/course-detail/${courseId}/edit`)}
+              className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Chỉnh sửa
+          </button>
+          <Loader isLoading={isLoading} />
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            {modules.map((module, index) => (
+                <div
+                    key={module.id}
+                    className={`border-b last:border-b-0 ${index % 2 === 0 ? 'bg-blue-50' : 'bg-green-50'}`}
+                    ref={el => moduleRefs.current[module.id] = el}
                 >
-              <span className="font-medium text-gray-700">
-                {index === 0 ? 'Chung' : `${module.name}`}
-              </span>
-                  <div className="flex items-center">
-                    {expandedSections.includes(module.id) ? (
-                        <ChevronDown className="h-5 w-5 text-gray-400" />
-                    ) : (
-                        <ChevronRight className="h-5 w-5 text-gray-400" />
-                    )}
-                  </div>
-                </button>
-                {expandedSections.includes(module.id) && (
-                    <div className="px-4 py-2 bg-gray-50">
-                      {index === 0 ? (
-                          <div>
-                            {module.description && <span>{module.description}</span>}
-                            {moduleData[module.id] && (
-                                <>
-                                  {moduleData[module.id].lectures.map((lecture) => (
-                                      <Lecture key={lecture.id} name={lecture.name} content={lecture.content} />
-                                  ))}
-                                  {moduleData[module.id].resources.map((resource) => {
-                                    const resourceType = resource.urlDocument.endsWith('.pdf') ? 'word' :
-                                        resource.urlDocument.endsWith('.ppt') ? 'ppt' :
-                                            resource.urlDocument.endsWith('.xlsx') ? 'excel' : 'word';
-                                    return (
-                                        <Resource key={resource.id} type={resourceType} title={resource.title}
-                                                  link={resource.urlDocument} />
-                                    );
-                                  })}
-                                  {moduleData[module.id].assignments.map((assignment) => (
-                                      <SubmissionHeader key={assignment.id} id={assignment.id} title={assignment.title}
-                                                        startDate={assignment.startDate} endDate={assignment.endDate} />
-                                  ))}
-                                </>
-                            )}
-                          </div>// Component displayed when module 'Chung' is expanded
+                  <button
+                      onClick={() => toggleSection(module)}
+                      className="w-full px-4 py-3 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
+                  >
+                <span className="text-xl bold font-extrabold text-gray-700">
+                  {`${module.name}`}
+                </span>
+                    <div className="flex items-center">
+                      {expandedSections.includes(module.id) ? (
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
                       ) : (
-                          <div>
-                            {module.description && <span>{module.description}</span>}
-                            {moduleData[module.id] && (
-                                <>
-                                  {moduleData[module.id].lectures.map((lecture) => (
-                                      <Lecture key={lecture.id} name={lecture.name} content={lecture.content} />
-                                  ))}
-                                  {moduleData[module.id].resources.map((resource) => {
-                                    const resourceType = resource.urlDocument.endsWith('.pdf') ? 'word' :
-                                        resource.urlDocument.endsWith('.ppt') ? 'ppt' :
-                                            resource.urlDocument.endsWith('.xlsx') ? 'excel' : 'word';
-                                    return (
-                                        <Resource key={resource.id} type={resourceType} title={resource.title}
-                                                  link={resource.urlDocument} />
-                                    );
-                                  })}
-                                  {moduleData[module.id].assignments.map((assignment) => (
-                                      <SubmissionHeader key={assignment.id} id={assignment.id} title={assignment.title}
-                                                        startDate={assignment.startDate} endDate={assignment.endDate} />
-                                  ))}
-                                </>
-                            )}
-                          </div>
+                          <ChevronRight className="h-5 w-5 text-gray-400" />
                       )}
                     </div>
-                )}
-              </div>
-          ))}
+                  </button>
+                  {expandedSections.includes(module.id) && (
+                      <div className="px-4 py-2">
+                        {module.description && <span>{module.description}</span>}
+                        {moduleData[module.id] && (
+                            <>
+                              {moduleData[module.id].lectures.map((lecture) => (
+                                  <Lecture key={lecture.id} name={lecture.title} content={lecture.content} />
+                              ))}
+                              {moduleData[module.id].resources.map((resource) => {
+                                const resourceType = resource.urlDocument.endsWith('.pdf') ? 'word' :
+                                    resource.urlDocument.endsWith('.ppt') ? 'ppt' :
+                                        resource.urlDocument.endsWith('.xlsx') ? 'excel' : 'word';
+                                return (
+                                    <Resource key={resource.id} type={resourceType} title={resource.title} link={resource.urlDocument} />
+                                );
+                              })}
+                              {moduleData[module.id].assignments.map((assignment) => (
+                                  <SubmissionHeader key={assignment.id} id={assignment.id} title={assignment.title} startDate={assignment.startDate} endDate={assignment.endDate} />
+                              ))}
+                            </>
+                        )}
+                      </div>
+                  )}
+                </div>
+            ))}
+          </div>
         </div>
       </div>
   );
 }
 
 export default CourseContent;
+

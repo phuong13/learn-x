@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
-import { useAuth } from '../contexts/auth/useAuth';
+import { useAuth } from '@hooks/useAuth.js';
 
 export const ChangePasswordModal = ({ visible, onClose, getResponse }) => {
     const axiosPrivate = useAxiosPrivate();

@@ -40,7 +40,7 @@ export default function InteractiveStepProgress() {
         const { id } = JSON.parse(localStorage.getItem('courseInfo'));
         localStorage.removeItem('courseInfo');
         localStorage.removeItem('sections');
-        window.location.href = `/courses/${id}`;
+        window.location.href = `/course-detail/${id}`;
     }
 
     return (

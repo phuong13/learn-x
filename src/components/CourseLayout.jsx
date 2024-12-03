@@ -3,46 +3,61 @@ import { MoreVertical } from 'lucide-react';
 import CourseContent from './CourseContent';
 import StudentRegisteredLayout from './StudentRegisteredLayout.jsx';
 import { useParams } from 'react-router-dom';
-import { axiosPrivate} from '@/axios/axios.js';
+import { axiosPrivate } from '@/axios/axios.js';
+import Sidebar from '../layout/Sidebar.jsx';
 
 export default function CoursePageLayout() {
-    const [selectedTab, setSelectedTab] = useState(0); // Quản lý trạng thái tab được chọn
+    const [selectedTab, setSelectedTab] = useState(0);
     const [course, setCourse] = useState(null);
+    const [modules, setModules] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số', 'Năng lực'];
-
-
 
     const { courseId } = useParams();
 
-    useEffect( () => {
+    useEffect(() => {
         const fetchData = async () => {
             const response = await axiosPrivate.get(`courses/${courseId}`);
-            const data = response.status === 200 ? response.data : null;
-            if (data.success) {
-                setCourse(data.data);
+            if (response.status === 200) {
+                setCourse(response.data.data);
                 console.log(course);
-            } else {
-                console.error('Failed to fetch course:', data.message);
             }
-        }
+        };
         fetchData();
     }, [courseId]);
 
-    // Nội dung cho mỗi tab
+    useEffect(() => {
+        const fetchModules = async () => {
+            setIsLoading(true);
+            try {
+                const response = await axiosPrivate.get(`courses/${courseId}/modules`);
+                setModules(response.data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchModules();
+    }, [courseId]);
+
+    const handleModuleClick = (module) => {
+        document.getElementById(module.id).scrollIntoView({ behavior: 'smooth' });
+    };
+
     const renderContentForTab = () => {
         switch (selectedTab) {
             case 0:
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Nội dung Khóa học</h2>
-                        <span><CourseContent /></span>
+                        <CourseContent modules={modules} />
                     </div>
                 );
             case 1:
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Danh sách thành viên</h2>
-                        <p>Đây là danh sách các thành viên trong khóa học.</p>
                         <StudentRegisteredLayout />
                     </div>
                 );
@@ -50,14 +65,12 @@ export default function CoursePageLayout() {
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Điểm số</h2>
-                        <p>Điểm số của các thành viên trong khóa học sẽ được hiển thị ở đây.</p>
                     </div>
                 );
             case 3:
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Năng lực</h2>
-                        <p>Đánh giá năng lực của các thành viên trong khóa học.</p>
                     </div>
                 );
             default:
@@ -67,7 +80,6 @@ export default function CoursePageLayout() {
 
     return (
         <div className="bg-gray-100 min-h-screen">
-            {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
                     src={course?.thumbnail}
@@ -86,13 +98,12 @@ export default function CoursePageLayout() {
                 </div>
             </div>
 
-            {/* Navigation */}
             <nav className="bg-white border-b">
                 <ul className="flex">
                     {tabs.map((item, index) => (
                         <li key={index}>
                             <button
-                                onClick={() => setSelectedTab(index)} // Cập nhật trạng thái tab khi nhấn
+                                onClick={() => setSelectedTab(index)}
                                 className={`block px-4 py-2 text-sm ${
                                     selectedTab === index ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'
                                 }`}>
@@ -103,9 +114,8 @@ export default function CoursePageLayout() {
                 </ul>
             </nav>
 
-            {/* Course Content - Nội dung thay đổi theo tab */}
             <div className="container mx-auto mt-6 px-4 bg-white rounded-lg shadow-lg overflow-hidden">
-                {renderContentForTab()} {/* Hiển thị nội dung tương ứng với tab */}
+                {renderContentForTab()}
             </div>
         </div>
     );

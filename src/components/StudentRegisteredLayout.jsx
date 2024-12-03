@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import StudentRegisteredList from '@components/StudentRegisteredList.jsx';
 import { axiosPrivate } from '../axios/axios.js';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '@contexts/auth/useAuth.js';
+import { useAuth } from '@hooks/useAuth.js';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { X } from 'lucide-react';
 import readXlsxFile from 'read-excel-file';
@@ -111,6 +111,20 @@ const StudentRegisteredLayout = () => {
         }
     };
 
+    const handleDeleteStudent = async (students) => {
+        console.log(students);
+        const response = await axiosPrivate.post(`/course-registrations/remove/${courseId}/list-email`,
+           { emails: students }
+        );
+        console.log(response);
+        if (response.status === 200) {
+            await fetchStudents(0);
+            toast.info(response.data.message);
+        } else {
+            toast.error(response.data.message);
+        }
+    }
+
     return (
         <div className="container mx-auto px-4 py-8">
             <Toaster richColors={true} position={'top-right'} />
@@ -118,6 +132,7 @@ const StudentRegisteredLayout = () => {
                 students={students}
                 paginationInfo={paginationInfo}
                 onPageChange={handlePageChange}
+                onDeleteStudents={handleDeleteStudent}
             />
 
             {

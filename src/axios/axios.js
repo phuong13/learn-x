@@ -29,14 +29,15 @@ axiosPrivate.interceptors.request.use(
                 const response = await axios.post(`${baseURL}/auth/refresh`, {
                     token: refreshToken
                 })
+                console.log(response);
                 if (response.status !== 200) {
                     console.log('Failed to refresh token');
                     return Promise.reject('Failed to refresh token');
                 }
-                const { newAccessToken, newRefreshToken } = response.data.data;
-                localStorage.setItem('access_token', newAccessToken);
+                const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+                localStorage.setItem('access_token', accessToken);
                 localStorage.setItem('refresh_token', newRefreshToken);
-                config.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                config.headers['Authorization'] = `Bearer ${accessToken}`;
             }
         }
         return config;
