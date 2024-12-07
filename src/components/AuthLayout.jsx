@@ -94,7 +94,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 toast.error(result.response.data.message);
             }
         } catch (error) {
-            console.error(error);
+            toast.error(error.response.data.message)
         } finally {
             setIsLoading(false);
         }

@@ -63,7 +63,6 @@ export default function EditCourseContent() {
         setIsConfirmDialogOpen(false);
         const sectionId = confirmingSectionId;
         const section = sections.find(section => section.id === sectionId);
-        const originalSection = originalData.find(s => s.id === sectionId);
 
         try {
             let moduleId;
@@ -92,7 +91,7 @@ export default function EditCourseContent() {
                         let lectureData = {
                             moduleId,
                             title: item.title,
-                            content: item.content
+                            content: itemContents[item.id] || item.content
                         };
                         if (item.isNew) {
                             let res = await axiosPrivate.post(`/lectures`, lectureData);
