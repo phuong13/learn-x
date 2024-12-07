@@ -124,7 +124,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                   formData.append('assignment', new Blob([JSON.stringify(submissionData)], { type: 'application/json' }));
 
                   setIsLoading(true);
-                  const response = await axiosPrivate.patch(`/assignment-submissions`, formData, {
+                  const response = await axiosPrivate.post(`/assignment-submissions`, formData, {
                     headers: {
                       'Content-Type': 'multipart/form-data',
                     },
@@ -132,7 +132,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                   console.log(response);
                   setIsLoading(false);
 
-                  if (response.status === 201) {
+                  if (response.status === 201 || response.status === 200) {
                     toast.info('Đã nộp bài');
                     setAssignmentSubmission(response.data.data);
                   } else {
@@ -187,8 +187,9 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                 <h2 className="text-lg font-semibold mb-4 text-gray-800">Hướng dẫn nộp bài</h2>
                 <div className="pb-4" dangerouslySetInnerHTML={{ __html: content }} />
                 <button
-                    className="bg-[#02a189] text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+                    // className="bg-[#02a189] text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
                     onClick={toggleFolderVisibility}
+                    className={"btn btn--primary"}
                 >
                   {assignmentSubmission ? 'Sửa bài nộp' : 'Thêm bài nộp'}
                 </button>
@@ -285,7 +286,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                         <td className="py-3 text-gray-600">
                           {assignmentSubmission && assignmentSubmission.updatedAt
                               ? format(new Date(assignmentSubmission.updatedAt), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi })
-                              : '-'}
+                              : assignmentSubmission && format(new Date(assignmentSubmission.createdAt), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi })}
                         </td>
                       </tr>
                       </tbody>
