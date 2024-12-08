@@ -22,11 +22,11 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
             {isOpen && (
                 <div className={`${isOpen ? '' : 'hidden'}`}>
                     <div className="flex justify-evenly">
-                        <button className="btn btn--primary w-24" onClick={expandAll}>
-                            Expand All
+                        <button className="p-0 btn--small btn btn--primary rounded-2xl" onClick={expandAll}>
+                            Mở rộng tất cả
                         </button>
-                        <button className="btn btn--primary w-24" onClick={collapseAll}>
-                            Collapse All
+                        <button className="p-0 btn--small btn btn--primary rounded-2xl" onClick={collapseAll}>
+                            Thu nhỏ tất cả
                         </button>
                     </div>
                     <List component="nav">

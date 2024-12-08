@@ -65,7 +65,10 @@ export default function EditCourseContent() {
     const confirmAndUpdateModule = async () => {
         setIsConfirmDialogOpen(false);
         const sectionId = confirmingSectionId;
-        const section = sections.find(section => section.id === sectionId);
+        const sectionsLocal = JSON.parse(localStorage.getItem('sections'));
+        const section = sectionsLocal.find(section => section.id === sectionId);
+
+        console.log(section);
 
         try {
             let moduleId;
@@ -117,13 +120,20 @@ export default function EditCourseContent() {
                         if (files[`${sectionId}-${item.typeId}`]) {
                             formData.append('document', files[`${sectionId}-${item.typeId}`]);
                         }
+                        const urlParams = new URLSearchParams();
+                        urlParams.append('content', assignmentData.content);
+                        urlParams.append('startDate', assignmentData.startDate);
+                        urlParams.append('endDate', assignmentData.endDate);
+                        urlParams.append('state', assignmentData.state);
+                        urlParams.append('title', assignmentData.title);
+                        const url = urlParams.toString();
+                        console.log(url);
                         if (item.isNew) {
                             await axiosPrivate.post(`/assignments`, formData, {
                                 headers: { 'Content-Type': 'multipart/form-data' },
                             });
-
                         } else {
-                            await axiosPrivate.patch(`/assignments/${item.id}`, formData, {
+                            await axiosPrivate.patch(`/assignments/${item.id}?${url}`, formData, {
                                 headers: { 'Content-Type': 'multipart/form-data' },
                             });
                         }
@@ -134,6 +144,7 @@ export default function EditCourseContent() {
                             title: item.title,
                             moduleId: moduleId
                         };
+                        const urlParams = new URLSearchParams();
                         formData.append('resources', new Blob([JSON.stringify(resourceData)], { type: 'application/json' }));
                         if (files[`${sectionId}-${item.typeId}`]) {
                             formData.append('document', files[`${sectionId}-${item.typeId}`]);
@@ -182,6 +193,7 @@ export default function EditCourseContent() {
     }, [sections]);
 
     const handleDateChange = (sectionId, itemId, field, date) => {
+        console.log(date);
         setSections(sections.map(section =>
             section.id === sectionId
                 ? {
@@ -267,6 +279,10 @@ export default function EditCourseContent() {
 
     const confirmAndDeleteSection = async () => {
         setIsDeleteConfirmDialogOpen(false);
+        if (sections.find(section => section.id === deletingSectionId).isNew) {
+            setSections(sections.filter(section => section.id !== deletingSectionId));
+            return;
+        }
         try {
             const response = await axiosPrivate.delete(`/modules/${deletingSectionId}`);
             if (response.status === 200) {
@@ -524,7 +540,7 @@ export default function EditCourseContent() {
                                                     timeFormat="hh:mm aa"
                                                     selected={item.startDate ? new Date(item.startDate) : null}
                                                     ref={datePickerRef_startDay}
-                                                    onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
+                                                    onChange={(date) => handleDateChange(section.id, item.typeId, 'startDate', date)}
                                                     showMonthYearDropdown/>
 
                                                 <div

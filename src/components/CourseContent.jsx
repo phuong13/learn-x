@@ -25,9 +25,9 @@ const CourseContent = () => {
       try {
         const response = await CourseService.getModulesByCourseId(courseId);
         setModules(response);
-        if (response.length > 0) {
-          setExpandedSections([modules[0].id]);
-        }
+        // if (response.length > 0) {
+        //   setExpandedSections([modules[0].id]);
+        // }
       } catch (err) {
         console.log(err);
       } finally {

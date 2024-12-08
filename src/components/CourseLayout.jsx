@@ -19,8 +19,7 @@ export default function CoursePageLayout() {
             const response = await axiosPrivate.get(`courses/${courseId}`);
             if (response.status === 200) {
                 setCourse(response.data.data);
-                console.log(course);
-            }   
+            }
         };
         fetchData();
     }, [courseId]);
