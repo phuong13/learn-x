@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
@@ -478,7 +479,7 @@ export default function EditCourseContent() {
                                                     selected={item.startDate}
                                                     ref={datePickerRef_startDay}
                                                     onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
-                                                />
+                                                    showMonthYearDropdown/>
                                                 <div
                                                     className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                                     <Calendar className="h-5 w-5 text-gray-400" />

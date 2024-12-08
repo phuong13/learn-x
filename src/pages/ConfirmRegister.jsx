@@ -4,7 +4,7 @@ import ConfirmOTP from '../components/ConfirmOTP';
 const ConfirmRegister = () => {
     return (
         <>
-            <DocumentTitle title="Confirm Register" />
+            <DocumentTitle title="Xác nhận tài khoản" />
             <ConfirmOTP />
         </>
     );
