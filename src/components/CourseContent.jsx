@@ -122,7 +122,7 @@ const CourseContent = () => {
         <div className="flex-1 p-6">
           <button
               onClick={() => navigate(`/course-detail/${courseId}/edit`)}
-              className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              className="btn btn--primary mb-4 px-4 py-2 transition-colors"
           >
             Chỉnh sửa
           </button>
@@ -166,7 +166,7 @@ const CourseContent = () => {
                                 );
                               })}
                               {moduleData[module.id].assignments.map((assignment) => (
-                                  <SubmissionHeader key={assignment.id} id={assignment.id} title={assignment.title} startDate={assignment.startDate} endDate={assignment.endDate} />
+                                  <SubmissionHeader courseID={courseId} key={assignment.id} id={assignment.id} title={assignment.title} startDate={assignment.startDate} endDate={assignment.endDate} />
                               ))}
                             </>
                         )}

@@ -7,10 +7,20 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { axiosPrivate } from '@/axios/axios.js';
 const Submission = () => {
+      const { courseId} = useParams();
       const { assignmentId } = useParams();
       const [assignment, setAssignment] = useState(null);
       // const [isLoading, setIsLoading] = useState(false);
-
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await axiosPrivate.get(`courses/${courseId}`);
+            if (response.status === 200) {
+                setCourse(response.data.data);
+                console.log(course);
+            }   
+        };
+        fetchData();
+    }, [courseId]);
     useEffect( () => {
         const fetchData = async () => {
             const response = await axiosPrivate
@@ -32,8 +42,8 @@ const Submission = () => {
             <div className="flex flex-col min-h-screen">
                     <div className="sticky top-0 z-50">
                         <Header />
-                        <Navbar />
                     </div>
+                        <Navbar />
 
                     {/* Nội dung chính */}
                     <div className="flex-grow pr-6 pl-6">

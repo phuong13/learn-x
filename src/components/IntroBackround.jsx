@@ -6,7 +6,7 @@ export default function Component() {
                 <img
                     src="/src/assets/backround.jpg"
                     alt=""
-                    className="w-full h-full object-cover transform scale-90"
+                    className="w-full h-full object-cover transform"
                 />
                 <div className="absolute inset-0 bg-white/80 mix-blend-overlay" />
             </div>
@@ -26,7 +26,7 @@ export default function Component() {
                         <div className="rounded-md shadow">
                             <a
                                 href="/my-course"
-                                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#14919B] hover:bg-[#213A57] md:py-4 md:text-lg md:px-10"
+                                className="w-full flex items-center justify-center px-8 py-3 bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#14919B] transition-colors md:py-4 md:text-lg md:px-10"
                             >
                                 Xem các khoá học
                             </a>
