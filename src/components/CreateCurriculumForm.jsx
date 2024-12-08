@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker';
 import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'react-toastify';
 
 export default function Curriculum() {
   const [sections, setSections] = useState(() => {
@@ -43,7 +43,7 @@ export default function Curriculum() {
     const response = await axiosPrivate.post(`/modules`, moduleData);
     let moduleId;
     if (response.status === 200) {
-      toast.info(response.data.message);
+      toast(response.data.message, {});
       moduleId = response.data.data.id;
       console.log(response);
       await Promise.all(section.items.map(async item => {
@@ -56,14 +56,14 @@ export default function Curriculum() {
             };
             console.log(lectureData);
             await axiosPrivate.post(`/lectures`, lectureData)
-              .then(r => {
-                console.log(r.data.message);
-                toast.info(r.data.message, { duration: 2000 });
-              })
-              .catch(e => {
-                console.error(e.response.data.message);
-                toast.error(e.response.data.message, { duration: 5000 });
-              });
+                .then(r => {
+                  console.log(r);
+                  toast(r.data.message)
+                })
+                .catch(e => {
+                  console.error(e.response.message);
+                  toast(e.response.data.message);
+                });
             break;
           }
           case 'quiz':
@@ -86,14 +86,15 @@ export default function Curriculum() {
             await axiosPrivate.post(`/assignments`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
-              .then(r => {
-                console.log(r);
-                toast.info(r.data.message, { duration: 2000 });
-              })
-              .catch(e => {
-                console.error(e.response.message);
-                toast.error(e.response.data.message, { duration: 5000 });
-              });
+                .then(r => {
+                  console.log(r);
+                  toast(r.data.message)
+                })
+                .catch(e => {
+                  console.error(e.response.message);
+                  toast(e.response.data.message);
+                });
+
             break;
           }
           case 'resource': {
@@ -110,14 +111,15 @@ export default function Curriculum() {
             await axiosPrivate.post(`/resources`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
-              .then(r => {
-                console.log(r);
-                toast.info(r.data.message, { duration: 2000 });
-              })
-              .catch(e => {
-                console.error(e.response.data.message);
-                toast.error(e.response.data.message, { duration: 5000 });
-              });
+                .then(r => {
+                  console.log(r);
+                  toast(r.data.message)
+                })
+                .catch(e => {
+                  console.error(e.response.data.message);
+                  toast(e.response.data.message);
+                });
+
             break;
           }
         }
@@ -130,7 +132,6 @@ export default function Curriculum() {
   const [editingSectionId, setEditingSectionId] = useState(null);
   const [editingItemId, setEditingItemId] = useState(null);
   const [tempTitle, setTempTitle] = useState('');
-  const [editorContent, setEditorContent] = useState('');
   const datePickerRef_starDay = useRef(null);
   const datePickerRef_endDay = useRef(null);
   const [itemContents, setItemContents] = useState({});
@@ -257,20 +258,20 @@ export default function Curriculum() {
   };
 
   return (
-    <>
-      <Toaster richColors={true} position={'top-right'} />
-      <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold flex items-center">
-            <List className="mr-2" /> Thêm nội dung khóa học
-          </h1>
-          <button
-            onClick={addSection}
-            className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#14919B] transition-colors"
-          >
-            New Section
-          </button>
-        </div>
+      <>
+        <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold flex items-center">
+              <List className="mr-2" />Thêm nội dung khóa học
+            </h1>
+            <button
+                onClick={addSection}
+                className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
+            >
+              Thêm chương mới
+            </button>
+          </div>
+
 
         {sections.map(section => (
           <div key={section.id} className="mb-6">

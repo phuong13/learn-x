@@ -6,6 +6,7 @@ import SubmissionLayout from '../components/SubmissionLayout'
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { axiosPrivate } from '@/axios/axios.js';
+import DocumentTitle from '@components/DocumentTitle.jsx';
 const Submission = () => {
       const { courseId} = useParams();
       const { assignmentId } = useParams();
@@ -39,11 +40,13 @@ const Submission = () => {
     }, [assignmentId]);
 
       return (
-            <div className="flex flex-col min-h-screen">
+        <>
+          <DocumentTitle title="Nộp bài" />
+          <div className="flex flex-col min-h-screen">
                     <div className="sticky top-0 z-50">
                         <Header />
-                    </div>
                         <Navbar />
+                    </div>
 
                     {/* Nội dung chính */}
                     <div className="flex-grow pr-6 pl-6">
@@ -58,6 +61,7 @@ const Submission = () => {
                         <Footer />
                     </div>
                 </div>
+        </>
       );
 };
 

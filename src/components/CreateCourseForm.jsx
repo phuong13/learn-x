@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Toaster, toast } from 'sonner';
+
 import DatePicker from 'react-datepicker';
 import { axiosPrivate } from '../axios/axios';
 import Loader from './Loader';
 import { CalendarIcon } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 
 const CreateCourseForm = ({onSubmitSuccess}) => {
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -48,17 +49,17 @@ const CreateCourseForm = ({onSubmitSuccess}) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       if (response.status === 200) {
-        toast.success('Thêm khóa học thành công!');
+        toast(response.data.message);
         const data = response.data.data;
         console.log('Course created:', data);
         localStorage.setItem('courseInfo', JSON.stringify(data));
         onSubmitSuccess();
       } else {
-        toast.error('Thêm khóa học thất bại!');
+        toast(response.data.message, { type: 'error' });
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast.error('Đã xảy ra lỗi khi thêm khóa học');
+      toast(error.response.data.message, { type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +69,6 @@ const CreateCourseForm = ({onSubmitSuccess}) => {
 
   return (
       <div className="min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
-        <Toaster position="top-right" richColors />
         <Loader isLoading={isLoading} />
         <div className="max-w-md mx-auto">
           <form onSubmit={handleOnSubmit} className="bg-white shadow-xl rounded-lg overflow-hidden">

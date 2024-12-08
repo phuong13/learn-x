@@ -4,8 +4,11 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@hooks/useAuth.js';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
-import { Toaster, toast } from 'sonner';
+
 import Loader from './Loader';
+
+import { ToastContainer, toast } from 'react-toastify';
+
 const ProfileInfo = () => {
     const [avatar, setAvatar] = useState('');
     const [email, setEmail] = useState('');
@@ -16,7 +19,7 @@ const ProfileInfo = () => {
 
     const axiosPrivate = useAxiosPrivate();
 
-    const { authUser, setAuthUser } = useAuth();
+    const { authUser } = useAuth();
 
     useEffect(() => {
         if (authUser) {
@@ -73,11 +76,11 @@ const ProfileInfo = () => {
             if (response.status === 200) {
                 console.log(response.data);
                 localStorage.setItem('user', JSON.stringify(response.data.data));
-                toast.success('Profile updated successfully');
+                toast('Cập nhật thông tin thành công!', { type: 'success' });
             }
         } catch (error) {
             console.error(error);
-            toast.error('An error occurred. Please try again later');
+            toast(error.response.data.message, { type: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -89,9 +92,6 @@ const ProfileInfo = () => {
         setShowChangePassword(true);
     };
 
-    const handleUpgradeRole = () => {
-        console.log('Upgrade role clicked');
-    };
 
     let response = useMemo(() => ({}), []);
 
@@ -101,38 +101,87 @@ const ProfileInfo = () => {
 
     useEffect(() => {
         if (response.code === 200) {
-            toast.success('Password changed successfully');
+            toast(response.message, { type: 'success' });
         } else if (response.code === 500) {
-            toast.error('Invalid password');
+            toast(response.message, { type: 'error' });
         } else if (response === undefined) {
-            toast.error('An error occurred. Please try again later');
+            toast('Có lỗi xảy ra, vui lòng thử lại sau!', { type: 'error' });
         }
     }, [response]);
 
+    const [isOpenRequestRole, setIsOpenRequestRole] = useState(false);
+
+    const handleConfirmRequestRole = async () => {
+        setIsOpenRequestRole(false);
+        try {
+            const requestBody = {
+                email: authUser.email,
+                oldRole: authUser.role,
+                newRole: 'TEACHER'
+            }
+            const response = await axiosPrivate.post('/user/change-role/request', requestBody);
+            if (response.status === 201) {
+                toast('Yêu cầu quyền giảng viên thành công!', { type: 'success' });
+            } else if (response.status === 200) {
+                toast(response.data.message, { type: 'info' });
+            }
+        } catch (error) {
+            console.error('Error deleting section:', error);
+            toast('Có lỗi xảy ra khi yêu cầu quyền!' + error.response.data.message, { type: 'error' });
+        }
+    };
+
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+        <div
+            // initial={{ opacity: 0 }}
+            // animate={{ opacity: 1 }}
+            // transition={{ duration: 0.5 }}
             className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
             <ChangePasswordModal
                 visible={showChangePassword}
                 onClose={() => setShowChangePassword(false)}
                 getResponse={getReponse}
             />
-            <Toaster position="top-right" richColors duration={5000} />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition: Bounce
+            />
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Thông tin cá nhân</h1>
                 </div>
             </header>
+            {isOpenRequestRole && (
+                <div className="z-50 fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded-lg z-50">
+                        <h2 className="text-xl font-bold mb-4">Yêu cầu quyền giảng viên</h2>
+                        <div className="flex justify-end space-x-2">
+                            <button className="btn btn--secondary text-btn hover:bg-emerald-400"
+                                    onClick={() => setIsOpenRequestRole(false)}>Không
+                            </button>
+                            <button className="btn btn--primary hover:bg-emerald-400"
+                                    onClick={handleConfirmRequestRole}>Có
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <main>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <Loader isLoading={isLoading} />
-                    <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2, duration: 0.5 }}
+                    <div
+                        // initial={{ y: 20, opacity: 0 }}
+                        // animate={{ y: 0, opacity: 1 }}
+                        // transition={{ delay: 0.2, duration: 0.5 }}
                         className="px-4 py-6 sm:px-0">
                         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                             <div className="px-4 py-5 sm:px-6">
@@ -181,7 +230,8 @@ const ProfileInfo = () => {
                                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                                 <input
                                                     type="email"
-                                                    className={`w-full disabled:opacity-60 px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d] ${
+                                                    aria-disabled={true}
+                                                    className={`z-auto w-full disabled:opacity-60 px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d] ${
                                                         errors.email ? 'border-red-500' : ''
                                                     }`}
                                                     value={email}
@@ -197,7 +247,7 @@ const ProfileInfo = () => {
                                             className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                             <dt className="text-sm font-medium text-gray-500 flex items-center">
                                                 <FaUser className="mr-2 text-[#00ba9d]" />
-                                                Full Name
+                                                Tên đầy đủ
                                             </dt>
                                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                                 <input
@@ -216,7 +266,7 @@ const ProfileInfo = () => {
                                             className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                             <dt className="text-sm font-medium text-gray-500 flex items-center">
                                                 <FaBriefcase className="mr-2 text-[#00ba9d]" />
-                                                Role
+                                                Quyền
                                             </dt>
                                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                                 <input
@@ -241,29 +291,30 @@ const ProfileInfo = () => {
                                                 onClick={handleChangePassword}
                                                 className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 mr-3">
                                                 <FaKey className="mr-2" />
-                                                Change Password
+                                                Đổi mật khẩu
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={handleUpgradeRole}
-                                                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300">
+                                                disabled={authUser.role === 'TEACHER'}
+                                                onClick={() => setIsOpenRequestRole(true)}
+                                                className={`z-99 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 ${authUser.role === 'TEACHER' ? 'bg-neutral-400 text-gray-500' : ''}`}>
                                                 <FaLock className="mr-2" />
-                                                Change Role
+                                                Yêu cầu quyền giảng viên
                                             </button>
                                         </div>
                                         <button
                                             type="submit"
                                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#00ba9d] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300">
-                                            Save Changes
+                                            Lưu thay đổi
                                         </button>
                                     </motion.div>
                                 </form>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </main>
-        </motion.div>
+        </div>
     );
 };
 

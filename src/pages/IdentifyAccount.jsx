@@ -5,7 +5,7 @@ import IdentifyEmail from '../components/IdentifyEmail';
 const IdentifyAccount = () => {
     return (
         <>
-            <DocumentTitle title="Identify" />
+            <DocumentTitle title="Đặt lại mật khẩu" />
             <IdentifyEmail />
         </>
     );

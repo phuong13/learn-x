@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-
+import 'react-toastify/ReactToastify.min.css';
 // styles
 import '@styles/index.scss';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -24,7 +24,7 @@ const Submission = lazy(() => import('./pages/Submission'));
 const AddCourse = lazy(() => import('./pages/AddCourse'));
 const EditCourseContent = lazy(() => import('./components/EditCourseContent'));
 // utils
-// eslint-disable-next-line no-unused-vars
+
 import ProtectedRoute from './utils/ProtectedRoute';
 
 // contexts
@@ -33,6 +33,7 @@ import { AuthProvider } from './contexts/auth/AuthContext';
 // services
 import Loader from './components/Loader';
 import AuthService from './services/auth/auth.service';
+import { Bounce, ToastContainer } from 'react-toastify';
 // import EditCourseContent from '@components/EditCourseContent.jsx';
 
 function App() {
@@ -51,6 +52,19 @@ function App() {
 
     return (
         <AuthProvider>
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition={Bounce}
+            />
             <Suspense fallback={<Loader isLoading />}>
                 <ScrollToTop />
                 <div className="main">

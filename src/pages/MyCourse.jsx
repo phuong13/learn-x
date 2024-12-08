@@ -52,7 +52,7 @@ const MyCourse = () => {
     return (
         <>
             <Loader isLoading={isLoading} />
-            <DocumentTitle title="My Course" />
+            <DocumentTitle title="Khóa học của tôi" />
             <div className="flex flex-col min-h-screen">
                 <div className="sticky top-0 z-50">
                     <Header />
