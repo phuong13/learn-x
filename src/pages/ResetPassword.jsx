@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Alert from '../components/Alert';
+
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaKey } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
@@ -7,12 +7,12 @@ import AuthService from '../services/auth/auth.service';
 import Loader from '../components/Loader';
 import classNames from 'classnames';
 import DocumentTitle from '@components/DocumentTitle.jsx';
+import { toast } from 'react-toastify';
 
 const ResetPassword = () => {
-    const [alert, setAlert] = useState({ show: false, title: '', severity: '', message: '' });
     const [isLoading, setIsLoading] = useState(false);
     const [countdown, setCountdown] = useState(5);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const defaultValues = {
         password: '',
@@ -25,10 +25,6 @@ const ResetPassword = () => {
         watch,
     } = useForm({ defaultValues });
 
-    const onToggleVisibility = (isVisible) => {
-        setAlert({ ...alert, show: isVisible });
-    };
-
     const onSubmit = async ({ password }) => {
         setIsLoading(true);
         const token = searchParams.get('token');
@@ -37,12 +33,7 @@ const ResetPassword = () => {
             console.log(result);
 
             if (result.code === 200) {
-                setAlert({
-                    show: true,
-                    title: 'Đổi mật khẩu thành công!',
-                    severity: 'success',
-                    message: `Chuyển hướng đến trang đăng nhập sau ${countdown}s`,
-                });
+                toast(`${result.message} Chuyển hướng sau ${countdown}s`, { type: 'success' });
                 const countdownInterval = setInterval(() => {
                     setCountdown((prevCountdown) => {
                         if (prevCountdown === 1) {
@@ -53,15 +44,10 @@ const ResetPassword = () => {
                     });
                 }, 1000);
             } else {
-                setAlert({
-                    show: true,
-                    title: 'Đổi mật khẩu thất bại!',
-                    severity: 'error',
-                    message: 'Vui lòng thử lại sau!',
-                });
+                toast(result.message, { type: 'error' });
             }
         } catch (error) {
-            console.log(error);
+            toast(error.response.data.message, { type: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -71,15 +57,6 @@ const ResetPassword = () => {
         <>
             <DocumentTitle title="Quên mật khẩu" />
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                {alert.show && (
-                    <Alert
-                        hideAfter={3000}
-                        isVisible={alert.show}
-                        onToggleVisibility={onToggleVisibility}
-                        variant={alert.severity}
-                        title={alert.title}
-                        message={alert.message}></Alert>
-                )}
                 <Loader isLoading={isLoading} />
                 <div className="bg-white p-8 rounded-lg shadow-md w-96">
                     <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Quên mật khẩu</h2>

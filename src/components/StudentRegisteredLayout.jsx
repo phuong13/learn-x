@@ -6,7 +6,7 @@ import { useAuth } from '@hooks/useAuth.js';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { X } from 'lucide-react';
 import readXlsxFile from 'read-excel-file';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'react-toastify';
 
 const StudentRegisteredLayout = () => {
     const [students, setStudents] = useState([]);
@@ -105,9 +105,9 @@ const StudentRegisteredLayout = () => {
         if (response.status === 200) {
             await fetchStudents(0);
             handleClose();
-            toast.info(response.data.message);
+            toast(response.data.message);
         } else {
-            toast.error(response.data.message);
+            toast(response.data.message, { type: 'error' });
         }
     };
 
@@ -119,15 +119,14 @@ const StudentRegisteredLayout = () => {
         console.log(response);
         if (response.status === 200) {
             await fetchStudents(0);
-            toast.info(response.data.message);
+            toast(response.data.message);
         } else {
-            toast.error(response.data.message);
+            toast(response.data.message, { type: 'error' });
         }
     }
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <Toaster richColors={true} position={'top-right'} />
             <StudentRegisteredList
                 students={students}
                 paginationInfo={paginationInfo}

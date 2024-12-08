@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ChevronDown, Search, Upload } from 'lucide-react'
 
 export default function AssignmentControlPanel() {

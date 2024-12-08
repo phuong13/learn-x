@@ -21,6 +21,7 @@ class AuthService {
             })
             .catch((err) => {
                 console.log(err);
+                return err;
             });
     };
 
@@ -95,7 +96,7 @@ class AuthService {
                 return res.data;
             })
             .catch((err) => {
-                console.log(err);
+                return err;
             });
     };
 
@@ -132,10 +133,7 @@ class AuthService {
                 return res.data;
             })
             .catch((err) => {
-                return {
-                    error: true,
-                    response: err.response,
-                }
+                return err;
             });
     }
 

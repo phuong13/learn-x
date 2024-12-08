@@ -1,42 +1,33 @@
-/* eslint-disable no-unused-vars */
 // components
-import Logo from '@components/Logo';
-import { LoginSocialGoogle } from 'reactjs-social-login';
 import Spring from '@components/Spring';
-import PasswordInput from '@components/PasswordInput';
-import { Toaster, toast } from 'sonner';
 
 // hooks
-import { useForm, Controller, set } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useWindowSize } from 'react-use';
 
 // utils
 import classNames from 'classnames';
-
-// assets
-import media from '@assets/login.webp';
-import google from '@assets/icons/google.png';
 import { useState } from 'react';
 
 // services
 import AuthService from '../services/auth/auth.service';
 
-import { Button } from '@mui/material';
-import { GoogleLogin, GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 
 import PropTypes from 'prop-types';
 import { useAuth } from '@hooks/useAuth.js';
 import Loader from './Loader';
+import { toast } from 'react-toastify';
 
 const AuthLayout = ({ type = 'login' }) => {
     const { width } = useWindowSize();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const [isLogin, setIsLogin] = useState();
+
     const [form, setForm] = useState(type);
 
-    const { authUser, setAuthUser, isAuthenticated, setIsAuthenticated } = useAuth();
+    const { setAuthUser, setIsAuthenticated } = useAuth();
 
     const defaultValues = {
         email: '',
@@ -46,7 +37,6 @@ const AuthLayout = ({ type = 'login' }) => {
         register,
         handleSubmit,
         formState: { errors },
-        control,
         watch,
     } = useForm({
         mode: 'onChange',
@@ -57,21 +47,16 @@ const AuthLayout = ({ type = 'login' }) => {
         setIsLoading(true);
         try {
             const result = await AuthService.login(email, password);
-            if (result === undefined) {
-                toast.error('Error from server, please try again later!');
-                return;
-            }
             if (result.code === 200) {
                 const { email, fullName, avatar, role } = result.data;
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
                 navigate('/my-course');
             } else {
-                toast.error('Invalid email or password!');
+                toast(result.message, { type: 'error' });
             }
         } catch (error) {
-            console.error(error);
-            toast.error('Invalid email or password!');
+            toast(error.response.data.message, { type: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -91,10 +76,10 @@ const AuthLayout = ({ type = 'login' }) => {
                 setIsAuthenticated(true);
                 navigate('/my-course');
             } else if (result.error === true) {
-                toast.error(result.response.data.message);
+                toast(result.message, { type: 'error' });
             }
         } catch (error) {
-            toast.error(error.response.data.message)
+            toast(error.response.data.message, { type: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -105,22 +90,14 @@ const AuthLayout = ({ type = 'login' }) => {
         try {
             const result = await AuthService.register(fullName, email, password);
             console.log(result);
-            if (result === undefined) {
-                toast.error('Có lỗi xảy ra, vui lòng thử lại sau!');
-                return;
-            }
             if (result.status === 200) {
                 navigate(`/register/verify?email=${email}`);
             }
         } catch (error) {
-            console.error(error);
+            toast(error.response.data.message, { type: 'error' });
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const onReject = (err) => {
-        toast.error(err);
     };
 
     const handlePasswordReminder = (e) => {
@@ -130,7 +107,6 @@ const AuthLayout = ({ type = 'login' }) => {
 
     return (
         <div className="flex w-full h-screen">
-            <Toaster duration={5000} richColors position={'top-right'}/>
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-[minmax(0,_1030px)_minmax(0,_1fr)]">
                 {width >= 1024 && (
                     <div className="lg:flex relative hidden justify-center items-center h-full">

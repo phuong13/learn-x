@@ -297,7 +297,7 @@ const ProfileInfo = () => {
                                                 type="button"
                                                 disabled={authUser.role === 'TEACHER'}
                                                 onClick={() => setIsOpenRequestRole(true)}
-                                                className="z-99 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300">
+                                                className={`z-99 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 ${authUser.role === 'TEACHER' ? 'bg-neutral-400 text-gray-500' : ''}`}>
                                                 <FaLock className="mr-2" />
                                                 Yêu cầu quyền giảng viên
                                             </button>

@@ -6,9 +6,9 @@ import PropTypes from 'prop-types';
 import { axiosPrivate } from '@/axios/axios.js';
 import { useParams } from 'react-router-dom';
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
-import submission from '@pages/Submission.jsx';
-import { toast, Toaster } from 'sonner';
+
 import Loader from '@components/Loader.jsx';
+import { toast } from 'react-toastify';
 
 
 export default function SubmissionLayout({ title, content, startDate, endDate }) {
@@ -110,10 +110,10 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                   console.log(response);
 
                   if (response.status === 200) {
-                    toast.info('Đã cập nhật bài nộp');
+                    toast(response.data.message);
                     setAssignmentSubmission(response.data.data);
                   } else {
-                    toast.error('Có lỗi xảy ra khi cập nhật bài nộp');
+                    toast(response.data.message, { type: 'error' });
                   }
                 } else {
                   const submissionData = {
@@ -133,20 +133,19 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                   setIsLoading(false);
 
                   if (response.status === 201 || response.status === 200) {
-                    toast.info('Đã nộp bài');
+                    toast(response.data.message);
                     setAssignmentSubmission(response.data.data);
                   } else {
-                    toast.error('Có lỗi xảy ra khi nộp bài');
+                    toast(response.data.message, { type: 'error' });
                   }
                 }
             } catch (error) {
-                console.error('Failed to submit assignment:', error);
+                toast(error.response.data.message, { type: 'error' });
             }
         }
 
         return (
         <div className="bg-gray-100 min-h-screen">
-          <Toaster richColors={true} position={'top-right'} />
           <Loader isLoading={isLoading} />
           {/* Header Banner */}
           <div className="relative h-48 bg-emerald-200 overflow-hidden">

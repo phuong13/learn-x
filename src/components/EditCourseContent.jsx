@@ -5,7 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'react-toastify';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -53,7 +53,7 @@ export default function EditCourseContent() {
                 setOriginalData(formattedSections);
             } catch (error) {
                 console.error('Error fetching course content:', error);
-                toast.error('Failed to load course content');
+                toast(error.response.data.message, { type: 'error' });
             }
         };
 
@@ -150,7 +150,7 @@ export default function EditCourseContent() {
                 }
             }));
 
-            toast.success(section.isNew ? 'Module created successfully' : 'Module updated successfully');
+            toast('Module updated successfully');
             setSavedSections(prev => ({...prev, [sectionId]: true}));
 
             // Update originalData after successful save
@@ -165,7 +165,7 @@ export default function EditCourseContent() {
 
         } catch (error) {
             console.error('Error updating/creating module:', error);
-            toast.error('Failed to update/create module');
+            toast(error.response.data.message, { type: 'error' });
         }
     };
 
@@ -234,13 +234,13 @@ export default function EditCourseContent() {
             const response = await axiosPrivate.delete(`/modules/${deletingSectionId}`);
             if (response.status === 200) {
                 setSections(sections.filter(section => section.id !== deletingSectionId));
-                toast.success('Xóa section thành công');
+                toast(response.data.message);
             } else {
-                toast.error('Xóa section thất bại');
+                toast(response.data.message, { type: 'error' });
             }
         } catch (error) {
             console.error('Error deleting section:', error);
-            toast.error('Có lỗi xảy ra khi xóa section!' + error.response.data.message);
+            toast(error.response.data.message, { type: 'error' });
         }
         setDeletingSectionId(null);
     };
@@ -313,7 +313,6 @@ export default function EditCourseContent() {
 
     return (
         <>
-            <Toaster richColors={true} position={'top-right'}/>
             <div className="max-w-4xl my-8 mx-auto p-6 bg-white shadow-md rounded-lg">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold flex items-center mb-6">
