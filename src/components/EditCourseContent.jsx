@@ -5,6 +5,7 @@ import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { Toaster, toast } from 'sonner';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -20,6 +21,7 @@ export default function EditCourseContent() {
 
     const datePickerRef_startDay = useRef(null);
     const datePickerRef_endDay = useRef(null);
+
 
     const [originalData, setOriginalData] = useState({});
     const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
@@ -150,16 +152,16 @@ export default function EditCourseContent() {
             }));
 
             toast.success(section.isNew ? 'Module created successfully' : 'Module updated successfully');
-            setSavedSections(prev => ({...prev, [sectionId]: true}));
+            setSavedSections(prev => ({ ...prev, [sectionId]: true }));
 
             // Update originalData after successful save
             setOriginalData(prevOriginal =>
-                prevOriginal.map(s => s.id === sectionId ? {...section, isNew: false} : s)
+                prevOriginal.map(s => s.id === sectionId ? { ...section, isNew: false } : s)
             );
 
             // Update the sections state to reflect that the section is no longer new
             setSections(prevSections =>
-                prevSections.map(s => s.id === sectionId ? {...s, isNew: false, items: s.items.map(item => ({...item, isNew: false}))} : s)
+                prevSections.map(s => s.id === sectionId ? { ...s, isNew: false, items: s.items.map(item => ({ ...item, isNew: false })) } : s)
             );
 
         } catch (error) {
@@ -172,6 +174,7 @@ export default function EditCourseContent() {
         setIsConfirmDialogOpen(true);
         setConfirmingSectionId(sectionId);
     };
+
 
     useEffect(() => {
         localStorage.setItem('sections', JSON.stringify(sections));
@@ -276,7 +279,7 @@ export default function EditCourseContent() {
                         ...section,
                         items: section.items.map(item =>
                             item.id === editingItemId
-                                ? { ...item, title: tempTitle, content: itemContents[editingItemId]}
+                                ? { ...item, title: tempTitle, content: itemContents[editingItemId] }
                                 : item
                         ),
                     }
@@ -312,7 +315,15 @@ export default function EditCourseContent() {
 
     return (
         <>
-            <Toaster richColors={true} position={'top-right'}/>
+            <button
+                onClick={() => window.history.back()}
+                className="text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-6 py-2  flex items-center space-x-2"
+            >
+                <i className="fa fa-arrow-left" aria-hidden="true"></i>
+                <span>Back</span>
+            </button>
+
+            <Toaster richColors={true} position={'top-right'} />
             <div className="max-w-4xl my-8 mx-auto p-6 bg-white shadow-md rounded-lg">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold flex items-center mb-6">
@@ -445,7 +456,7 @@ export default function EditCourseContent() {
 
                                             {editingItemId === item.id && (
                                                 <button onClick={() => saveItem(section.id)}
-                                                        className="text-green-500 hover:text-green-700">
+                                                    className="text-green-500 hover:text-green-700">
                                                     <Check size={18} />
                                                 </button>
                                             )}
@@ -469,12 +480,14 @@ export default function EditCourseContent() {
                                 {item.type === 'assignment' && editingItemId === item.id && (
                                     <div className="mt-4">
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày bắt đầu</p>
+                                            <p>Ngày và giờ bắt đầu</p>
                                             <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
                       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                 onClick={() => datePickerRef_startDay.current.setOpen(true)}>
+                                                onClick={() => datePickerRef_startDay.current.setOpen(true)}>
                                                 <DatePicker
-                                                    dateFormat="yyyy-MM-dd"
+                                                    dateFormat="yyyy-MM-dd hh:mm aa"
+                                                    showTimeSelect
+                                                    timeFormat="hh:mm aa"
                                                     selected={item.startDate}
                                                     ref={datePickerRef_startDay}
                                                     onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
@@ -487,12 +500,14 @@ export default function EditCourseContent() {
                                         </div>
 
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày kết thúc</p>
+                                            <p>Ngày và giờ kết thúc</p>
                                             <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-                       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                 onClick={() => datePickerRef_endDay.current.setOpen(true)}>
+                                                focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                onClick={() => datePickerRef_endDay.current.setOpen(true)}>
                                                 <DatePicker
-                                                    dateFormat="yyyy-MM-dd"
+                                                    dateFormat="yyyy-MM-dd hh:mm aa"
+                                                    showTimeSelect
+                                                    timeFormat="hh:mm aa"
                                                     selected={item.endDate}
                                                     ref={datePickerRef_endDay}
                                                     onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
@@ -577,10 +592,10 @@ export default function EditCourseContent() {
                         <p className="mb-4">Bạn có muốn xóa chương này? (Hành động này không thể undo)</p>
                         <div className="flex justify-end space-x-2">
                             <button className="btn btn--secondary text-btn hover:bg-emerald-400"
-                                    onClick={() => setIsDeleteConfirmDialogOpen(false)}>Không
+                                onClick={() => setIsDeleteConfirmDialogOpen(false)}>Không
                             </button>
                             <button className="btn btn--primary hover:bg-emerald-400"
-                                    onClick={confirmAndDeleteSection}>Có
+                                onClick={confirmAndDeleteSection}>Có
                             </button>
                         </div>
                     </div>
