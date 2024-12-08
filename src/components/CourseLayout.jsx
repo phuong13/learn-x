@@ -4,7 +4,6 @@ import CourseContent from './CourseContent';
 import StudentRegisteredLayout from './StudentRegisteredLayout.jsx';
 import { useParams } from 'react-router-dom';
 import { axiosPrivate } from '@/axios/axios.js';
-import Sidebar from '../layout/Sidebar.jsx';
 
 export default function CoursePageLayout() {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -21,7 +20,7 @@ export default function CoursePageLayout() {
             if (response.status === 200) {
                 setCourse(response.data.data);
                 console.log(course);
-            }
+            }   
         };
         fetchData();
     }, [courseId]);
@@ -87,15 +86,40 @@ export default function CoursePageLayout() {
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                    <div>
-                        <div className="bg-[#14919B] text-white px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                            {course?.name}
-                        </div>
+                    <div className="bg-[#14919B] text-white px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+                        <nav aria-label="breadcrumb">
+                            <ol className="flex items-center space-x-2">
+                                <li>
+                                    <a
+                                        href="/"
+                                        className="text-white hover:underline">
+                                        Trang chủ
+                                    </a>
+                                </li>
+                                <li>
+                                    <span className="mx-2 text-gray-300">/</span>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/my-course"
+                                        className="text-white hover:underline">
+                                        Khóa học
+                                    </a>
+                                </li>
+                                <li>
+                                    <span className="mx-2 text-gray-300">/</span>
+                                </li>
+                                <li className="text-gray-200">
+                                    {course?.name || 'Đang tải...'}
+                                </li>
+                            </ol>
+                        </nav>
                     </div>
                     <button className="text-white">
                         <MoreVertical className="h-6 w-6" />
                     </button>
                 </div>
+
             </div>
 
             <nav className="bg-white border-b">
@@ -104,9 +128,8 @@ export default function CoursePageLayout() {
                         <li key={index}>
                             <button
                                 onClick={() => setSelectedTab(index)}
-                                className={`block px-4 py-2 text-sm ${
-                                    selectedTab === index ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'
-                                }`}>
+                                className={`block px-4 py-2 text-sm ${selectedTab === index ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'
+                                    }`}>
                                 {item}
                             </button>
                         </li>

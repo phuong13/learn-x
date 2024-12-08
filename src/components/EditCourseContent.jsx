@@ -6,6 +6,7 @@ import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -22,6 +23,7 @@ export default function EditCourseContent() {
     const datePickerRef_startDay = useRef(null);
     const datePickerRef_endDay = useRef(null);
 
+
     const [originalData, setOriginalData] = useState({});
     const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
     const [deletingSectionId, setDeletingSectionId] = useState(null);
@@ -37,9 +39,9 @@ export default function EditCourseContent() {
                     const assignmentsResponse = await axiosPrivate.get(`/modules/${module.id}/assignments`);
 
                     const items = [
-                        ...lecturesResponse.data.data.map(lecture => ({ ...lecture, type: 'lecture' })),
-                        ...resourcesResponse.data.data.map(resource => ({ ...resource, type: 'resource' })),
-                        ...assignmentsResponse.data.data.map(assignment => ({ ...assignment, type: 'assignment' })),
+                        ...lecturesResponse.data.data.map(lecture => ({ ...lecture, type: 'lecture', typeId: `lecture-${lecture.id}` })),
+                        ...resourcesResponse.data.data.map(resource => ({ ...resource, type: 'resource', typeId: `resource-${resource.id}` })),
+                        ...assignmentsResponse.data.data.map(assignment => ({ ...assignment, type: 'assignment', typeId: `assignment-${assignment.id}` })),
                     ];
 
                     return {
@@ -92,7 +94,7 @@ export default function EditCourseContent() {
                         let lectureData = {
                             moduleId,
                             title: item.title,
-                            content: itemContents[item.id] || item.content
+                            content: itemContents[item.typeId] || item.content
                         };
                         if (item.isNew) {
                             let res = await axiosPrivate.post(`/lectures`, lectureData);
@@ -105,15 +107,15 @@ export default function EditCourseContent() {
                     case 'assignment': {
                         let assignmentData = {
                             title: item.title,
-                            content: itemContents[item.id] || item.content,
+                            content: itemContents[item.typeId] || item.content,
                             startDate: item.startDate,
                             endDate: item.endDate,
                             state: "OPEN",
                             moduleId: moduleId
                         };
                         formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
-                        if (files[`${sectionId}-${item.id}`]) {
-                            formData.append('document', files[`${sectionId}-${item.id}`]);
+                        if (files[`${sectionId}-${item.typeId}`]) {
+                            formData.append('document', files[`${sectionId}-${item.typeId}`]);
                         }
                         if (item.isNew) {
                             await axiosPrivate.post(`/assignments`, formData, {
@@ -133,8 +135,8 @@ export default function EditCourseContent() {
                             moduleId: moduleId
                         };
                         formData.append('resources', new Blob([JSON.stringify(resourceData)], { type: 'application/json' }));
-                        if (files[`${sectionId}-${item.id}`]) {
-                            formData.append('document', files[`${sectionId}-${item.id}`]);
+                        if (files[`${sectionId}-${item.typeId}`]) {
+                            formData.append('document', files[`${sectionId}-${item.typeId}`]);
                         }
                         if (item.isNew) {
                             await axiosPrivate.post(`/resources`, formData, {
@@ -155,12 +157,12 @@ export default function EditCourseContent() {
 
             // Update originalData after successful save
             setOriginalData(prevOriginal =>
-                prevOriginal.map(s => s.id === sectionId ? {...section, isNew: false} : s)
+                prevOriginal.map(s => s.id === sectionId ? { ...section, isNew: false } : s)
             );
 
             // Update the sections state to reflect that the section is no longer new
             setSections(prevSections =>
-                prevSections.map(s => s.id === sectionId ? {...s, isNew: false, items: s.items.map(item => ({...item, isNew: false}))} : s)
+                prevSections.map(s => s.id === sectionId ? { ...s, isNew: false, items: s.items.map(item => ({ ...item, isNew: false })) } : s)
             );
 
         } catch (error) {
@@ -174,6 +176,7 @@ export default function EditCourseContent() {
         setConfirmingSectionId(sectionId);
     };
 
+
     useEffect(() => {
         localStorage.setItem('sections', JSON.stringify(sections));
     }, [sections]);
@@ -184,7 +187,7 @@ export default function EditCourseContent() {
                 ? {
                     ...section,
                     items: section.items.map(item =>
-                        item.id === itemId ? { ...item, [field]: date } : item
+                        item.typeId === itemId ? { ...item, [field]: date } : item
                     ),
                 }
                 : section
@@ -193,7 +196,7 @@ export default function EditCourseContent() {
 
     const addSection = () => {
         const newSection = {
-            id: Date.now().toString(),
+            id: `${Date.now()}-${Math.random()}`,
             title: 'New Section',
             items: [],
             isNew: true
@@ -205,6 +208,7 @@ export default function EditCourseContent() {
         const newItem = {
             id: Date.now().toString(),
             type,
+            typeId: `${type}-${Date.now()}`,
             title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
             isNew: true
         };
@@ -215,12 +219,45 @@ export default function EditCourseContent() {
         ));
     };
 
-    const deleteItem = (sectionId, itemId) => {
+    const deleteItem = (sectionId, itemId, type, id) => {
         setSections(sections.map(section =>
             section.id === sectionId
-                ? { ...section, items: section.items.filter(item => item.id !== itemId) }
+                ? { ...section, items: section.items.filter(item => item.typeId !== itemId) }
                 : section
         ));
+
+        switch (type) {
+            case 'lecture':
+                axiosPrivate.delete(`/lectures/${id}`)
+                    .then(() => {
+                        toast.success('Xóa lecture thành công');
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting lecture:', error);
+                        toast.error(error.response.data.message);
+                    });
+                break;
+            case 'assignment':
+                axiosPrivate.delete(`/assignments/${id}`)
+                    .then(() => {
+                        toast.success('Xóa assignment thành công');
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting assignment:', error);
+                        toast.error(error.response.data.message);
+                    });
+                break;
+            case 'resource':
+                axiosPrivate.delete(`/resources/${id}`)
+                    .then(() => {
+                        toast.success('Xóa resource thành công');
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting resource:', error);
+                        toast.error(error.response.data.message);
+                    });
+                break;
+        }
     };
 
     const deleteSection = (sectionId) => {
@@ -276,8 +313,8 @@ export default function EditCourseContent() {
                     ? {
                         ...section,
                         items: section.items.map(item =>
-                            item.id === editingItemId
-                                ? { ...item, title: tempTitle, content: itemContents[editingItemId]}
+                            item.typeId === editingItemId
+                                ? { ...item, title: tempTitle, content: itemContents[editingItemId] }
                                 : item
                         ),
                     }
@@ -299,7 +336,7 @@ export default function EditCourseContent() {
                     ? {
                         ...section,
                         items: section.items.map(item =>
-                            item.id === itemId ? { ...item, title: fileName } : item
+                        item.typeId === itemId ? { ...item, title: fileName } : item
                         ),
                     }
                     : section
@@ -313,6 +350,14 @@ export default function EditCourseContent() {
 
     return (
         <>
+            <button
+                onClick={() => window.history.back()}
+                className="text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-6 py-2  flex items-center space-x-2"
+            >
+                <i className="fa fa-arrow-left" aria-hidden="true"></i>
+                <span>Back</span>
+            </button>
+
             <div className="max-w-4xl my-8 mx-auto p-6 bg-white shadow-md rounded-lg">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold flex items-center mb-6">
@@ -328,7 +373,7 @@ export default function EditCourseContent() {
                 </div>
 
                 {sections.map(section => (
-                    <div key={section.id} className="mb-6">
+                    <div key={`section-${section.id}`} className="mb-6">
                         <div className="flex justify-between items-center mb-2">
                             {editingSectionId === section.id ? (
                                 <div className="flex items-center space-x-2">
@@ -374,7 +419,7 @@ export default function EditCourseContent() {
 
                         {section.items.map(item => (
                             <div
-                                key={item.id}
+                                key={`section-${section.id}-item-${item.id}-${item.type}`}
                                 className="bg-slate-200 p-3 mb-2 rounded flex flex-col group relative"
                             >
                                 <div className="flex items-center justify-between">
@@ -387,7 +432,7 @@ export default function EditCourseContent() {
                                         {item.type === 'resource' ? (
                                             <div className="flex items-center">
                                                 <Upload className="mr-2 text-[#CD4F2E]" size={18} />
-                                                {editingItemId === item.id ? (
+                                                {editingItemId === item.typeId ? (
                                                     <input
                                                         type="text"
                                                         value={tempTitle}
@@ -399,7 +444,7 @@ export default function EditCourseContent() {
                                                 )}
                                                 <input
                                                     type="file"
-                                                    onChange={(e) => handleFileUpload(section.id, item.id, e)}
+                                                    onChange={(e) => handleFileUpload(section.id, item.typeId, e)}
                                                     className="hidden"
                                                     id={`upload-${item.id}`}
                                                 />
@@ -413,7 +458,7 @@ export default function EditCourseContent() {
                                                 )}
                                             </div>
                                         ) : (
-                                            editingItemId === item.id ? (
+                                            editingItemId === item.typeId ? (
                                                 <input
                                                     type="text"
                                                     value={tempTitle}
@@ -430,22 +475,22 @@ export default function EditCourseContent() {
                                         <div className="hidden group-hover:flex space-x-2">
                                             {item.type !== 'resource' && (
                                                 <button
-                                                    onClick={() => startEditingItem(item.id, item.title)}
+                                                    onClick={() => startEditingItem(item.typeId, item.title)}
                                                     className="text-gray-500 hover:text-gray-700"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
                                             )}
                                             <button
-                                                onClick={() => deleteItem(section.id, item.id)}
+                                                onClick={() => deleteItem(section.id, item.typeId, item.type, item.id)}
                                                 className="text-gray-500 hover:text-gray-700"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
 
-                                            {editingItemId === item.id && (
+                                            {editingItemId === item.typeId && (
                                                 <button onClick={() => saveItem(section.id)}
-                                                        className="text-green-500 hover:text-green-700">
+                                                    className="text-green-500 hover:text-green-700">
                                                     <Check size={18} />
                                                 </button>
                                             )}
@@ -454,31 +499,34 @@ export default function EditCourseContent() {
                                     )}
                                 </div>
 
-                                {item.type === 'lecture' && editingItemId === item.id && (
+                                {item.type === 'lecture' && editingItemId === item.typeId && (
                                     <div className="mt-4">
                                         <RichTextEditor
-                                            initialContent={itemContents[item.id] || item.content || ''}
+                                            initialContent={itemContents[item.typeId] || item.content || ''}
                                             onContentChange={(content) => setItemContents(prevContents => ({
                                                 ...prevContents,
-                                                [item.id]: content,
+                                                [item.typeId]: content,
                                             }))}
                                         />
                                     </div>
                                 )}
 
-                                {item.type === 'assignment' && editingItemId === item.id && (
+                                {item.type === 'assignment' && editingItemId === item.typeId && (
                                     <div className="mt-4">
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày bắt đầu</p>
+                                            <p>Ngày và giờ bắt đầu</p>
                                             <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
                       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                 onClick={() => datePickerRef_startDay.current.setOpen(true)}>
+                                                onClick={() => datePickerRef_startDay.current.setOpen(true)}>
                                                 <DatePicker
-                                                    dateFormat="yyyy-MM-dd"
-                                                    selected={item.startDate}
+                                                    dateFormat="yyyy-MM-dd hh:mm aa"
+                                                    showTimeSelect
+                                                    timeFormat="hh:mm aa"
+                                                    selected={item.startDate ? new Date(item.startDate) : null}
                                                     ref={datePickerRef_startDay}
                                                     onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
                                                     showMonthYearDropdown/>
+
                                                 <div
                                                     className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                                     <Calendar className="h-5 w-5 text-gray-400" />
@@ -487,15 +535,17 @@ export default function EditCourseContent() {
                                         </div>
 
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày kết thúc</p>
+                                            <p>Ngày và giờ kết thúc</p>
                                             <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-                       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                 onClick={() => datePickerRef_endDay.current.setOpen(true)}>
+                                                focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                onClick={() => datePickerRef_endDay.current.setOpen(true)}>
                                                 <DatePicker
-                                                    dateFormat="yyyy-MM-dd"
-                                                    selected={item.endDate}
+                                                    dateFormat="yyyy-MM-dd hh:mm aa"
+                                                    showTimeSelect
+                                                    timeFormat="hh:mm aa"
+                                                    selected={item.endDate ? new Date(item.endDate) : null}
                                                     ref={datePickerRef_endDay}
-                                                    onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
+                                                    onChange={(date) => handleDateChange(section.id, item.typeId, 'endDate', date)}
                                                 />
                                                 <div
                                                     className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -508,10 +558,10 @@ export default function EditCourseContent() {
                                             <p>Nội dung</p>
                                         </div>
                                         <RichTextEditor
-                                            initialContent={itemContents[item.id] || item.content || ''}
+                                            initialContent={itemContents[item.typeId] || item.content || ''}
                                             onContentChange={(content) => setItemContents(prevContents => ({
                                                 ...prevContents,
-                                                [item.id]: content,
+                                                [item.typeId]: content,
                                             }))}
                                         />
 
@@ -577,10 +627,10 @@ export default function EditCourseContent() {
                         <p className="mb-4">Bạn có muốn xóa chương này? (Hành động này không thể undo)</p>
                         <div className="flex justify-end space-x-2">
                             <button className="btn btn--secondary text-btn hover:bg-emerald-400"
-                                    onClick={() => setIsDeleteConfirmDialogOpen(false)}>Không
+                                onClick={() => setIsDeleteConfirmDialogOpen(false)}>Không
                             </button>
                             <button className="btn btn--primary hover:bg-emerald-400"
-                                    onClick={confirmAndDeleteSection}>Có
+                                onClick={confirmAndDeleteSection}>Có
                             </button>
                         </div>
                     </div>

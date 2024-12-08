@@ -8,10 +8,20 @@ import { useEffect, useState } from 'react';
 import { axiosPrivate } from '@/axios/axios.js';
 import DocumentTitle from '@components/DocumentTitle.jsx';
 const Submission = () => {
+      const { courseId} = useParams();
       const { assignmentId } = useParams();
       const [assignment, setAssignment] = useState(null);
       // const [isLoading, setIsLoading] = useState(false);
-
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await axiosPrivate.get(`courses/${courseId}`);
+            if (response.status === 200) {
+                setCourse(response.data.data);
+                console.log(course);
+            }   
+        };
+        fetchData();
+    }, [courseId]);
     useEffect( () => {
         const fetchData = async () => {
             const response = await axiosPrivate
@@ -30,28 +40,28 @@ const Submission = () => {
     }, [assignmentId]);
 
       return (
-          <>
-              <DocumentTitle title="Nộp bài" />
-              <div className="flex flex-col min-h-screen">
-                  <div className="sticky top-0 z-50">
-                      <Header />
-                      <Navbar />
-                  </div>
+        <>
+          <DocumentTitle title="Nộp bài" />
+          <div className="flex flex-col min-h-screen">
+                    <div className="sticky top-0 z-50">
+                        <Header />
+                        <Navbar />
+                    </div>
 
-                  {/* Nội dung chính */}
-                  <div className="flex-grow pr-6 pl-6">
-                      {/*<SideBar>*/}
-                      {/*    {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}*/}
-                      {/*                                     startDate={assignment.startDate} endDate={assignment.endDate}/>}*/}
-                      {/*</SideBar>*/}
-                      {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}
-                                                       startDate={assignment.startDate} endDate={assignment.endDate} />}
-                  </div>
-                  <div className="sticky">
-                      <Footer />
-                  </div>
-              </div>
-          </>
+                    {/* Nội dung chính */}
+                    <div className="flex-grow pr-6 pl-6">
+                        {/*<SideBar>*/}
+                        {/*    {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}*/}
+                        {/*                                     startDate={assignment.startDate} endDate={assignment.endDate}/>}*/}
+                        {/*</SideBar>*/}
+                        {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}
+                                                         startDate={assignment.startDate} endDate={assignment.endDate}/>}
+                    </div>
+                    <div className="sticky">
+                        <Footer />
+                    </div>
+                </div>
+        </>
       );
 };
 

@@ -36,7 +36,7 @@ export default function CollapsibleSidebarMenu({ children, modules }) {
 
             {/* Sidebar */}
             <div
-                className={`fixed top-35 left-0 h-screen bg-white shadow-lg transition-all duration-300 ${
+                className={`fixed top-35 left-0 h-screen bg-slate-200 shadow-lg transition-all duration-300 ${
                     isOpen ? 'w-48' : 'w-0'
                 } overflow-hidden`}>
                 <div className="p-4 h-full">

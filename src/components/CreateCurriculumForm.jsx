@@ -94,6 +94,7 @@ export default function Curriculum() {
                   console.error(e.response.message);
                   toast(e.response.data.message);
                 });
+
             break;
           }
           case 'resource': {
@@ -118,12 +119,13 @@ export default function Curriculum() {
                   console.error(e.response.data.message);
                   toast(e.response.data.message);
                 });
+
             break;
           }
         }
       }));
       // Mark this section as saved
-      setSavedSections(prev => ({...prev, [sectionId]: true}));
+      setSavedSections(prev => ({ ...prev, [sectionId]: true }));
     }
   };
 
@@ -143,14 +145,14 @@ export default function Curriculum() {
 
   const handleDateChange = (sectionId, itemId, field, date) => {
     setSections(sections.map(section =>
-        section.id === sectionId
-            ? {
-              ...section,
-              items: section.items.map(item =>
-                  item.id === itemId ? { ...item, [field]: date } : item
-              ),
-            }
-            : section
+      section.id === sectionId
+        ? {
+          ...section,
+          items: section.items.map(item =>
+            item.id === itemId ? { ...item, [field]: date } : item
+          ),
+        }
+        : section
     ));
   };
 
@@ -170,17 +172,17 @@ export default function Curriculum() {
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
     };
     setSections(sections.map(section =>
-        section.id === sectionId
-            ? { ...section, items: [...section.items, newItem] }
-            : section
+      section.id === sectionId
+        ? { ...section, items: [...section.items, newItem] }
+        : section
     ));
   };
 
   const deleteItem = (sectionId, itemId) => {
     setSections(sections.map(section =>
-        section.id === sectionId
-            ? { ...section, items: section.items.filter(item => item.id !== itemId) }
-            : section
+      section.id === sectionId
+        ? { ...section, items: section.items.filter(item => item.id !== itemId) }
+        : section
     ));
   };
 
@@ -204,9 +206,9 @@ export default function Curriculum() {
 
   const saveSection = () => {
     setSections(sections.map(section =>
-        section.id === editingSectionId
-            ? { ...section, title: tempTitle }
-            : section
+      section.id === editingSectionId
+        ? { ...section, title: tempTitle }
+        : section
     ));
     setEditingSectionId(null);
     setTempTitle('');
@@ -215,16 +217,16 @@ export default function Curriculum() {
   const saveItem = (sectionId) => {
     setSections(prevSections => {
       const updatedSections = prevSections.map(section =>
-          section.id === sectionId
-              ? {
-                ...section,
-                items: section.items.map(item =>
-                    item.id === editingItemId
-                        ? { ...item, title: tempTitle, content: itemContents[editingItemId]}
-                        : item
-                ),
-              }
-              : section
+        section.id === sectionId
+          ? {
+            ...section,
+            items: section.items.map(item =>
+              item.id === editingItemId
+                ? { ...item, title: tempTitle, content: itemContents[editingItemId] }
+                : item
+            ),
+          }
+          : section
       );
       localStorage.setItem('sections', JSON.stringify(updatedSections));
       return updatedSections;
@@ -239,14 +241,14 @@ export default function Curriculum() {
     if (file) {
       const fileName = file.name;
       setSections(sections.map(section =>
-          section.id === sectionId
-              ? {
-                ...section,
-                items: section.items.map(item =>
-                    item.id === itemId ? { ...item, title: fileName } : item
-                ),
-              }
-              : section
+        section.id === sectionId
+          ? {
+            ...section,
+            items: section.items.map(item =>
+              item.id === itemId ? { ...item, title: fileName } : item
+            ),
+          }
+          : section
       ));
       setFiles(prevFiles => ({
         ...prevFiles,
@@ -260,256 +262,261 @@ export default function Curriculum() {
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold flex items-center">
-              <List className="mr-2" /> Thêm nội dung khóa học
+              <List className="mr-2" />Thêm nội dung khóa học
             </h1>
             <button
                 onClick={addSection}
                 className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
             >
-              New Section
+              Thêm chương mới
             </button>
           </div>
 
-          {sections.map(section => (
-              <div key={section.id} className="mb-6">
-                <div className="flex justify-between items-center mb-2">
-                  {editingSectionId === section.id ? (
-                      <div className="flex items-center space-x-2">
-                        <input
-                            type="text"
-                            value={tempTitle || ''}
-                            onChange={(e) => setTempTitle(e.target.value)}
-                            className="border border-gray-300 p-1 rounded"
-                        />
-                        <button onClick={saveSection} className="text-green-500 hover:text-green-700">
-                          <Check size={18} />
-                        </button>
-                        <button
-                            onClick={() => setEditingSectionId(null)}
-                            className="text-red-500 hover:text-red-700"
-                        >
-                          <X size={18} />
-                        </button>
-                      </div>
-                  ) : (
-                      <h2 className="text-xl font-semibold flex items-center">
-                        <List className="mr-2" /> {section.title}
-                      </h2>
-                  )}
 
-                    {!savedSections[section.id] && (
-                        <div>
-                          <button
-                              onClick={() => startEditingSection(section.id, section.title)}
-                              className="p-1 bg-cyan-400 text-green-500 hover:text-green-700 rounded-full mr-2"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button
-                              onClick={() => deleteSection(section.id)}
-                              className="p-1 bg-rose-400 text-green-500 hover:text-green-700 rounded-full mr-2"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                    )}
+        {sections.map(section => (
+          <div key={section.id} className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              {editingSectionId === section.id ? (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={tempTitle || ''}
+                    onChange={(e) => setTempTitle(e.target.value)}
+                    className="border border-gray-300 p-1 rounded"
+                  />
+                  <button onClick={saveSection} className="text-green-500 hover:text-green-700">
+                    <Check size={18} />
+                  </button>
+                  <button
+                    onClick={() => setEditingSectionId(null)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <X size={18} />
+                  </button>
                 </div>
+              ) : (
+                <h2 className="text-xl font-semibold flex items-center">
+                  <List className="mr-2" /> {section.title}
+                </h2>
+              )}
 
-                {section.items.map(item => (
-                    <div
-                        key={item.id}
-                        className="bg-slate-200 p-3 mb-2 rounded flex flex-col group relative"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          {item.type === 'lecture' && <FileText className="mr-2 text-blue-500" size={18} />}
-                          {item.type === 'quiz' && <List className="mr-2 text-[#25764a]" size={18} />}
-                          {item.type === 'assignment' && <FileText className="mr-2 text-[#CD4F2E]" size={18} />}
-                          {item.type === 'resource' ? (
-                              <div className="flex items-center">
-                                <Upload className="mr-2 text-[#CD4F2E]" size={18} />
-                                {editingItemId === item.id ? (
-                                    <input
-                                        type="text"
-                                        value={tempTitle}
-                                        onChange={(e) => setTempTitle(e.target.value)}
-                                        className="ml-0 border border-gray-300 p-1 rounded"
-                                    />
-                                ) : (
-                                    <span className={'p-0 ml-0'}>{item.title}</span>
-                                )}
-                                <input
-                                    type="file"
-                                    onChange={(e) => handleFileUpload(section.id, item.id, e)}
-                                    className="hidden"
-                                    id={`upload-${item.id}`}
-                                />
-                                {!savedSections[section.id] && (
-                                    <button
-                                        onClick={() => document.getElementById(`upload-${item.id}`).click()}
-                                        className="text-blue-500 hover:text-blue-700 hidden group-hover:flex items-center"
-                                    >
-                                      <Plus size={20} className="absolute right-8 " />
-                                    </button>
-                                )}
-                              </div>
-                          ) : (
-                              editingItemId === item.id ? (
-                                  <input
-                                      type="text"
-                                      value={tempTitle}
-                                      onChange={(e) => setTempTitle(e.target.value)}
-                                      className="border border-gray-300 p-1 rounded"
-                                  />
-                              ) : (
-                                  <span className="ml-0">{item.title}</span>
-                              )
-                          )}
-                        </div>
+              {!savedSections[section.id] && (
+                <div>
+                  <button
+                    onClick={() => startEditingSection(section.id, section.title)}
+                    className="p-1 bg-cyan-400 text-green-500 hover:text-green-700 rounded-full mr-2"
+                  >
+                    <Edit2 size={18} />
+                  </button>
+                  <button
+                    onClick={() => deleteSection(section.id)}
+                    className="p-1 bg-rose-400 text-green-500 hover:text-green-700 rounded-full mr-2"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {section.items.map(item => (
+              <div
+                key={item.id}
+                className="bg-slate-200 p-3 mb-2 rounded flex flex-col group relative"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    {item.type === 'lecture' && <FileText className="mr-2 text-blue-500" size={18} />}
+                    {item.type === 'quiz' && <List className="mr-2 text-[#25764a]" size={18} />}
+                    {item.type === 'assignment' && <FileText className="mr-2 text-[#CD4F2E]" size={18} />}
+                    {item.type === 'resource' ? (
+                      <div className="flex items-center">
+                        <Upload className="mr-2 text-[#CD4F2E]" size={18} />
+                        {editingItemId === item.id ? (
+                          <input
+                            type="text"
+                            value={tempTitle}
+                            onChange={(e) => setTempTitle(e.target.value)}
+                            className="ml-0 border border-gray-300 p-1 rounded"
+                          />
+                        ) : (
+                          <span className={'p-0 ml-0'}>{item.title}</span>
+                        )}
+                        <input
+                          type="file"
+                          onChange={(e) => handleFileUpload(section.id, item.id, e)}
+                          className="hidden"
+                          id={`upload-${item.id}`}
+                        />
                         {!savedSections[section.id] && (
-
-                          <div className="hidden group-hover:flex space-x-2">
-                            {item.type !== 'resource' && (
-                                <button
-                                    onClick={() => startEditingItem(item.id, item.title)}
-                                    className="text-gray-500 hover:text-gray-700"
-                                >
-                                  <Edit2 size={16} />
-                                </button>
-                            )}
-                            <button
-                                onClick={() => deleteItem(section.id, item.id)}
-                                className="text-gray-500 hover:text-gray-700"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-
-                            {editingItemId === item.id && (
-                                <button onClick={() => saveItem(section.id)}
-                                        className="text-green-500 hover:text-green-700">
-                                  <Check size={18} />
-                                </button>
-                            )}
-
-                          </div>
+                          <button
+                            onClick={() => document.getElementById(`upload-${item.id}`).click()}
+                            className="text-blue-500 hover:text-blue-700 hidden group-hover:flex items-center"
+                          >
+                            <Plus size={20} className="absolute right-8 " />
+                          </button>
                         )}
                       </div>
+                    ) : (
+                      editingItemId === item.id ? (
+                        <input
+                          type="text"
+                          value={tempTitle}
+                          onChange={(e) => setTempTitle(e.target.value)}
+                          className="border border-gray-300 p-1 rounded"
+                        />
+                      ) : (
+                        <span className="ml-0">{item.title}</span>
+                      )
+                    )}
+                  </div>
+                  {!savedSections[section.id] && (
 
-                      {item.type === 'lecture' && editingItemId === item.id && (
-                          <div className="mt-4">
-                            <RichTextEditor
-                                initialContent={itemContents[item.id] || item.content || ''}
-                                onContentChange={(content) => setItemContents(prevContents => ({
-                                  ...prevContents,
-                                  [item.id]: content
-                                }))}
-                            />
-                          </div>
+                    <div className="hidden group-hover:flex space-x-2">
+                      {item.type !== 'resource' && (
+                        <button
+                          onClick={() => startEditingItem(item.id, item.title)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => deleteItem(section.id, item.id)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+
+                      {editingItemId === item.id && (
+                        <button onClick={() => saveItem(section.id)}
+                          className="text-green-500 hover:text-green-700">
+                          <Check size={18} />
+                        </button>
                       )}
 
-                      {item.type === 'assignment' && editingItemId === item.id && (
-                          <div className="mt-4">
-                            <div className="block text-sm font-medium text-gray-700 mb-1">
-                              <p>Ngày bắt đầu</p>
-                              <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-                      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                   onClick={() => datePickerRef_starDay.current.setOpen(true)}>
-                                <DatePicker
-                                    dateFormat="yyyy-MM-dd"
-                                    selected={item.startDate}
-                                    ref={datePickerRef_starDay}
-                                    onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
-                                />
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                  <Calendar className="h-5 w-5 text-gray-400" />
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="block text-sm font-medium text-gray-700 mb-1">
-                              <p>Ngày kết thúc</p>
-                              <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-                       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                   onClick={() => datePickerRef_endDay.current.setOpen(true)}>
-                                <DatePicker
-                                    dateFormat="yyyy-MM-dd"
-                                    selected={item.endDate}
-                                    ref={datePickerRef_endDay}
-                                    onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
-                                />
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                  <Calendar className="h-5 w-5 text-gray-400" />
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="block text-sm font-medium text-gray-700 mb-1">
-                              <p>Nội dung</p>
-                            </div>
-                            <RichTextEditor
-                                initialContent={itemContents[item.id] || item.content || ''}
-                                onContentChange={(content) => setItemContents(prevContents => ({
-                                  ...prevContents,
-                                  [item.id]: content
-                                }))}
-                            />
-
-                          </div>
-                      )}
                     </div>
-                ))}
+                  )}
+                </div>
 
+                {item.type === 'lecture' && editingItemId === item.id && (
+                  <div className="mt-4">
+                    <RichTextEditor
+                      initialContent={itemContents[item.id] || item.content || ''}
+                      onContentChange={(content) => setItemContents(prevContents => ({
+                        ...prevContents,
+                        [item.id]: content
+                      }))}
+                    />
+                  </div>
+                )}
 
-                {!savedSections[section.id] && (
-                    <div className="bg-[#02a189] p-4 rounded-lg flex justify-around mt-4">
-                      <button
-                          onClick={() => addItem(section.id, 'lecture')}
-                          className="text-white flex items-center justify-between"
-                      >
-                        Lecture <Plus size={18} className="ml-1" />
-                      </button>
-                      <button
-                          onClick={() => addItem(section.id, 'quiz')}
-                          className="text-white flex items-center justify-between"
-                      >
-                        Quiz <Plus size={18} className="ml-1" />
-                      </button>
-                      <button
-                          onClick={() => addItem(section.id, 'assignment')}
-                          className="text-white flex items-center justify-between"
-                      >
-                        Assignment <Plus size={18} className="ml-1" />
-                      </button>
-                      <button
-                          onClick={() => addItem(section.id, 'resource')}
-                          className="text-white flex items-center justify-between"
-                      >
-                        Resource <Plus size={18} className="ml-1" />
-                      </button>
-                      <button
-                          onClick={() => handlePostModule(section.id)}
-                          className="p-2 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg"
-                      >
-                        <Check size={24} />
-                      </button>
+                {item.type === 'assignment' && editingItemId === item.id && (
+                  <div className="mt-4">
+                    <div className="block text-sm font-medium text-gray-700 mb-1">
+                      <p>Ngày và giờ bắt đầu</p>
+                      <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
+      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        onClick={() => datePickerRef_starDay.current.setOpen(true)}>
+                        <DatePicker
+                          dateFormat="yyyy-MM-dd hh:mm aa"
+                          showTimeSelect
+                          timeFormat="hh:mm aa"
+                          selected={item.startDate}
+                          ref={datePickerRef_starDay}
+                          onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
+                        />
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <Calendar className="h-5 w-5 text-gray-400" />
+                        </div>
+                      </div>
                     </div>
+
+                    <div className="block text-sm font-medium text-gray-700 mb-1">
+                      <p>Ngày và giờ kết thúc</p>
+                      <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
+      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        onClick={() => datePickerRef_endDay.current.setOpen(true)}>
+                        <DatePicker
+                          dateFormat="yyyy-MM-dd hh:mm aa"
+                          showTimeSelect
+                          timeFormat="hh:mm aa"
+                          selected={item.endDate}
+                          ref={datePickerRef_endDay}
+                          onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
+                        />
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <Calendar className="h-5 w-5 text-gray-400" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="block text-sm font-medium text-gray-700 mb-1">
+                      <p>Nội dung</p>
+                    </div>
+                    <RichTextEditor
+                      initialContent={itemContents[item.id] || item.content || ''}
+                      onContentChange={(content) => setItemContents(prevContents => ({
+                        ...prevContents,
+                        [item.id]: content
+                      }))}
+                    />
+
+                  </div>
                 )}
               </div>
-          ))}
-        </div>
-        {isConfirmDialogOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-6 rounded-lg">
-                <h2 className="text-xl font-bold mb-4">Xác nhận lưu chương</h2>
-                <p className="mb-4">Bạn có muốn lưu chương này? (Nội dung chương có thể thay đổi sau hành động này)</p>
-                <div className="flex justify-end space-x-2">
-                  <button className="btn btn--secondary text-btn hover:bg-emerald-400" onClick={() => setIsConfirmDialogOpen(false)}>Không</button>
-                  <button className="btn btn--primary hover:bg-emerald-400" onClick={confirmAndPostModule}>Có</button>
-                </div>
+            ))}
+
+
+            {!savedSections[section.id] && (
+              <div className="bg-[#02a189] p-4 rounded-lg flex justify-around mt-4">
+                <button
+                  onClick={() => addItem(section.id, 'lecture')}
+                  className="text-white flex items-center justify-between"
+                >
+                  Lecture <Plus size={18} className="ml-1" />
+                </button>
+                <button
+                  onClick={() => addItem(section.id, 'quiz')}
+                  className="text-white flex items-center justify-between"
+                >
+                  Quiz <Plus size={18} className="ml-1" />
+                </button>
+                <button
+                  onClick={() => addItem(section.id, 'assignment')}
+                  className="text-white flex items-center justify-between"
+                >
+                  Assignment <Plus size={18} className="ml-1" />
+                </button>
+                <button
+                  onClick={() => addItem(section.id, 'resource')}
+                  className="text-white flex items-center justify-between"
+                >
+                  Resource <Plus size={18} className="ml-1" />
+                </button>
+                <button
+                  onClick={() => handlePostModule(section.id)}
+                  className="p-2 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg"
+                >
+                  <Check size={24} />
+                </button>
               </div>
+            )}
+          </div>
+        ))}
+      </div>
+      {isConfirmDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Xác nhận lưu chương</h2>
+            <p className="mb-4">Bạn có muốn lưu chương này? (Nội dung chương có thể thay đổi sau hành động này)</p>
+            <div className="flex justify-end space-x-2">
+              <button className="btn btn--secondary text-btn hover:bg-emerald-400" onClick={() => setIsConfirmDialogOpen(false)}>Không</button>
+              <button className="btn btn--primary hover:bg-emerald-400" onClick={confirmAndPostModule}>Có</button>
             </div>
-        )}
-      </>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

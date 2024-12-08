@@ -178,7 +178,7 @@ const StudentRegisteredLayout = () => {
                             ></textarea>
                             <button
                                 onClick={handleSumbit}
-                                className="btn btn--outline w-full bg- hover:bg-[#02a189] font-bold py-2 px-4 rounded"
+                                className="btn btn--primary w-full font-bold py-2 px-4 rounded"
                             >
                                 Submit
                             </button>
