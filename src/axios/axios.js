@@ -33,6 +33,7 @@ axiosPrivate.interceptors.request.use(
                 console.log(response);
                 if (response.status !== 200) {
                     console.log('Failed to refresh token');
+                    useNavigate().navigate('/login');
                     return Promise.reject('Failed to refresh token');
                 }
                 const { accessToken, refreshToken: newRefreshToken } = response.data.data;
