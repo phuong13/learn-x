@@ -69,11 +69,13 @@ export default function Curriculum() {
           case 'quiz':
             break;
           case 'assignment': {
+            let utcStartDate = convertUTCToLocal(item.startDate);
+            let utcEndDate = convertUTCToLocal(item.endDate);
             let assignmentData = {
               title: item.title,
-              content: item.content,
-              startDate: item.startDate,
-              endDate: item.endDate,
+              content: itemContents[item.id] || item.content,
+              startDate: utcStartDate.toISOString(),
+              endDate: utcEndDate.toISOString(),
               state: "OPEN",
               moduleId: moduleId
             };
@@ -124,7 +126,7 @@ export default function Curriculum() {
           }
         }
       }));
-      // Mark this section as saved
+
       setSavedSections(prev => ({ ...prev, [sectionId]: true }));
     }
   };
@@ -144,16 +146,23 @@ export default function Curriculum() {
   }, [sections]);
 
   const handleDateChange = (sectionId, itemId, field, date) => {
+    // Convert the selected date to UTC
+    const utcDate = new Date(date.getTime());
     setSections(sections.map(section =>
-      section.id === sectionId
-        ? {
-          ...section,
-          items: section.items.map(item =>
-            item.id === itemId ? { ...item, [field]: date } : item
-          ),
-        }
-        : section
+        section.id === sectionId
+            ? {
+              ...section,
+              items: section.items.map(item =>
+                  item.id === itemId ? { ...item, [field]: utcDate.toISOString() } : item
+              ),
+            }
+            : section
     ));
+  };
+
+  const convertUTCToLocal = (dateString) => {
+    const date = new Date(dateString);
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
   };
 
   const addSection = () => {
@@ -418,12 +427,14 @@ export default function Curriculum() {
       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         onClick={() => datePickerRef_starDay.current.setOpen(true)}>
                         <DatePicker
-                          dateFormat="yyyy-MM-dd hh:mm aa"
-                          showTimeSelect
-                          timeFormat="hh:mm aa"
-                          selected={item.startDate}
-                          ref={datePickerRef_starDay}
-                          onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
+                            dateFormat="yyyy-MM-dd hh:mm aa"
+                            showTimeSelect
+                            timeFormat="hh:mm aa"
+                            locale={'vi'}
+                            selected={item.startDate ? new Date(item.startDate) : null}
+                            ref={datePickerRef_starDay}
+                            onChange={(date) => handleDateChange(section.id, item.typeId, 'startDate', date)}
+                            showMonthYearDropdown
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <Calendar className="h-5 w-5 text-gray-400" />
@@ -437,12 +448,13 @@ export default function Curriculum() {
       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         onClick={() => datePickerRef_endDay.current.setOpen(true)}>
                         <DatePicker
-                          dateFormat="yyyy-MM-dd hh:mm aa"
-                          showTimeSelect
-                          timeFormat="hh:mm aa"
-                          selected={item.endDate}
-                          ref={datePickerRef_endDay}
-                          onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
+                            dateFormat="yyyy-MM-dd hh:mm aa"
+                            showTimeSelect
+                            timeFormat="hh:mm aa"
+                            locale={'vi'}
+                            selected={item.endDate ? new Date(item.endDate) : null}
+                            ref={datePickerRef_endDay}
+                            onChange={(date) => handleDateChange(section.id, item.typeId, 'endDate', date)}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <Calendar className="h-5 w-5 text-gray-400" />

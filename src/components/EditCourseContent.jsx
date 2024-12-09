@@ -7,6 +7,8 @@ import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useStateWithHistory } from 'react-use';
+import { useNavigate } from 'react-router-dom';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -27,6 +29,7 @@ export default function EditCourseContent() {
     const [originalData, setOriginalData] = useState({});
     const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
     const [deletingSectionId, setDeletingSectionId] = useState(null);
+
 
     useEffect(() => {
         const fetchCourseContent = async () => {
@@ -61,6 +64,19 @@ export default function EditCourseContent() {
 
         fetchCourseContent();
     }, [courseId]);
+
+
+    useEffect(() => {
+        localStorage.setItem('sections', JSON.stringify(sections));
+    }, [sections]);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        return () => {
+            localStorage.removeItem('sections');
+        }
+    }, [navigate]);
 
     const confirmAndUpdateModule = async () => {
         setIsConfirmDialogOpen(false);
@@ -108,11 +124,13 @@ export default function EditCourseContent() {
                         break;
                     }
                     case 'assignment': {
+                        let utcStartDate = convertUTCToLocal(item.startDate);
+                        let utcEndDate = convertUTCToLocal(item.endDate);
                         let assignmentData = {
                             title: item.title,
                             content: itemContents[item.typeId] || item.content,
-                            startDate: item.startDate,
-                            endDate: item.endDate,
+                            startDate: utcStartDate.toISOString(),
+                            endDate: utcEndDate.toISOString(),
                             state: "OPEN",
                             moduleId: moduleId
                         };
@@ -145,6 +163,8 @@ export default function EditCourseContent() {
                             moduleId: moduleId
                         };
                         const urlParams = new URLSearchParams();
+                        urlParams.append('title', resourceData.title);
+                        const url = urlParams.toString();
                         formData.append('resources', new Blob([JSON.stringify(resourceData)], { type: 'application/json' }));
                         if (files[`${sectionId}-${item.typeId}`]) {
                             formData.append('document', files[`${sectionId}-${item.typeId}`]);
@@ -154,7 +174,7 @@ export default function EditCourseContent() {
                                 headers: { 'Content-Type': 'multipart/form-data' },
                             });
                         } else {
-                            await axiosPrivate.patch(`/resources/${item.id}`, formData, {
+                            await axiosPrivate.patch(`/resources/${item.id}?${url}`, formData, {
                                 headers: { 'Content-Type': 'multipart/form-data' },
                             });
                         }
@@ -188,22 +208,24 @@ export default function EditCourseContent() {
     };
 
 
-    useEffect(() => {
-        localStorage.setItem('sections', JSON.stringify(sections));
-    }, [sections]);
-
     const handleDateChange = (sectionId, itemId, field, date) => {
-        console.log(date);
+        // Convert the selected date to UTC
+        const utcDate = new Date(date.getTime());
         setSections(sections.map(section =>
             section.id === sectionId
                 ? {
                     ...section,
                     items: section.items.map(item =>
-                        item.typeId === itemId ? { ...item, [field]: date } : item
+                        item.typeId === itemId ? { ...item, [field]: utcDate.toISOString() } : item
                     ),
                 }
                 : section
         ));
+    };
+
+    const convertUTCToLocal = (dateString) => {
+        const date = new Date(dateString);
+        return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     };
 
     const addSection = () => {
@@ -538,10 +560,12 @@ export default function EditCourseContent() {
                                                     dateFormat="yyyy-MM-dd hh:mm aa"
                                                     showTimeSelect
                                                     timeFormat="hh:mm aa"
+                                                    locale={'vi'}
                                                     selected={item.startDate ? new Date(item.startDate) : null}
                                                     ref={datePickerRef_startDay}
                                                     onChange={(date) => handleDateChange(section.id, item.typeId, 'startDate', date)}
-                                                    showMonthYearDropdown/>
+                                                    showMonthYearDropdown
+                                                />
 
                                                 <div
                                                     className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -559,6 +583,7 @@ export default function EditCourseContent() {
                                                     dateFormat="yyyy-MM-dd hh:mm aa"
                                                     showTimeSelect
                                                     timeFormat="hh:mm aa"
+                                                    locale={'vi'}
                                                     selected={item.endDate ? new Date(item.endDate) : null}
                                                     ref={datePickerRef_endDay}
                                                     onChange={(date) => handleDateChange(section.id, item.typeId, 'endDate', date)}
