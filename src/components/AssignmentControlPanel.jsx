@@ -69,7 +69,7 @@ export default function AssignmentControlPanel() {
       </div>
 
       {assignments.map((assignment) => (
-          <SubmissionHeader courseID={assignment.courseId} key={assignment.id} id={assignment.id} title={assignment.title} startDate={assignment.startDate} endDate={assignment.endDate} />
+          <SubmissionHeader courseID={assignment.courseId} key={assignment.id} id={assignment.id} title={`${assignment.courseName} - ${assignment.title}`} startDate={assignment.startDate} endDate={assignment.endDate} />
       ))}
 
       {/*<div className="bg-white rounded-lg shadow overflow-hidden">*/}

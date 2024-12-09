@@ -117,32 +117,39 @@ export default function Calendar() {
                     <div className="border-t border-l">
                         {getMonthData().map((week, weekIndex) => (
                             <div key={weekIndex} className="grid grid-cols-7">
-                                {week.map((day, dayIndex) => (
-                                    <div
-                                        key={`${weekIndex}-${dayIndex}`}
-                                        className="min-h-[120px] border-r border-b p-2"
-                                    >
-                                        {day && (
-                                            <>
-                                                <div className={`text-sm mb-1`}>
-                                                    {day}
-                                                </div>
-                                                <div className="space-y-1">
-                                                    {getEventsForDate(day).map(event => (
-                                                        <div
-                                                            key={event.id}
-                                                            className="text-xs p-1 bg-orange-100 text-blue-800 rounded truncate"
-                                                        >
-                                                            <a href={`/submission/${event.courseId}/${event.id}`} className="hover:underline">
-                                                                {event.title}
-                                                            </a>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                ))}
+                                {week.map((day, dayIndex) => {
+                                    const isToday = day === new Date().getDate() &&
+                                        currentDate.getMonth() === new Date().getMonth() &&
+                                        currentDate.getFullYear() === new Date().getFullYear();
+                                    return (
+                                        <div
+                                            key={`${weekIndex}-${dayIndex}`}
+                                            className={`min-h-[120px] border-r border-b p-2 ${isToday ? 'bg-emerald-100' : ''}`}
+                                        >
+                                            {day && (
+                                                <>
+                                                    <div className={`text-sm mb-1 `}>
+                                                        <span className={`${isToday ? 'px-2 py-1 bg-rose-400 rounded-3xl' : ''}`}>{day}</span>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        {getEventsForDate(day).map(event => (
+                                                            <div
+                                                                key={event.id}
+                                                                className="text-xs p-1 bg-orange-100 text-blue-800 rounded truncate"
+                                                            >
+                                                                <a href={`/submission/${event.courseId}/${event.id}`}
+                                                                   title={`${event.courseName} - ${event.title}`}
+                                                                   className="hover:underline text-blue-600 font-semibold hover:text-blue-800 transition duration-300 ease-in-out">
+                                                                    ● {event.courseName} - {event.title}
+                                                                </a>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ))}
                     </div>
