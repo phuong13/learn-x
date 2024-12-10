@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import { useAuth } from '@hooks/useAuth.js';
 import Loader from './Loader';
 import { toast } from 'react-toastify';
+import { Eye, EyeOff } from 'lucide-react';
 
 const AuthLayout = ({ type = 'login' }) => {
     const { width } = useWindowSize();
@@ -26,6 +27,8 @@ const AuthLayout = ({ type = 'login' }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [form, setForm] = useState(type);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { setAuthUser, setIsAuthenticated } = useAuth();
 
@@ -42,6 +45,16 @@ const AuthLayout = ({ type = 'login' }) => {
         mode: 'onChange',
         defaultValues,
     });
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            if (form === 'login') {
+                handleSubmit(onSubmitLogin)();
+            } else {
+                handleSubmit(onSubmitRegister)();
+            }
+        }
+    };
 
     const onSubmitLogin = async ({ email, password }) => {
         setIsLoading(true);
@@ -91,6 +104,7 @@ const AuthLayout = ({ type = 'login' }) => {
             const result = await AuthService.register(fullName, email, password);
             console.log(result);
             if (result.status === 200) {
+                toast(result.message, { type: 'success' });
                 navigate(`/register/verify?email=${email}`);
             }
         } catch (error) {
@@ -140,6 +154,7 @@ const AuthLayout = ({ type = 'login' }) => {
                                             name="fullName"
                                             placeholder="Nhập tên của bạn"
                                             {...register('fullName', { required: true })}
+                                            onKeyDown={handleKeyDown}
                                         />
                                     </div>
                                 )}
@@ -154,32 +169,40 @@ const AuthLayout = ({ type = 'login' }) => {
                                         name="email"
                                         placeholder="Nhập địa chỉ email"
                                         {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
+                                        onKeyDown={handleKeyDown}
                                     />
                                 </div>
-                                <div className="field-wrapper">
+                                <div className="field-wrapper relative">
                                     <label htmlFor="password" className="field-label">
                                         Mật khẩu
                                     </label>
                                     <input
                                         className={classNames('field-input', { 'field-input--error': errors.password })}
                                         id="password"
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         name="password"
                                         placeholder="Nhập mật khẩu"
                                         {...register('password', { required: true })}
+                                        onKeyDown={handleKeyDown}
                                     />
+                                    <button
+                                        type="button"
+                                        className="absolute right-3 top-[38px] text-gray-500"
+                                        onClick={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
                                 </div>
                                 {form === 'register' && (
-                                    <div className="field-wrapper">
+                                    <div className="field-wrapper relative">
                                         <label htmlFor="confirmPassword" className="field-label">
                                             Xác nhận mật khẩu
                                         </label>
                                         <input
-                                            className={classNames('field-input', {
+                                            className={classNames('field-input pr-10', {
                                                 'field-input--error': errors.confirmPassword,
                                             })}
                                             id="confirmPassword"
-                                            type="password"
+                                            type={showConfirmPassword ? "text" : "password"}
                                             name="confirmPassword"
                                             placeholder="Nhập lại mật khẩu"
                                             {...register('confirmPassword', {
@@ -187,7 +210,15 @@ const AuthLayout = ({ type = 'login' }) => {
                                                 validate: (value) =>
                                                     value === watch('password') || 'Mật khẩu không khớp',
                                             })}
+                                            onKeyDown={handleKeyDown}
                                         />
+                                        <button
+                                            type="button"
+                                            className="absolute right-3 top-[38px] text-gray-500"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        >
+                                            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                        </button>
                                     </div>
                                 )}
                             </div>
@@ -254,3 +285,4 @@ AuthLayout.propTypes = {
 };
 
 export default AuthLayout;
+

@@ -19,7 +19,12 @@ export const AuthProvider = (props) => {
     const [isAuthenticated, setIsAuthenticated] = useState(getAccessTokenFromCookie());
 
     useEffect(() => {
+        setAuthUser(getUserFromLocalStorage());
+    }, []);
+
+    useEffect(() => {
         if (!authUser) {
+            setIsAuthenticated(false);
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');

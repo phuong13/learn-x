@@ -71,7 +71,7 @@ function App() {
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register/verify" element={<ConfirmRegister />} />
-                        <Route path="reset-password" element={<ResetPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
                         <Route path="/identify" element={<IdentifyAccount />} />
 
                         <Route path="/" element={<ProtectedRoute><HomePage/></ProtectedRoute>} />
