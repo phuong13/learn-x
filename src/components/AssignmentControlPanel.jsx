@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronDown, Search, Upload } from 'lucide-react'
+import { ChevronDown, Search } from 'lucide-react'
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import SubmissionHeader from '@components/SubmissionHeader.jsx';

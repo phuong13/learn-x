@@ -8,6 +8,8 @@ import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
+import Header from '@layout/Header.jsx';
+import NavBar from '@layout/NavBar.jsx';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -188,7 +190,7 @@ export default function EditCourseContent() {
             }));
 
             toast('Module updated successfully');
-            setSavedSections(prev => ({...prev, [sectionId]: true}));
+            setSavedSections(prev => ({ ...prev, [sectionId]: true }));
 
             // Update the sections state to reflect that the section is no longer new
             setSections(prevSections =>
@@ -209,7 +211,22 @@ export default function EditCourseContent() {
 
     const handleDateChange = (sectionId, itemId, field, date) => {
         // Convert the selected date to UTC
+        const now = new Date();
         const utcDate = new Date(date.getTime());
+
+        if (field === 'startDate' && utcDate <= now) {
+            toast.error('Ngày bắt đầu phải lớn hơn thời gian hiện tại');
+            return;
+        }
+
+        const section = sections.find(section => section.id === sectionId);
+        const item = section.items.find(item => item.typeId === itemId);
+
+        if (field === 'endDate' && utcDate <= new Date(item.startDate)) {
+            toast.error('Ngày kết thúc phải lớn hơn ngày bắt đầu');
+            return;
+        }
+
         setSections(sections.map(section =>
             section.id === sectionId
                 ? {
@@ -373,7 +390,7 @@ export default function EditCourseContent() {
                     ? {
                         ...section,
                         items: section.items.map(item =>
-                        item.typeId === itemId ? { ...item, title: fileName } : item
+                            item.typeId === itemId ? { ...item, title: fileName } : item
                         ),
                     }
                     : section
@@ -387,6 +404,10 @@ export default function EditCourseContent() {
 
     return (
         <>
+            <div className="sticky top-0 z-50">
+                <Header />
+            </div>
+            <NavBar />
             <button
                 onClick={() => window.history.back()}
                 className="text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-6 py-2  flex items-center space-x-2"
@@ -650,7 +671,9 @@ export default function EditCourseContent() {
                         )}
                     </div>
                 ))}
+
             </div>
+
             {isConfirmDialogOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded-lg">
@@ -682,4 +705,3 @@ export default function EditCourseContent() {
         </>
     );
 }
-

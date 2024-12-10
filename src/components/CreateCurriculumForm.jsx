@@ -56,14 +56,14 @@ export default function Curriculum() {
             };
             console.log(lectureData);
             await axiosPrivate.post(`/lectures`, lectureData)
-                .then(r => {
-                  console.log(r);
-                  toast(r.data.message)
-                })
-                .catch(e => {
-                  console.error(e.response.message);
-                  toast(e.response.data.message);
-                });
+              .then(r => {
+                console.log(r);
+                toast(r.data.message)
+              })
+              .catch(e => {
+                console.error(e.response.message);
+                toast(e.response.data.message);
+              });
             break;
           }
           case 'quiz':
@@ -88,14 +88,14 @@ export default function Curriculum() {
             await axiosPrivate.post(`/assignments`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
-                .then(r => {
-                  console.log(r);
-                  toast(r.data.message)
-                })
-                .catch(e => {
-                  console.error(e.response.message);
-                  toast(e.response.data.message);
-                });
+              .then(r => {
+                console.log(r);
+                toast(r.data.message)
+              })
+              .catch(e => {
+                console.error(e.response.message);
+                toast(e.response.data.message);
+              });
 
             break;
           }
@@ -113,20 +113,20 @@ export default function Curriculum() {
             await axiosPrivate.post(`/resources`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
-                .then(r => {
-                  console.log(r);
-                  toast(r.data.message)
-                })
-                .catch(e => {
-                  console.error(e.response.data.message);
-                  toast(e.response.data.message);
-                });
+              .then(r => {
+                console.log(r);
+                toast(r.data.message)
+              })
+              .catch(e => {
+                console.error(e.response.data.message);
+                toast(e.response.data.message);
+              });
 
             break;
           }
         }
       }));
-
+      // Mark this section as saved
       setSavedSections(prev => ({ ...prev, [sectionId]: true }));
     }
   };
@@ -140,14 +140,39 @@ export default function Curriculum() {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [confirmingSectionId, setConfirmingSectionId] = useState(null);
   const [savedSections, setSavedSections] = useState({});
-  const inputRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem('sections', JSON.stringify(sections));
   }, [sections]);
 
   const handleDateChange = (sectionId, itemId, field, date) => {
-    // Convert the selected date to UTC
+    // Lấy thời gian hiện tại
+    const now = new Date();
+
+    // Tìm section và item hiện tại để kiểm tra giá trị startDate và endDate
+    const section = sections.find(section => section.id === sectionId);
+    const item = section.items.find(item => item.id === itemId);
+
+    // Kiểm tra điều kiện validate
+    if (field === 'startDate') {
+      if (date <= now) {
+        toast("Ngày giờ bắt đầu phải sau giờ hiện tại!", {type: 'error'});
+        return;
+      }
+      if (item.endDate && date >= item.endDate) {
+        toast("Ngày giờ bắt đầu phải trước ngày kết thúc!", {type: 'error'});
+        return;
+      }
+    }
+
+    if (field === 'endDate') {
+      if (item.startDate && date <= item.startDate) {
+        toast("Ngày giờ kết thúc phải sau ngày bắt đầu!", {type: 'error'});
+        return;
+      }
+    }
+
+    // Cập nhật state nếu các điều kiện hợp lệ
     const utcDate = new Date(date.getTime());
     setSections(sections.map(section =>
         section.id === sectionId
@@ -275,19 +300,19 @@ export default function Curriculum() {
   };
 
   return (
-      <>
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold flex items-center">
-              <List className="mr-2" />Thêm nội dung khóa học
-            </h1>
-            <button
-                onClick={addSection}
-                className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
-            >
-              Thêm chương mới
-            </button>
-          </div>
+    <>
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold flex items-center">
+            <List className="mr-2" />Thêm nội dung khóa học
+          </h1>
+          <button
+            onClick={addSection}
+            className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
+          >
+            Thêm chương mới
+          </button>
+        </div>
 
 
         {sections.map(section => (
