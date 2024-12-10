@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 const baseURL = 'http://localhost:9191/api/v1';
 
@@ -32,6 +33,7 @@ axiosPrivate.interceptors.request.use(
                 console.log(response);
                 if (response.status !== 200) {
                     console.log('Failed to refresh token');
+                    useNavigate().navigate('/login');
                     return Promise.reject('Failed to refresh token');
                 }
                 const { accessToken, refreshToken: newRefreshToken } = response.data.data;
@@ -43,6 +45,7 @@ axiosPrivate.interceptors.request.use(
         return config;
     },
     error => {
+        useNavigate().navigate('/login');
         return Promise.reject(error);
     }
 );

@@ -2,9 +2,12 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import PropTypes from 'prop-types';
 
-export default function SubmissionHeader({ courseID,id, title, startDate, endDate }) {
+export default function SubmissionHeader({ courseID, id, title, startDate, endDate }) {
     const formattedStartDate = format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
     const formattedEndDate = format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
+
+    console.log(formattedStartDate);
+    console.log(formattedEndDate);
 
     return (
         <div className="flex items-start gap-4 mt-2 pt-2 border-t border-slate-400">
@@ -34,6 +37,7 @@ export default function SubmissionHeader({ courseID,id, title, startDate, endDat
 }
 
 SubmissionHeader.propTypes = {
+    courseID: PropTypes.number,
     id: PropTypes.number,
     title: PropTypes.string.isRequired,
     startDate: PropTypes.string.isRequired,

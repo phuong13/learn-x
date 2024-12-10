@@ -69,11 +69,13 @@ export default function Curriculum() {
           case 'quiz':
             break;
           case 'assignment': {
+            let utcStartDate = convertUTCToLocal(item.startDate);
+            let utcEndDate = convertUTCToLocal(item.endDate);
             let assignmentData = {
               title: item.title,
-              content: item.content,
-              startDate: item.startDate,
-              endDate: item.endDate,
+              content: itemContents[item.id] || item.content,
+              startDate: utcStartDate.toISOString(),
+              endDate: utcEndDate.toISOString(),
               state: "OPEN",
               moduleId: moduleId
             };
@@ -154,33 +156,46 @@ export default function Curriculum() {
     // Kiểm tra điều kiện validate
     if (field === 'startDate') {
       if (date <= now) {
-        toast.error("Ngày giờ bắt đầu phải sau giờ hiện tại!");
+        toast("Ngày giờ bắt đầu phải sau giờ hiện tại!", {type: 'error'});
         return;
       }
       if (item.endDate && date >= item.endDate) {
-        toast.error("Ngày giờ bắt đầu phải trước ngày kết thúc!");
+        toast("Ngày giờ bắt đầu phải trước ngày kết thúc!", {type: 'error'});
         return;
       }
     }
 
     if (field === 'endDate') {
       if (item.startDate && date <= item.startDate) {
-        toast.error("Ngày giờ kết thúc phải sau ngày bắt đầu!");
+        toast("Ngày giờ kết thúc phải sau ngày bắt đầu!", {type: 'error'});
         return;
       }
     }
 
     // Cập nhật state nếu các điều kiện hợp lệ
+    const utcDate = new Date(date.getTime());
     setSections(sections.map(section =>
-      section.id === sectionId
-        ? {
-          ...section,
-          items: section.items.map(item =>
-            item.id === itemId ? { ...item, [field]: date } : item
-          ),
-        }
-        : section
+        section.id === sectionId
+            ? {
+              ...section,
+              items: section.items.map(item =>
+                  item.id === itemId ? { ...item, [field]: utcDate.toISOString() } : item
+              ),
+            }
+            : section
     ));
+  };
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editingItemId, editingSectionId]);
+
+  const convertUTCToLocal = (dateString) => {
+    const date = new Date(dateString);
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
   };
 
   const addSection = () => {
@@ -310,6 +325,7 @@ export default function Curriculum() {
                     value={tempTitle || ''}
                     onChange={(e) => setTempTitle(e.target.value)}
                     className="border border-gray-300 p-1 rounded"
+                    ref={inputRef}
                   />
                   <button onClick={saveSection} className="text-green-500 hover:text-green-700">
                     <Check size={18} />
@@ -364,6 +380,7 @@ export default function Curriculum() {
                             value={tempTitle}
                             onChange={(e) => setTempTitle(e.target.value)}
                             className="ml-0 border border-gray-300 p-1 rounded"
+                            ref={inputRef}
                           />
                         ) : (
                           <span className={'p-0 ml-0'}>{item.title}</span>
@@ -390,6 +407,7 @@ export default function Curriculum() {
                           value={tempTitle}
                           onChange={(e) => setTempTitle(e.target.value)}
                           className="border border-gray-300 p-1 rounded"
+                          ref={inputRef}
                         />
                       ) : (
                         <span className="ml-0">{item.title}</span>
@@ -442,15 +460,17 @@ export default function Curriculum() {
                     <div className="block text-sm font-medium text-gray-700 mb-1">
                       <p>Ngày và giờ bắt đầu</p>
                       <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         onClick={() => datePickerRef_starDay.current.setOpen(true)}>
                         <DatePicker
-                          dateFormat="yyyy-MM-dd hh:mm aa"
-                          showTimeSelect
-                          timeFormat="hh:mm aa"
-                          selected={item.startDate}
-                          ref={datePickerRef_starDay}
-                          onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
+                            dateFormat="yyyy-MM-dd hh:mm aa"
+                            showTimeSelect
+                            timeFormat="hh:mm aa"
+                            locale={'vi'}
+                            selected={item.startDate ? new Date(item.startDate) : null}
+                            ref={datePickerRef_starDay}
+                            onChange={(date) => handleDateChange(section.id, item.typeId, 'startDate', date)}
+                            showMonthYearDropdown
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <Calendar className="h-5 w-5 text-gray-400" />
@@ -464,12 +484,13 @@ export default function Curriculum() {
       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         onClick={() => datePickerRef_endDay.current.setOpen(true)}>
                         <DatePicker
-                          dateFormat="yyyy-MM-dd hh:mm aa"
-                          showTimeSelect
-                          timeFormat="hh:mm aa"
-                          selected={item.endDate}
-                          ref={datePickerRef_endDay}
-                          onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
+                            dateFormat="yyyy-MM-dd hh:mm aa"
+                            showTimeSelect
+                            timeFormat="hh:mm aa"
+                            locale={'vi'}
+                            selected={item.endDate ? new Date(item.endDate) : null}
+                            ref={datePickerRef_endDay}
+                            onChange={(date) => handleDateChange(section.id, item.typeId, 'endDate', date)}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <Calendar className="h-5 w-5 text-gray-400" />

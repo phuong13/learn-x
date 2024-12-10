@@ -9,6 +9,7 @@ export default function ConfirmOTP() {
     const navigate = useNavigate();
     const query = new URLSearchParams(location.search);
     const emailFromQuery = query.get('email')?.replace(/\s/g, '+');
+    const otpFromQuery = query.get('otp');
 
     const [otp, setOtp] = useState(new Array(6).fill(''));
     const inputRefs = useRef([]);
@@ -16,6 +17,21 @@ export default function ConfirmOTP() {
     const formRef = useRef(null);
 
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (otpFromQuery && emailFromQuery) {
+            const newOtp = otpFromQuery.split('');
+            setOtp(newOtp);
+            newOtp.forEach((value, index) => {
+                inputRefs.current[index].value = value;
+            });
+            inputRefs.current[5].focus();
+
+            if (otp.every((digit) => digit !== '')) {
+                handleSubmitOTP();
+            }
+        }
+    }, [otpFromQuery, emailFromQuery]);
 
     const handleChange = (element, index) => {
         const newOtp = [...otp];
@@ -59,7 +75,7 @@ export default function ConfirmOTP() {
     }, [isResendDisabled]);
 
     const handleSubmitOTP = async (e) => {
-        if (e) 
+        if (e)
             e.preventDefault();
         const otpValue = otp.join('');
         const email = emailFromQuery;

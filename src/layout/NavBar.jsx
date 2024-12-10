@@ -1,6 +1,10 @@
-import React from 'react';
+import { useAuth } from '@hooks/useAuth.js';
+
 
 function Navbar() {
+
+    const {authUser} = useAuth();
+
     return (
         <nav className='bg-slate-300'>
             <div className="container mx-auto flex justify-between items-center p-2 px-4 ">
@@ -17,7 +21,7 @@ function Navbar() {
                         Trang chủ
                     </a>
                     <a href="/my-course" className="font-medium hover:text-gray-200 text-base">
-                        Khoá học của tôi
+                        {authUser.role === "TEACHER" ? "Quản lý khóa học" : "Khóa học của tôi"}
                     </a>
                     <a href="/dashboard" className="font-medium hover:text-gray-200 text-base">
                         Bảng điều khiển

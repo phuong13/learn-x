@@ -7,11 +7,9 @@ import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useStateWithHistory } from 'react-use';
 import { useNavigate } from 'react-router-dom';
-import Header from '../layout/Header';
-import Navbar from '@layout/NavBar.jsx';
-import Footer from '@layout/Footer.jsx';
+import Header from '@layout/Header.jsx';
+import NavBar from '@layout/NavBar.jsx';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -28,11 +26,17 @@ export default function EditCourseContent() {
     const datePickerRef_startDay = useRef(null);
     const datePickerRef_endDay = useRef(null);
 
-
-    const [originalData, setOriginalData] = useState({});
     const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
     const [deletingSectionId, setDeletingSectionId] = useState(null);
 
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [editingSectionId, editingItemId]);
 
     useEffect(() => {
         const fetchCourseContent = async () => {
@@ -58,7 +62,6 @@ export default function EditCourseContent() {
                     };
                 }));
                 setSections(formattedSections);
-                setOriginalData(formattedSections);
             } catch (error) {
                 console.error('Error fetching course content:', error);
                 toast(error.response.data.message, { type: 'error' });
@@ -189,11 +192,6 @@ export default function EditCourseContent() {
             toast('Module updated successfully');
             setSavedSections(prev => ({ ...prev, [sectionId]: true }));
 
-            // Update originalData after successful save
-            setOriginalData(prevOriginal =>
-                prevOriginal.map(s => s.id === sectionId ? { ...section, isNew: false } : s)
-            );
-
             // Update the sections state to reflect that the section is no longer new
             setSections(prevSections =>
                 prevSections.map(s => s.id === sectionId ? { ...s, isNew: false, items: s.items.map(item => ({ ...item, isNew: false })) } : s)
@@ -212,6 +210,7 @@ export default function EditCourseContent() {
 
 
     const handleDateChange = (sectionId, itemId, field, date) => {
+        // Convert the selected date to UTC
         const now = new Date();
         const utcDate = new Date(date.getTime());
 
@@ -408,7 +407,7 @@ export default function EditCourseContent() {
             <div className="sticky top-0 z-50">
                 <Header />
             </div>
-            <Navbar />
+            <NavBar />
             <button
                 onClick={() => window.history.back()}
                 className="text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-6 py-2  flex items-center space-x-2"
@@ -441,6 +440,7 @@ export default function EditCourseContent() {
                                         value={tempTitle}
                                         onChange={(e) => setTempTitle(e.target.value)}
                                         className="border border-gray-300 p-1 rounded"
+                                        ref={inputRef}
                                     />
                                     <button onClick={saveSection} className="text-green-500 hover:text-green-700">
                                         <Check size={18} />
@@ -497,6 +497,7 @@ export default function EditCourseContent() {
                                                         value={tempTitle}
                                                         onChange={(e) => setTempTitle(e.target.value)}
                                                         className="ml-0 border border-gray-300 p-1 rounded"
+                                                        ref={inputRef}
                                                     />
                                                 ) : (
                                                     <span className={'p-0 ml-0'}>{item.title}</span>
@@ -523,6 +524,7 @@ export default function EditCourseContent() {
                                                     value={tempTitle}
                                                     onChange={(e) => setTempTitle(e.target.value)}
                                                     className="border border-gray-300 p-1 rounded"
+                                                    ref={inputRef}
                                                 />
                                             ) : (
                                                 <span className="ml-0">{item.title}</span>
@@ -669,7 +671,7 @@ export default function EditCourseContent() {
                         )}
                     </div>
                 ))}
-                
+
             </div>
 
             {isConfirmDialogOpen && (
