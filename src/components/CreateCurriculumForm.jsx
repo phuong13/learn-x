@@ -22,6 +22,8 @@ export default function Curriculum() {
     ];
   });
 
+  const inputRef = useRef(null);
+
   const handlePostModule = async (sectionId) => {
     setIsConfirmDialogOpen(true);
     setConfirmingSectionId(sectionId);

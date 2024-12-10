@@ -2,8 +2,8 @@
 import DocumentTitle from '@components/DocumentTitle';
 import IdentifyEmail from '../components/IdentifyEmail';
 import Header from '../layout/Header';
-import Navbar from '@layout/NavBar.jsx';
-import Footer from '@layout/Footer.jsx';
+import Navbar from '../layout/NavBar.jsx';
+import Footer from '../layout/Footer.jsx';
 
 const IdentifyAccount = () => {
     return (

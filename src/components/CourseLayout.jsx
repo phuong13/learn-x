@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Trash2 } from 'lucide-react';
 import CourseContent from './CourseContent';
 import StudentRegisteredLayout from './StudentRegisteredLayout.jsx';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { axiosPrivate } from '@/axios/axios.js';
+import { useAuth } from '@hooks/useAuth.js';
+import { toast } from 'react-toastify';
 
 export default function CoursePageLayout() {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -11,6 +13,10 @@ export default function CoursePageLayout() {
     const [modules, setModules] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số', 'Năng lực'];
+
+    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+
+    const { authUser } = useAuth();
 
     const { courseId } = useParams();
 
@@ -25,6 +31,7 @@ export default function CoursePageLayout() {
     }, [courseId]);
 
     useEffect(() => {
+        setIsLoading(true);
         const fetchModules = async () => {
             setIsLoading(true);
             try {
@@ -39,9 +46,21 @@ export default function CoursePageLayout() {
         fetchModules();
     }, [courseId]);
 
-    const handleModuleClick = (module) => {
-        document.getElementById(module.id).scrollIntoView({ behavior: 'smooth' });
-    };
+    const navigate = useNavigate();
+
+    const handleDeleteCourse = async () => {
+        try {
+            const response = await axiosPrivate.delete(`courses/${courseId}`);
+            if (response.status === 200) {
+                setIsConfirmDialogOpen(false);
+                navigate('/my-course');
+                toast(response.data.message);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
 
     const renderContentForTab = () => {
         switch (selectedTab) {
@@ -114,21 +133,32 @@ export default function CoursePageLayout() {
                             </ol>
                         </nav>
                     </div>
-                    <button className="text-white">
-                        <MoreVertical className="h-6 w-6" />
-                    </button>
+                    <div className="flex items-center space-x-2">
+                        {authUser?.role === 'TEACHER' && (
+                            <button
+                                onClick={() => setIsConfirmDialogOpen(true)}
+                                className="bg-emerald-600 text-white bg-red-500 hover:bg-red-700 p-2 rounded-full"
+                            >
+                                <Trash2 className="h-6 w-6" />
+                            </button>
+                        )}
+
+                    {/*    <button className="text-white">*/}
+                    {/*        <MoreVertical className="h-6 w-6" />*/}
+                    {/*    </button>*/}
+                    </div>
                 </div>
 
             </div>
 
             <nav className="bg-white border-b">
                 <ul className="flex">
-                    {tabs.map((item, index) => (
+                {tabs.map((item, index) => (
                         <li key={index}>
                             <button
                                 onClick={() => setSelectedTab(index)}
                                 className={`block px-4 py-2 text-sm ${selectedTab === index ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'
-                                    }`}>
+                                }`}>
                                 {item}
                             </button>
                         </li>
@@ -139,6 +169,20 @@ export default function CoursePageLayout() {
             <div className="container mx-auto mt-6 px-4 bg-white rounded-lg shadow-lg overflow-hidden">
                 {renderContentForTab()}
             </div>
+
+
+            {isConfirmDialogOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded-lg">
+                        {/*<h2 className="text-xl font-bold mb-4">Xác nhận</h2>*/}
+                        <p className="mb-4">Xác nhận xóa khóa học? <br/>(Hành động này không thể quay lại)</p>
+                        <div className="flex justify-end space-x-2">
+                            <button className="btn btn--secondary text-btn hover:bg-emerald-400" onClick={() => setIsConfirmDialogOpen(false)}>Không</button>
+                            <button className="btn btn--primary hover:bg-emerald-400" onClick={handleDeleteCourse}>Có</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
