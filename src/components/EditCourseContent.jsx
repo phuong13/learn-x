@@ -7,7 +7,6 @@ import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useStateWithHistory } from 'react-use';
 import { useNavigate } from 'react-router-dom';
 
 export default function EditCourseContent() {
@@ -25,11 +24,17 @@ export default function EditCourseContent() {
     const datePickerRef_startDay = useRef(null);
     const datePickerRef_endDay = useRef(null);
 
-
-    const [originalData, setOriginalData] = useState({});
     const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
     const [deletingSectionId, setDeletingSectionId] = useState(null);
 
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [editingSectionId, editingItemId]);
 
     useEffect(() => {
         const fetchCourseContent = async () => {
@@ -55,7 +60,6 @@ export default function EditCourseContent() {
                     };
                 }));
                 setSections(formattedSections);
-                setOriginalData(formattedSections);
             } catch (error) {
                 console.error('Error fetching course content:', error);
                 toast(error.response.data.message, { type: 'error' });
@@ -185,11 +189,6 @@ export default function EditCourseContent() {
 
             toast('Module updated successfully');
             setSavedSections(prev => ({...prev, [sectionId]: true}));
-
-            // Update originalData after successful save
-            setOriginalData(prevOriginal =>
-                prevOriginal.map(s => s.id === sectionId ? { ...section, isNew: false } : s)
-            );
 
             // Update the sections state to reflect that the section is no longer new
             setSections(prevSections =>
@@ -420,6 +419,7 @@ export default function EditCourseContent() {
                                         value={tempTitle}
                                         onChange={(e) => setTempTitle(e.target.value)}
                                         className="border border-gray-300 p-1 rounded"
+                                        ref={inputRef}
                                     />
                                     <button onClick={saveSection} className="text-green-500 hover:text-green-700">
                                         <Check size={18} />
@@ -476,6 +476,7 @@ export default function EditCourseContent() {
                                                         value={tempTitle}
                                                         onChange={(e) => setTempTitle(e.target.value)}
                                                         className="ml-0 border border-gray-300 p-1 rounded"
+                                                        ref={inputRef}
                                                     />
                                                 ) : (
                                                     <span className={'p-0 ml-0'}>{item.title}</span>
@@ -502,6 +503,7 @@ export default function EditCourseContent() {
                                                     value={tempTitle}
                                                     onChange={(e) => setTempTitle(e.target.value)}
                                                     className="border border-gray-300 p-1 rounded"
+                                                    ref={inputRef}
                                                 />
                                             ) : (
                                                 <span className="ml-0">{item.title}</span>

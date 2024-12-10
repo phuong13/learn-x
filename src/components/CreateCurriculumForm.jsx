@@ -140,6 +140,7 @@ export default function Curriculum() {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [confirmingSectionId, setConfirmingSectionId] = useState(null);
   const [savedSections, setSavedSections] = useState({});
+  const inputRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem('sections', JSON.stringify(sections));
@@ -159,6 +160,13 @@ export default function Curriculum() {
             : section
     ));
   };
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editingItemId, editingSectionId]);
 
   const convertUTCToLocal = (dateString) => {
     const date = new Date(dateString);
@@ -292,6 +300,7 @@ export default function Curriculum() {
                     value={tempTitle || ''}
                     onChange={(e) => setTempTitle(e.target.value)}
                     className="border border-gray-300 p-1 rounded"
+                    ref={inputRef}
                   />
                   <button onClick={saveSection} className="text-green-500 hover:text-green-700">
                     <Check size={18} />
@@ -346,6 +355,7 @@ export default function Curriculum() {
                             value={tempTitle}
                             onChange={(e) => setTempTitle(e.target.value)}
                             className="ml-0 border border-gray-300 p-1 rounded"
+                            ref={inputRef}
                           />
                         ) : (
                           <span className={'p-0 ml-0'}>{item.title}</span>
@@ -372,6 +382,7 @@ export default function Curriculum() {
                           value={tempTitle}
                           onChange={(e) => setTempTitle(e.target.value)}
                           className="border border-gray-300 p-1 rounded"
+                          ref={inputRef}
                         />
                       ) : (
                         <span className="ml-0">{item.title}</span>
