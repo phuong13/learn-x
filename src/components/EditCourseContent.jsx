@@ -7,6 +7,11 @@ import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useStateWithHistory } from 'react-use';
+import { useNavigate } from 'react-router-dom';
+import Header from '../layout/Header';
+import Navbar from '@layout/NavBar.jsx';
+import Footer from '@layout/Footer.jsx';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -27,6 +32,7 @@ export default function EditCourseContent() {
     const [originalData, setOriginalData] = useState({});
     const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
     const [deletingSectionId, setDeletingSectionId] = useState(null);
+
 
     useEffect(() => {
         const fetchCourseContent = async () => {
@@ -61,6 +67,19 @@ export default function EditCourseContent() {
 
         fetchCourseContent();
     }, [courseId]);
+
+
+    useEffect(() => {
+        localStorage.setItem('sections', JSON.stringify(sections));
+    }, [sections]);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        return () => {
+            localStorage.removeItem('sections');
+        }
+    }, [navigate]);
 
     const confirmAndUpdateModule = async () => {
         setIsConfirmDialogOpen(false);
@@ -108,11 +127,13 @@ export default function EditCourseContent() {
                         break;
                     }
                     case 'assignment': {
+                        let utcStartDate = convertUTCToLocal(item.startDate);
+                        let utcEndDate = convertUTCToLocal(item.endDate);
                         let assignmentData = {
                             title: item.title,
                             content: itemContents[item.typeId] || item.content,
-                            startDate: item.startDate,
-                            endDate: item.endDate,
+                            startDate: utcStartDate.toISOString(),
+                            endDate: utcEndDate.toISOString(),
                             state: "OPEN",
                             moduleId: moduleId
                         };
@@ -145,6 +166,8 @@ export default function EditCourseContent() {
                             moduleId: moduleId
                         };
                         const urlParams = new URLSearchParams();
+                        urlParams.append('title', resourceData.title);
+                        const url = urlParams.toString();
                         formData.append('resources', new Blob([JSON.stringify(resourceData)], { type: 'application/json' }));
                         if (files[`${sectionId}-${item.typeId}`]) {
                             formData.append('document', files[`${sectionId}-${item.typeId}`]);
@@ -154,7 +177,7 @@ export default function EditCourseContent() {
                                 headers: { 'Content-Type': 'multipart/form-data' },
                             });
                         } else {
-                            await axiosPrivate.patch(`/resources/${item.id}`, formData, {
+                            await axiosPrivate.patch(`/resources/${item.id}?${url}`, formData, {
                                 headers: { 'Content-Type': 'multipart/form-data' },
                             });
                         }
@@ -164,7 +187,7 @@ export default function EditCourseContent() {
             }));
 
             toast('Module updated successfully');
-            setSavedSections(prev => ({...prev, [sectionId]: true}));
+            setSavedSections(prev => ({ ...prev, [sectionId]: true }));
 
             // Update originalData after successful save
             setOriginalData(prevOriginal =>
@@ -188,22 +211,38 @@ export default function EditCourseContent() {
     };
 
 
-    useEffect(() => {
-        localStorage.setItem('sections', JSON.stringify(sections));
-    }, [sections]);
-
     const handleDateChange = (sectionId, itemId, field, date) => {
-        console.log(date);
+        const now = new Date();
+        const utcDate = new Date(date.getTime());
+
+        if (field === 'startDate' && utcDate <= now) {
+            toast.error('Ngày bắt đầu phải lớn hơn thời gian hiện tại');
+            return;
+        }
+
+        const section = sections.find(section => section.id === sectionId);
+        const item = section.items.find(item => item.typeId === itemId);
+
+        if (field === 'endDate' && utcDate <= new Date(item.startDate)) {
+            toast.error('Ngày kết thúc phải lớn hơn ngày bắt đầu');
+            return;
+        }
+
         setSections(sections.map(section =>
             section.id === sectionId
                 ? {
                     ...section,
                     items: section.items.map(item =>
-                        item.typeId === itemId ? { ...item, [field]: date } : item
+                        item.typeId === itemId ? { ...item, [field]: utcDate.toISOString() } : item
                     ),
                 }
                 : section
         ));
+    };
+
+    const convertUTCToLocal = (dateString) => {
+        const date = new Date(dateString);
+        return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     };
 
     const addSection = () => {
@@ -352,7 +391,7 @@ export default function EditCourseContent() {
                     ? {
                         ...section,
                         items: section.items.map(item =>
-                        item.typeId === itemId ? { ...item, title: fileName } : item
+                            item.typeId === itemId ? { ...item, title: fileName } : item
                         ),
                     }
                     : section
@@ -366,6 +405,10 @@ export default function EditCourseContent() {
 
     return (
         <>
+            <div className="sticky top-0 z-50">
+                <Header />
+            </div>
+            <Navbar />
             <button
                 onClick={() => window.history.back()}
                 className="text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-6 py-2  flex items-center space-x-2"
@@ -538,10 +581,12 @@ export default function EditCourseContent() {
                                                     dateFormat="yyyy-MM-dd hh:mm aa"
                                                     showTimeSelect
                                                     timeFormat="hh:mm aa"
+                                                    locale={'vi'}
                                                     selected={item.startDate ? new Date(item.startDate) : null}
                                                     ref={datePickerRef_startDay}
                                                     onChange={(date) => handleDateChange(section.id, item.typeId, 'startDate', date)}
-                                                    showMonthYearDropdown/>
+                                                    showMonthYearDropdown
+                                                />
 
                                                 <div
                                                     className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -559,6 +604,7 @@ export default function EditCourseContent() {
                                                     dateFormat="yyyy-MM-dd hh:mm aa"
                                                     showTimeSelect
                                                     timeFormat="hh:mm aa"
+                                                    locale={'vi'}
                                                     selected={item.endDate ? new Date(item.endDate) : null}
                                                     ref={datePickerRef_endDay}
                                                     onChange={(date) => handleDateChange(section.id, item.typeId, 'endDate', date)}
@@ -623,7 +669,9 @@ export default function EditCourseContent() {
                         )}
                     </div>
                 ))}
+                
             </div>
+
             {isConfirmDialogOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded-lg">
@@ -655,4 +703,3 @@ export default function EditCourseContent() {
         </>
     );
 }
-

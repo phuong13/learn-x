@@ -77,7 +77,7 @@ export default function CoursePageLayout() {
     };
 
     return (
-        <div className="bg-gray-100 min-h-screen">
+        <div className="bg-gray-100 min-h-screen mb-6">
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
                     src={course?.thumbnail}

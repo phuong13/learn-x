@@ -7,10 +7,11 @@ export default function Resource({ type, title, link }) {
     word: 'fa-file-word text-blue-500',
     ppt: 'fa-file-powerpoint text-[#CD4F2E]',
     excel: 'fa-file-excel text-[#25764a]',
+    pdf: 'fa-file-pdf text-[#d32f2f]',
   };
 
   return (
-    <div className="flex items-start gap-4 mt-2 pt-2 border-t border-slate-400">
+    <div className="flex items-start gap-4 pt-2 border-t border-slate-400">
       {/* Icon */}
       <div className="mt-1">
         <i className={`fa-solid ${icons[type]} text-2xl`}></i>

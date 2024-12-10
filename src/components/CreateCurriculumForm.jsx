@@ -56,14 +56,14 @@ export default function Curriculum() {
             };
             console.log(lectureData);
             await axiosPrivate.post(`/lectures`, lectureData)
-                .then(r => {
-                  console.log(r);
-                  toast(r.data.message)
-                })
-                .catch(e => {
-                  console.error(e.response.message);
-                  toast(e.response.data.message);
-                });
+              .then(r => {
+                console.log(r);
+                toast(r.data.message)
+              })
+              .catch(e => {
+                console.error(e.response.message);
+                toast(e.response.data.message);
+              });
             break;
           }
           case 'quiz':
@@ -86,14 +86,14 @@ export default function Curriculum() {
             await axiosPrivate.post(`/assignments`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
-                .then(r => {
-                  console.log(r);
-                  toast(r.data.message)
-                })
-                .catch(e => {
-                  console.error(e.response.message);
-                  toast(e.response.data.message);
-                });
+              .then(r => {
+                console.log(r);
+                toast(r.data.message)
+              })
+              .catch(e => {
+                console.error(e.response.message);
+                toast(e.response.data.message);
+              });
 
             break;
           }
@@ -111,14 +111,14 @@ export default function Curriculum() {
             await axiosPrivate.post(`/resources`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
-                .then(r => {
-                  console.log(r);
-                  toast(r.data.message)
-                })
-                .catch(e => {
-                  console.error(e.response.data.message);
-                  toast(e.response.data.message);
-                });
+              .then(r => {
+                console.log(r);
+                toast(r.data.message)
+              })
+              .catch(e => {
+                console.error(e.response.data.message);
+                toast(e.response.data.message);
+              });
 
             break;
           }
@@ -144,6 +144,33 @@ export default function Curriculum() {
   }, [sections]);
 
   const handleDateChange = (sectionId, itemId, field, date) => {
+    // Lấy thời gian hiện tại
+    const now = new Date();
+
+    // Tìm section và item hiện tại để kiểm tra giá trị startDate và endDate
+    const section = sections.find(section => section.id === sectionId);
+    const item = section.items.find(item => item.id === itemId);
+
+    // Kiểm tra điều kiện validate
+    if (field === 'startDate') {
+      if (date <= now) {
+        toast.error("Ngày giờ bắt đầu phải sau giờ hiện tại!");
+        return;
+      }
+      if (item.endDate && date >= item.endDate) {
+        toast.error("Ngày giờ bắt đầu phải trước ngày kết thúc!");
+        return;
+      }
+    }
+
+    if (field === 'endDate') {
+      if (item.startDate && date <= item.startDate) {
+        toast.error("Ngày giờ kết thúc phải sau ngày bắt đầu!");
+        return;
+      }
+    }
+
+    // Cập nhật state nếu các điều kiện hợp lệ
     setSections(sections.map(section =>
       section.id === sectionId
         ? {
@@ -258,19 +285,19 @@ export default function Curriculum() {
   };
 
   return (
-      <>
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold flex items-center">
-              <List className="mr-2" />Thêm nội dung khóa học
-            </h1>
-            <button
-                onClick={addSection}
-                className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
-            >
-              Thêm chương mới
-            </button>
-          </div>
+    <>
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold flex items-center">
+            <List className="mr-2" />Thêm nội dung khóa học
+          </h1>
+          <button
+            onClick={addSection}
+            className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
+          >
+            Thêm chương mới
+          </button>
+        </div>
 
 
         {sections.map(section => (
@@ -415,7 +442,7 @@ export default function Curriculum() {
                     <div className="block text-sm font-medium text-gray-700 mb-1">
                       <p>Ngày và giờ bắt đầu</p>
                       <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         onClick={() => datePickerRef_starDay.current.setOpen(true)}>
                         <DatePicker
                           dateFormat="yyyy-MM-dd hh:mm aa"

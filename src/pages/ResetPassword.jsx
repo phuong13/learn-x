@@ -8,6 +8,9 @@ import Loader from '../components/Loader';
 import classNames from 'classnames';
 import DocumentTitle from '@components/DocumentTitle.jsx';
 import { toast } from 'react-toastify';
+import Header from '../layout/Header';
+import Navbar from '@layout/NavBar.jsx';
+import Footer from '@layout/Footer.jsx';
 
 const ResetPassword = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -55,6 +58,10 @@ const ResetPassword = () => {
 
     return (
         <>
+            <div className="sticky top-0 z-50">
+                <Header />
+            </div>
+            <Navbar />
             <DocumentTitle title="Quên mật khẩu" />
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <Loader isLoading={isLoading} />
@@ -79,7 +86,7 @@ const ResetPassword = () => {
                                         'block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
                                         {
                                             'block w-full pl-10 pr-3 py-2 border border-red-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none sm:text-sm':
-                                            errors.password,
+                                                errors.password,
                                         },
                                     )}
                                     {...register('password', { required: true, minLength: 6 })}
@@ -104,7 +111,7 @@ const ResetPassword = () => {
                                         'block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
                                         {
                                             'block w-full pl-10 pr-3 py-2 border border-red-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none sm:text-sm':
-                                            errors.password,
+                                                errors.password,
                                         },
                                     )}
                                     {...register('confirmPassword', {
@@ -122,6 +129,7 @@ const ResetPassword = () => {
                     </form>
                 </div>
             </div>
+            <Footer />
         </>
     );
 };
