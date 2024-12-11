@@ -111,85 +111,98 @@ export default function EditCourseContent() {
             }
 
             // Update or create items
-            await Promise.all(section.items.map(async item => {
-                let formData = new FormData();
+            const updateModulePromise = new Promise( (resolve, reject) => {
+                try {
+                    Promise.all(section.items.map(async item => {
+                        let formData = new FormData();
 
-                switch (item.type) {
-                    case 'lecture': {
-                        let lectureData = {
-                            moduleId,
-                            title: item.title,
-                            content: itemContents[item.typeId] || item.content
-                        };
-                        if (item.isNew) {
-                            let res = await axiosPrivate.post(`/lectures`, lectureData);
-                            console.log('Created lecture ' + res);
-                        } else {
-                            await axiosPrivate.patch(`/lectures/${item.id}`, lectureData);
+                        switch (item.type) {
+                            case 'lecture': {
+                                let lectureData = {
+                                    moduleId,
+                                    title: item.title,
+                                    content: itemContents[item.typeId] || item.content
+                                };
+                                if (item.isNew) {
+                                    await axiosPrivate.post(`/lectures`, lectureData);
+                                } else {
+                                    await axiosPrivate.patch(`/lectures/${item.id}`, lectureData);
+                                }
+                                break;
+                            }
+                            case 'assignment': {
+                                let utcStartDate = convertUTCToLocal(item.startDate);
+                                let utcEndDate = convertUTCToLocal(item.endDate);
+                                let assignmentData = {
+                                    title: item.title,
+                                    content: itemContents[item.typeId] || item.content,
+                                    startDate: utcStartDate.toISOString(),
+                                    endDate: utcEndDate.toISOString(),
+                                    state: "OPEN",
+                                    moduleId: moduleId
+                                };
+                                formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
+                                if (files[`${sectionId}-${item.typeId}`]) {
+                                    formData.append('document', files[`${sectionId}-${item.typeId}`]);
+                                }
+                                const urlParams = new URLSearchParams();
+                                urlParams.append('content', assignmentData.content);
+                                urlParams.append('startDate', assignmentData.startDate);
+                                urlParams.append('endDate', assignmentData.endDate);
+                                urlParams.append('state', assignmentData.state);
+                                urlParams.append('title', assignmentData.title);
+                                const url = urlParams.toString();
+                                console.log(url);
+                                if (item.isNew) {
+                                    await axiosPrivate.post(`/assignments`, formData, {
+                                        headers: { 'Content-Type': 'multipart/form-data' },
+                                    });
+                                } else {
+                                    await axiosPrivate.patch(`/assignments/${item.id}?${url}`, formData, {
+                                        headers: { 'Content-Type': 'multipart/form-data' },
+                                    });
+                                }
+                                break;
+                            }
+                            case 'resource': {
+                                let resourceData = {
+                                    title: item.title,
+                                    moduleId: moduleId
+                                };
+                                const urlParams = new URLSearchParams();
+                                urlParams.append('title', resourceData.title);
+                                const url = urlParams.toString();
+                                formData.append('resources', new Blob([JSON.stringify(resourceData)], { type: 'application/json' }));
+                                if (files[`${sectionId}-${item.typeId}`]) {
+                                    formData.append('document', files[`${sectionId}-${item.typeId}`]);
+                                }
+                                if (item.isNew) {
+                                    await axiosPrivate.post(`/resources`, formData, {
+                                        headers: { 'Content-Type': 'multipart/form-data' },
+                                    });
+                                } else {
+                                    await axiosPrivate.patch(`/resources/${item.id}?${url}`, formData, {
+                                        headers: { 'Content-Type': 'multipart/form-data' },
+                                    });
+                                }
+                                break;
+                            }
                         }
-                        break;
-                    }
-                    case 'assignment': {
-                        let utcStartDate = convertUTCToLocal(item.startDate);
-                        let utcEndDate = convertUTCToLocal(item.endDate);
-                        let assignmentData = {
-                            title: item.title,
-                            content: itemContents[item.typeId] || item.content,
-                            startDate: utcStartDate.toISOString(),
-                            endDate: utcEndDate.toISOString(),
-                            state: "OPEN",
-                            moduleId: moduleId
-                        };
-                        formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
-                        if (files[`${sectionId}-${item.typeId}`]) {
-                            formData.append('document', files[`${sectionId}-${item.typeId}`]);
-                        }
-                        const urlParams = new URLSearchParams();
-                        urlParams.append('content', assignmentData.content);
-                        urlParams.append('startDate', assignmentData.startDate);
-                        urlParams.append('endDate', assignmentData.endDate);
-                        urlParams.append('state', assignmentData.state);
-                        urlParams.append('title', assignmentData.title);
-                        const url = urlParams.toString();
-                        console.log(url);
-                        if (item.isNew) {
-                            await axiosPrivate.post(`/assignments`, formData, {
-                                headers: { 'Content-Type': 'multipart/form-data' },
-                            });
-                        } else {
-                            await axiosPrivate.patch(`/assignments/${item.id}?${url}`, formData, {
-                                headers: { 'Content-Type': 'multipart/form-data' },
-                            });
-                        }
-                        break;
-                    }
-                    case 'resource': {
-                        let resourceData = {
-                            title: item.title,
-                            moduleId: moduleId
-                        };
-                        const urlParams = new URLSearchParams();
-                        urlParams.append('title', resourceData.title);
-                        const url = urlParams.toString();
-                        formData.append('resources', new Blob([JSON.stringify(resourceData)], { type: 'application/json' }));
-                        if (files[`${sectionId}-${item.typeId}`]) {
-                            formData.append('document', files[`${sectionId}-${item.typeId}`]);
-                        }
-                        if (item.isNew) {
-                            await axiosPrivate.post(`/resources`, formData, {
-                                headers: { 'Content-Type': 'multipart/form-data' },
-                            });
-                        } else {
-                            await axiosPrivate.patch(`/resources/${item.id}?${url}`, formData, {
-                                headers: { 'Content-Type': 'multipart/form-data' },
-                            });
-                        }
-                        break;
-                    }
+                    }));
+                    resolve();
+                } catch (error) {
+                    reject(error);
                 }
-            }));
+            });
 
-            toast('Module updated successfully');
+            toast.promise(
+                updateModulePromise,
+                {
+                    pending: 'Đang cập nhật...',
+                    success: 'Cập nhật thành công 👌',
+                    error: 'Có lỗi xảy ra 🤯'
+                }
+            );
             setSavedSections(prev => ({ ...prev, [sectionId]: true }));
 
             // Update the sections state to reflect that the section is no longer new
@@ -402,6 +415,13 @@ export default function EditCourseContent() {
         }
     };
 
+    const handleKeyDown = (event, saveFunction) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            saveFunction();
+        }
+    };
+
     return (
         <>
             <div className="sticky top-0 z-50">
@@ -439,6 +459,7 @@ export default function EditCourseContent() {
                                         type="text"
                                         value={tempTitle}
                                         onChange={(e) => setTempTitle(e.target.value)}
+                                        onKeyDown={(e) => handleKeyDown(e, saveSection)}
                                         className="border border-gray-300 p-1 rounded"
                                         ref={inputRef}
                                     />
@@ -524,6 +545,7 @@ export default function EditCourseContent() {
                                                     value={tempTitle}
                                                     onChange={(e) => setTempTitle(e.target.value)}
                                                     className="border border-gray-300 p-1 rounded"
+                                                    onKeyDown={(e) => handleKeyDown(e, () => saveItem(section.id))}
                                                     ref={inputRef}
                                                 />
                                             ) : (
@@ -643,12 +665,12 @@ export default function EditCourseContent() {
                                 >
                                     Lecture <Plus size={18} className="ml-1" />
                                 </button>
-                                <button
-                                    onClick={() => addItem(section.id, 'quiz')}
-                                    className="text-white flex items-center justify-between"
-                                >
-                                    Quiz <Plus size={18} className="ml-1" />
-                                </button>
+                                {/*<button*/}
+                                {/*    onClick={() => addItem(section.id, 'quiz')}*/}
+                                {/*    className="text-white flex items-center justify-between"*/}
+                                {/*>*/}
+                                {/*    Quiz <Plus size={18} className="ml-1" />*/}
+                                {/*</button>*/}
                                 <button
                                     onClick={() => addItem(section.id, 'assignment')}
                                     className="text-white flex items-center justify-between"

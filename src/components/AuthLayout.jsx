@@ -84,14 +84,14 @@ const AuthLayout = ({ type = 'login' }) => {
 
             if (result.code === 200) {
                 const { email, fullName, avatar, role } = result.data;
-
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
                 navigate('/my-course');
-            } else if (result.error === true) {
+            } else {
                 toast(result.message, { type: 'error' });
             }
         } catch (error) {
+            console.log(error);
             toast(error.response.data.message, { type: 'error' });
         } finally {
             setIsLoading(false);

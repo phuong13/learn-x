@@ -133,7 +133,7 @@ class AuthService {
                 return res.data;
             })
             .catch((err) => {
-                return err;
+                return err.response.data;
             });
     }
 

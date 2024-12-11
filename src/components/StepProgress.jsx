@@ -52,6 +52,7 @@ export default function InteractiveStepProgress() {
                         <div key={step.id} className="flex flex-col items-center">
                             <button
                                 onClick={() => handleStepClick(step.id)}
+                                disabled={step.id > currentStep}
                                 className={`w-8 h-8 rounded-full border-2 flex items-center justify-center mb-2 z-10
                   ${step.id === currentStep
                                     ? 'bg-[#ed2a26] border-[#ed2a26]'
@@ -101,15 +102,15 @@ export default function InteractiveStepProgress() {
                     >Chuyển hướng</button>
                 </div>}
             </div>
-            {/*{currentStep !== 1 && (*/}
-            {/*    <div className="flex justify-between mt-6">*/}
-            {/*        <button*/}
-            {/*            onClick={handlePrevious}*/}
-            {/*            disabled={currentStep === 1}*/}
-            {/*            className={`px-4 py-2 rounded bg-slate-400 text-gray-700 font-medium hover:bg-gray-400 transition-colors ${currentStep === 1 && 'opacity-50 cursor-not-allowed'}`}*/}
-            {/*        >*/}
-            {/*            Previous*/}
-            {/*        </button>*/}
+            {currentStep !== 1 && (
+                <div className="flex justify-between mt-6">
+                    <button
+                        onClick={handlePrevious}
+                        disabled={currentStep === 1 || currentStep === 2}
+                        className={`px-4 py-2 rounded bg-slate-400 text-gray-700 font-medium hover:bg-gray-400 transition-colors ${currentStep === 1 && 'opacity-50 cursor-not-allowed'}`}
+                    >
+                        Previous
+                    </button>
             {/*        <button*/}
             {/*            onClick={handleNext}*/}
             {/*            disabled={currentStep === steps.length}*/}
@@ -118,8 +119,8 @@ export default function InteractiveStepProgress() {
             {/*        >*/}
             {/*            Next*/}
             {/*        </button>*/}
-            {/*    </div>*/}
-            {/*)}*/}
+                </div>
+            )}
         </div>
     );
 }

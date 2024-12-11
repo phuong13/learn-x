@@ -36,9 +36,10 @@ axiosPrivate.interceptors.request.use(
                     useNavigate().navigate('/login');
                     return Promise.reject('Failed to refresh token');
                 }
-                const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+                const { accessToken, refreshToken: newRefreshToken, ...user } = response.data.data;
                 localStorage.setItem('access_token', accessToken);
                 localStorage.setItem('refresh_token', newRefreshToken);
+                localStorage.setItem('user', JSON.stringify(user));
                 config.headers['Authorization'] = `Bearer ${accessToken}`;
             }
         }

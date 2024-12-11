@@ -63,7 +63,7 @@ const MyCourse = () => {
                 </div>
                 <div className="flex-grow p-6 bg-white shadow-sm mx-4 my-4">
                     <CourseFilter />
-                    {!Array.isArray(courses) && <h2 className="mt-4">Bạn chưa đăng ký khóa học nào!</h2>}
+                    {!(courses.length > 0) && <h2 className="mt-4">Bạn chưa đăng ký khóa học nào!</h2>}
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                         {Array.isArray(courses) &&
                             courses.length > 0 &&

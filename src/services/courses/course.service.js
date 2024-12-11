@@ -12,7 +12,7 @@ class CourseService {
                     return res.data.data;
                 })
                 .catch((err) => {
-                    console.log(err);
+                    return err;
                 });
             return response;
         } else {

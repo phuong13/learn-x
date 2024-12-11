@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'react-toastify';
 import AuthService from '../services/auth/auth.service';
 import Loader from './Loader';
 
@@ -85,22 +85,21 @@ export default function ConfirmOTP() {
             const res = await AuthService.verifyEmail(otpValue, email);
             console.log(res);
             if (res && res.status === 200) {
-                toast.success(<div>Xác thực thành công! Chuyển hướng về trang đăng nhập sau {countdown}s</div>, {
-                    duration: 5000,
+                const countdown = 5;
+                const toastId = toast(`Xác thực thành công! Chuyển hướng về trang đăng nhập sau ${countdown}s`, {
+                    duration: countdown * 1000,
                 });
+
                 const countdownInterval = setInterval(() => {
                     setCountdown((prevCountdown) => {
                         if (prevCountdown === 1) {
                             clearInterval(countdownInterval);
                             navigate('/login');
                         } else {
-                            toast.dismiss();
-                            toast.success(
-                                `Xác thực thành công! Chuyển hướng về trang đăng nhập sau ${prevCountdown - 1}s`,
-                                {
-                                    duration: 5000,
-                                },
-                            );
+                            toast.update(toastId, {
+                                render: `Xác thực thành công! Chuyển hướng về trang đăng nhập sau ${prevCountdown - 1}s`,
+                                autoClose: (prevCountdown - 1) * 1000,
+                            });
                         }
                         return prevCountdown - 1;
                     });
@@ -155,7 +154,6 @@ export default function ConfirmOTP() {
 
     return (
         <>
-            <Toaster position="top-right" richColors />
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
                 <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
                     <Loader isLoading={isLoading} />

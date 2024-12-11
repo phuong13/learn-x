@@ -471,7 +471,7 @@ export default function Curriculum() {
                             locale={'vi'}
                             selected={item.startDate ? new Date(item.startDate) : null}
                             ref={datePickerRef_starDay}
-                            onChange={(date) => handleDateChange(section.id, item.typeId, 'startDate', date)}
+                            onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
                             showMonthYearDropdown
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -492,7 +492,7 @@ export default function Curriculum() {
                             locale={'vi'}
                             selected={item.endDate ? new Date(item.endDate) : null}
                             ref={datePickerRef_endDay}
-                            onChange={(date) => handleDateChange(section.id, item.typeId, 'endDate', date)}
+                            onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <Calendar className="h-5 w-5 text-gray-400" />
@@ -525,12 +525,12 @@ export default function Curriculum() {
                 >
                   Lecture <Plus size={18} className="ml-1" />
                 </button>
-                <button
-                  onClick={() => addItem(section.id, 'quiz')}
-                  className="text-white flex items-center justify-between"
-                >
-                  Quiz <Plus size={18} className="ml-1" />
-                </button>
+                {/*<button*/}
+                {/*  onClick={() => addItem(section.id, 'quiz')}*/}
+                {/*  className="text-white flex items-center justify-between"*/}
+                {/*>*/}
+                {/*  Quiz <Plus size={18} className="ml-1" />*/}
+                {/*</button>*/}
                 <button
                   onClick={() => addItem(section.id, 'assignment')}
                   className="text-white flex items-center justify-between"
