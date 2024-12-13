@@ -111,14 +111,14 @@ export default function InteractiveStepProgress() {
                     >
                         Previous
                     </button>
-            {/*        <button*/}
-            {/*            onClick={handleNext}*/}
-            {/*            disabled={currentStep === steps.length}*/}
-            {/*            className={`px-4 py-2 rounded btn btn--primary hover:bg-blue-600 transition-colors*/}
-            {/*${currentStep === steps.length && 'opacity-50 cursor-not-allowed'}`}*/}
-            {/*        >*/}
-            {/*            Next*/}
-            {/*        </button>*/}
+                    <button
+                        onClick={handleNext}
+                        disabled={currentStep === steps.length}
+                        className={`px-4 py-2 rounded btn btn--primary hover:bg-blue-600 transition-colors
+            ${currentStep === steps.length && 'opacity-50 cursor-not-allowed'}`}
+                    >
+                        Next
+                    </button>
                 </div>
             )}
         </div>

@@ -13,6 +13,7 @@ export default function CoursePageLayout() {
     const [modules, setModules] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số', 'Năng lực'];
+    const [teacher, setTeacher] = useState(null);
 
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
@@ -22,10 +23,14 @@ export default function CoursePageLayout() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await axiosPrivate.get(`courses/${courseId}`);
-            if (response.status === 200) {
-                setCourse(response.data.data);
-            }
+            await axiosPrivate.get(`courses/${courseId}`)
+                .then((res) => {
+                    setCourse(res.data);
+                });
+            await axiosPrivate.get(`courses/${courseId}/teacher`)
+                .then((res) => {
+                    setTeacher(res.data);
+                });
         };
         fetchData();
     }, [courseId]);
@@ -97,6 +102,7 @@ export default function CoursePageLayout() {
 
     return (
         <div className="bg-gray-100 min-h-screen mb-6">
+
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
                     src={course?.thumbnail}
@@ -148,6 +154,11 @@ export default function CoursePageLayout() {
                     {/*    </button>*/}
                     </div>
                 </div>
+                {teacher && (
+                    <div className="absolute bottom-4 left-4 text-white bg-[#14919B] px-4 py-2 rounded-lg text-sm font-semibold">
+                        Giảng viên: {teacher.fullName}
+                    </div>
+                )}
 
             </div>
 
