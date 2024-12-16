@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CreateCourseForm from './CreateCourseForm';
 import CreateCurriculumForm from './CreateCurriculumForm';
 
@@ -14,6 +14,8 @@ export default function InteractiveStepProgress() {
         const savedCourseInfo = localStorage.getItem('courseInfo');
         return savedCourseInfo ? JSON.parse(savedCourseInfo) : {};
     });
+
+    const postAllModulesRef = useRef(null);
 
     useEffect(() => {
         localStorage.setItem('courseInfo', JSON.stringify(courseInfo));
@@ -36,12 +38,15 @@ export default function InteractiveStepProgress() {
         }
     };
 
-    const handleRedirectCourseDetail = () => {
+    const handleRedirectCourseDetail = async () => {
+        if (postAllModulesRef.current) {
+            await postAllModulesRef.current();
+        }
         const { id } = JSON.parse(localStorage.getItem('courseInfo'));
         localStorage.removeItem('courseInfo');
         localStorage.removeItem('sections');
         window.location.href = `/course-detail/${id}`;
-    }
+    };
 
     return (
         <div className="w-full max-w-4xl mx-auto px-4 py-6">
@@ -92,7 +97,7 @@ export default function InteractiveStepProgress() {
             </div>
             <div className="mt-6">
                 {currentStep === 1 && <CreateCourseForm onSubmitSuccess={handleNext}/>}
-                {currentStep === 2 && <CreateCurriculumForm />}
+                {currentStep === 2 && <CreateCurriculumForm onPostAllModules={(callback) => postAllModulesRef.current = callback} />}
                 {currentStep === 3 && <div>
                     <h2 className="text-xl font-bold mb-2">Xác nhận</h2>
                     <h2 className={`text-lg font-semibold mb-2 text-gray-800`}>Lưu ý, hãy ấn vào nút ✔ sau khi đã điền thông tin khóa học.</h2>
