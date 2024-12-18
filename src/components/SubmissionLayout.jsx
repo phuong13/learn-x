@@ -11,6 +11,7 @@ import { differenceInDays, differenceInHours, differenceInMinutes, differenceInS
 
 import Loader from '@components/Loader.jsx';
 import { toast } from 'react-toastify';
+import GradingSummary from './GradingSummary';
 
 
 export default function SubmissionLayout({ title, content, startDate, endDate }) {
@@ -245,14 +246,19 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             <h2 className="text-lg font-semibold mb-4 text-gray-800">Hướng dẫn nộp bài</h2>
             <div className="pb-4" dangerouslySetInnerHTML={{ __html: content }} />
             <button
-              // className="bg-[#02a189] text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
-              onClick={toggleFolderVisibility}
-              className={"btn btn--primary"}
-            >
-              {assignmentSubmission ? 'Sửa bài nộp' : 'Thêm bài nộp'}
-            </button>
+                // className="bg-[#02a189] text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+                onClick={toggleFolderVisibility}
+                className={"btn btn--primary"}
+              >
+                {assignmentSubmission ? 'Sửa bài nộp' : 'Thêm bài nộp'}
+              </button>
+              <button className={"btn btn--primary mt-2"}>
+                <Link to={`/grading/${courseId}/${assignmentId}`} className="text-white">
+                Chấm điểm
+                </Link>
+              </button>
 
-            {/* Folder luôn hiển thị khi người dùng nhấn vào nút */}
+              {/* Folder luôn hiển thị khi người dùng nhấn vào nút */}
             {isFolderVisible && (
               <div className="mt-4 p-4 bg-slate-200 rounded-lg shadow-md">
                 <h3 className="text-lg font-semibold mb-2 text-gray-800">Tải tệp bài nộp của bạn</h3>
@@ -350,6 +356,9 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                 </tbody>
               </table>
             )}
+          </div>
+          <div className="">
+          <GradingSummary timeRemaining={calculateRemainingTime(endDate)} />
           </div>
         </div>
       </div>
