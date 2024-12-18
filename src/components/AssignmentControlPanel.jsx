@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import SubmissionHeader from '@components/SubmissionHeader.jsx';
 
 export default function AssignmentControlPanel() {
-  let [timeFilter, setTimeFilter] = useState('7 ngày tiếp theo')
+  let [timeFilter, setTimeFilter] = useState('7')
   let [sortBy, setSortBy] = useState('Sắp xếp theo ngày')
   let [searchQuery, setSearchQuery] = useState('')
 
@@ -13,7 +13,13 @@ export default function AssignmentControlPanel() {
 
   useEffect(() => {
     const fetchAssignments = async () => {
-      await axiosPrivate.get(`/assignments/get-top-3`)
+      const urlParams = new URLSearchParams();
+      const date = new Date();
+      urlParams.append('day', timeFilter);
+      urlParams.append('month', (date.getMonth() + 1).toString());
+      urlParams.append('year', date.getFullYear().toString());
+      const url = `/assignments/get-by-next-x-day?${urlParams.toString()}`;
+      await axiosPrivate.get(`${url}`)
           .then((res) => {
             setAssignments(res.data.data);
             console.log(res.data.data);
@@ -25,7 +31,7 @@ export default function AssignmentControlPanel() {
     }
 
     fetchAssignments();
-  }, []);
+  }, [timeFilter]);
 
   return (
     <div className="bg-gray-100 p-6 rounded-lg shadow-sm">
@@ -38,8 +44,8 @@ export default function AssignmentControlPanel() {
             onChange={(e) => setTimeFilter(e.target.value)}
             className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option>7 ngày tiếp theo</option>
-            <option>30 ngày tiếp theo</option>
+            <option value={'7'} selected={true}>7 ngày tiếp theo</option>
+            <option value={'30'}>30 ngày tiếp theo</option>
           </select>
           <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
@@ -51,7 +57,7 @@ export default function AssignmentControlPanel() {
             className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option>Sắp xếp theo ngày</option>
-            <option>Sắp xếp theo khoá học</option>
+            {/*<option>Sắp xếp theo khoá học</option>*/}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>

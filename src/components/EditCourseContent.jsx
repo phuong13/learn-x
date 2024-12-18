@@ -10,6 +10,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
 import Header from '@layout/Header.jsx';
 import NavBar from '@layout/NavBar.jsx';
+import { Tooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -684,11 +686,13 @@ export default function EditCourseContent() {
                                     Resource <Plus size={18} className="ml-1" />
                                 </button>
                                 <button
+                                    data-tooltip-id="my-tooltip" data-tooltip-content="Kiểm tra kĩ thông tin trước khi lưu!"
                                     onClick={() => handleUpdateModule(section.id)}
                                     className="p-2 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg"
                                 >
                                     <Check size={24} />
                                 </button>
+                                <Tooltip id="my-tooltip" />
                             </div>
                         )}
                     </div>

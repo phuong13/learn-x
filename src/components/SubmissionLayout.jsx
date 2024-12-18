@@ -46,7 +46,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
     if (submissionDate < date) {
       return <td className="py-3 text-blue-500">Nộp sớm {diffInDays > 0 ? `${diffInDays} ngày ` : ''} {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</td>;
     } else {
-      return <td className="py-3 text-rose-600">Nộp trễ {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</td>;
+      return <td className="py-3 text-rose-600">Nộp trễ {Math.abs(diffInHours)} giờ {Math.abs(diffInMinutes)} phút {Math.abs(diffInSeconds)} giây</td>;
     }
   };
   useEffect(() => {
@@ -65,7 +65,11 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
     const fetchAssignment = async () => {
       await axiosPrivate.get(`/assignment-submissions/${assignmentId}/logged-in`)
         .then((res) => {
-          setAssignmentSubmission(res.data.data);
+          if (res.data.data.fileSubmissionUrl != null) {
+            setAssignmentSubmission(res.data.data);
+          } else {
+            setAssignmentSubmission(null);
+          }
           console.log(res);
         })
         .catch((err) => {
@@ -271,11 +275,11 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                     onChange={handleFileChange}
                   />
                 )}
-                {assignmentSubmission && !uploadedFile && (
-                  <div>
-                    <span className="text-gray-700 mr-4">File đã nộp: </span>
-                    <span className="text-blue-700 mr-4">{assignmentSubmission.fileSubmissionUrl.split('/').pop()}</span>
-                  </div>
+                {assignmentSubmission && !uploadedFile && assignmentSubmission.fileSubmissionUrl && (
+                    <div>
+                      <span className="text-gray-700 mr-4">File đã nộp: </span>
+                      <span className="text-blue-700 mr-4">{assignmentSubmission.fileSubmissionUrl.split('/').pop()}</span>
+                    </div>
                 )}
                 <div className="flex justify-center mt-4">
                   <button
@@ -318,7 +322,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                   </tr>
                   <tr className="border-b">
                     <td className="py-3 font-medium text-gray-700">File đã nộp</td>
-                    {assignmentSubmission ? (
+                    {assignmentSubmission && assignmentSubmission.fileSubmissionUrl ? (
                       <td className="py-3 text-gray-600">
                         <div className="flex my-4">
                           <Upload className="mr-2 text-[#CD4F2E]" size={18} />
