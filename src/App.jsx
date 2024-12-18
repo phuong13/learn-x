@@ -23,6 +23,7 @@ const DashBoard = lazy(() => import('./pages/DashBoard'));
 const Submission = lazy(() => import('./pages/Submission'));
 const AddCourse = lazy(() => import('./pages/AddCourse'));
 const EditCourseContent = lazy(() => import('./components/EditCourseContent'));
+const Grading = lazy(() => import('./pages/Grade'));
 // utils
 
 import ProtectedRoute from './utils/ProtectedRoute';
@@ -83,6 +84,7 @@ function App() {
                         <Route path="/course-detail/:courseId/edit" element={<ProtectedRoute><EditCourseContent/></ProtectedRoute>} />
                         <Route path="/submission/:courseId/:assignmentId" element={<ProtectedRoute><Submission/></ProtectedRoute>} />
                         <Route path="/add-course" element={<ProtectedRoute><AddCourse/></ProtectedRoute>} />
+                        <Route path="/grading/:courseId/:assignmentId" element={<ProtectedRoute><Grading/></ProtectedRoute>} />
                         <Route path="/logout" element={<ProtectedRoute><Logout/></ProtectedRoute>} />
 
                     </Routes>
