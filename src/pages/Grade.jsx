@@ -8,8 +8,9 @@ import DocumentTitle from '@components/DocumentTitle.jsx';
 import GradingInterface from '../components/GradeForStudent';
 const Grading = () => {
     const { courseId} = useParams();
-      const { assignmentId } = useParams();
-      const [assignment, setAssignment] = useState(null);
+    const { assignmentId } = useParams();
+    const [assignment, setAssignment] = useState(null);
+    const [course, setCourse] = useState(null);
       // const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
@@ -17,7 +18,7 @@ const Grading = () => {
             if (response.status === 200) {
                 setCourse(response.data.data);
                 console.log(course);
-            }   
+            }
         };
         fetchData();
     }, [courseId]);

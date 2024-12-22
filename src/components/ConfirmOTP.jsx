@@ -88,6 +88,7 @@ export default function ConfirmOTP() {
                 const countdown = 5;
                 const toastId = toast(`Xác thực thành công! Chuyển hướng về trang đăng nhập sau ${countdown}s`, {
                     duration: countdown * 1000,
+                    hideProgressBar: true,
                 });
 
                 const countdownInterval = setInterval(() => {
@@ -99,6 +100,7 @@ export default function ConfirmOTP() {
                             toast.update(toastId, {
                                 render: `Xác thực thành công! Chuyển hướng về trang đăng nhập sau ${prevCountdown - 1}s`,
                                 autoClose: (prevCountdown - 1) * 1000,
+                                hideProgressBar: true,
                             });
                         }
                         return prevCountdown - 1;

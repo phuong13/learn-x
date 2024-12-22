@@ -11,14 +11,15 @@ const Submission = () => {
       const { courseId} = useParams();
       const { assignmentId } = useParams();
       const [assignment, setAssignment] = useState(null);
+      const [course, setCourse] = useState(null);
       // const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
             const response = await axiosPrivate.get(`courses/${courseId}`);
             if (response.status === 200) {
                 setCourse(response.data.data);
-                console.log(course);
-            }   
+                console.log(response.data.data);
+            }
         };
         fetchData();
     }, [courseId]);
