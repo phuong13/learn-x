@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CourseGradeChart from './CourseGradeChart.jsx';
+import GradeTable from '@components/GradeTable.jsx';
 
 export default function CoursePageLayout() {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -25,7 +26,7 @@ export default function CoursePageLayout() {
     const { authUser } = useAuth();
     const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số'];
 
-    const [startDate, setStartDate] = useState(null);
+    const [startDate, setStartDate] = useState(new Date());
     const [courseName, setCourseName] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
@@ -130,7 +131,8 @@ export default function CoursePageLayout() {
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Điểm số</h2>
-                        <CourseGradeChart courseId={courseId} />
+                        {authUser.role === 'TEACHER' && <CourseGradeChart courseId={courseId} />}
+                        {authUser.role === 'STUDENT' && <GradeTable courseId={courseId} />}
                     </div>
                 );
             case 3:
