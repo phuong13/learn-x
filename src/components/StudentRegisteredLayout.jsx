@@ -22,9 +22,9 @@ const StudentRegisteredLayout = () => {
 
     const { authUser } = useAuth();
 
-    const [ showModal, setShowModal ] = useState(false);
-    const handleOpen = () => setShowModal(true)
-    const handleClose = () => setShowModal(false)
+    const [showModal, setShowModal] = useState(false);
+    const handleOpen = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
 
     const { courseId } = useParams();
 
@@ -34,7 +34,9 @@ const StudentRegisteredLayout = () => {
                 page: page,
                 size: 5,
             };
-            const response = await axiosPrivate.get(`course-registrations/course/${courseId}?page=${pageable.page}&size=${pageable.size}`);
+            const response = await axiosPrivate.get(
+                `course-registrations/course/${courseId}?page=${pageable.page}&size=${pageable.size}`,
+            );
             const data = response.status === 200 ? response.data : null;
             if (data.success) {
                 setStudents(data.data.content);
@@ -65,25 +67,27 @@ const StudentRegisteredLayout = () => {
         const file = e.target.files[0];
         const emails = [];
 
-        readXlsxFile(file).then((rows) => {
-            const headers = rows[0];
-            const emailIndex = headers.indexOf('Email');
-            const mssvIndex = headers.indexOf('MSSV');
+        readXlsxFile(file)
+            .then((rows) => {
+                const headers = rows[0];
+                const emailIndex = headers.indexOf('Email');
+                const mssvIndex = headers.indexOf('MSSV');
 
-            if (emailIndex !== -1 && mssvIndex !== -1) {
-                for (let i = 1; i < rows.length; i++) {
-                    const columns = rows[i];
-                    if (columns[emailIndex]) {
-                        emails.push(columns[emailIndex].toString().trim());
-                    } else if (columns[mssvIndex]) {
-                        emails.push(`${columns[mssvIndex].toString().trim()}@student.hcmute.edu.vn`);
+                if (emailIndex !== -1 && mssvIndex !== -1) {
+                    for (let i = 1; i < rows.length; i++) {
+                        const columns = rows[i];
+                        if (columns[emailIndex]) {
+                            emails.push(columns[emailIndex].toString().trim());
+                        } else if (columns[mssvIndex]) {
+                            emails.push(`${columns[mssvIndex].toString().trim()}@student.hcmute.edu.vn`);
+                        }
                     }
                 }
-            }
-            setEmailList((prevEmailList) => [...prevEmailList, ...emails]);
-        }).catch((error) => {
-            console.error('Error reading file:', error);
-        });
+                setEmailList((prevEmailList) => [...prevEmailList, ...emails]);
+            })
+            .catch((error) => {
+                console.error('Error reading file:', error);
+            });
     };
 
     const handleTextareaChange = (e) => {
@@ -94,13 +98,17 @@ const StudentRegisteredLayout = () => {
     const handleSumbit = async () => {
         const textArea = document.querySelector('textarea');
         const value = textArea.value;
-        const emails = value.split('\n').map(email => email.trim()).filter(email => email);
+        const emails = value
+            .split('\n')
+            .map((email) => email.trim())
+            .filter((email) => email);
         setEmailList(emails);
         const uniqueEmails = [...new Set(emailList)];
         setEmailList(uniqueEmails);
         console.log(uniqueEmails);
-        const response = await axiosPrivate.post(`/course-registrations/register/${courseId}/list-email`,
-            { emails: uniqueEmails });
+        const response = await axiosPrivate.post(`/course-registrations/register/${courseId}/list-email`, {
+            emails: uniqueEmails,
+        });
         console.log(response);
         if (response.status === 200) {
             await fetchStudents(0);
@@ -113,9 +121,9 @@ const StudentRegisteredLayout = () => {
 
     const handleDeleteStudent = async (students) => {
         console.log(students);
-        const response = await axiosPrivate.post(`/course-registrations/remove/${courseId}/list-email`,
-           { emails: students }
-        );
+        const response = await axiosPrivate.post(`/course-registrations/remove/${courseId}/list-email`, {
+            emails: students,
+        });
         console.log(response);
         if (response.status === 200) {
             await fetchStudents(0);
@@ -123,44 +131,29 @@ const StudentRegisteredLayout = () => {
         } else {
             toast(response.data.message, { type: 'error' });
         }
-    }
+    };
 
     return (
         <div className="container mx-auto px-4 py-8">
             <StudentRegisteredList
+                totalStudents={paginationInfo.totalElements}
                 students={students}
                 paginationInfo={paginationInfo}
                 onPageChange={handlePageChange}
                 onDeleteStudents={handleDeleteStudent}
             />
 
-            {
-                authUser.role === 'TEACHER' && (
-                    <button
-                        className="btn btn--primary mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                        onClick={handleOpen}
-                    >
-                        Add Student
-                    </button>
-                )
-            }
-            <Dialog
-                open={showModal}
-                onClose={handleClose}
-                maxWidth="sm"
-                fullWidth
-                hideBackdrop={false}
-            >
+            {authUser.role === 'TEACHER' && (
+                <button className="btn btn--primary mt-4 bg-blue-500 text-white px-4 py-2 rounded" onClick={handleOpen}>
+                    Thêm sinh viên
+                </button>
+            )}
+            <Dialog open={showModal} onClose={handleClose} maxWidth="sm" fullWidth hideBackdrop={false}>
                 <div className="relative bg-white rounded-lg shadow-xl">
-                    <DialogTitle className="text-xl font-bold mb-4">
-                        Add Student
-                    </DialogTitle>
-                    <button
-                        onClick={handleClose}
-                        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                    >
+                    <DialogTitle className="text-xl font-bold mb-4">Thêm sinh viên</DialogTitle>
+                    <button onClick={handleClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
                         <X className="h-6 w-6" />
-                        <span className="sr-only">Close</span>
+                        <span className="sr-only">Đóng</span>
                     </button>
                     <DialogContent>
                         <div className="mt-2 space-y-4">
@@ -174,13 +167,11 @@ const StudentRegisteredLayout = () => {
                                 placeholder="Student Details"
                                 className="w-full p-2 border border-gray-300 rounded resize-none h-32"
                                 value={emailList.join('\n')}
-                                onChange={handleTextareaChange}
-                            ></textarea>
+                                onChange={handleTextareaChange}></textarea>
                             <button
                                 onClick={handleSumbit}
-                                className="btn btn--primary w-full font-bold py-2 px-4 rounded"
-                            >
-                                Submit
+                                className="btn btn--primary w-full font-bold py-2 px-4 rounded">
+                                Gửi
                             </button>
                         </div>
                     </DialogContent>

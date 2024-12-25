@@ -37,7 +37,7 @@ const IdentifyEmail = () => {
             if (res.code === 200) {
                 toast('Gửi mã xác nhận thành công', { type: 'success' });
             } else {
-                toast(res.message, { type: 'error' });
+                toast(res.response.data.message, { type: 'error' });
             }
         } catch (error) {
             toast(error.response.data.message, { type: 'error' });
@@ -74,7 +74,9 @@ const IdentifyEmail = () => {
                     <button
                         type="submit"
                         disabled={isResendDisabled}
-                        className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#00ba9d] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300">
+                        className={`${
+                            isResendDisabled ? 'bg-[#585858]' : 'bg-[#00ba9d]'
+                        } w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300`}>
                         {isResendDisabled ? `Thử lại ${countdownResend}s` : `Gửi`}
                     </button>
                 </form>

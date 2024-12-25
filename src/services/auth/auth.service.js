@@ -154,7 +154,7 @@ class AuthService {
                 return res.data;
             })
             .catch((err) => {
-                console.log(err);
+                return err;
             });
 
         return data;
@@ -177,10 +177,9 @@ class AuthService {
                 return res.data;
             })
             .catch((err) => {
-                console.log(err);
+                return err;
             });
     }
-
 }
 
 export default AuthService;

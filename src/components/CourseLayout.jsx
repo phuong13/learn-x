@@ -15,7 +15,6 @@ export default function CoursePageLayout() {
     const [course, setCourse] = useState(null);
     const [modules, setModules] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    // const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số', 'Năng lực'];
 
     const [teacher, setTeacher] = useState(null);
     const [isOpenEditCourseInfoModal, setIsOpenEditCourseInfoModal] = useState(false);
@@ -24,10 +23,8 @@ export default function CoursePageLayout() {
     const [categories, setCategories] = useState([]);
     const datePickerRef = useRef(null);
     const { authUser } = useAuth();
-    const tabs = ['Khóa học', 'Danh sách thành viên'];
-    if (authUser?.role === 'TEACHER') {
-        tabs.push('Điểm số');
-    }
+    const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số'];
+
     const [startDate, setStartDate] = useState(null);
     const [courseName, setCourseName] = useState('');
     const [description, setDescription] = useState('');
@@ -51,7 +48,6 @@ export default function CoursePageLayout() {
                 setDescription(response.data.data.description);
                 setCategory(response.data.data.categoryId);
                 setStartDate(new Date(response.data.data.startDate));
-                console.log(response.data.data);
             }
             const teacherResponse = await axiosPrivate.get(`courses/${courseId}/teacher`);
             if (teacherResponse.status === 200) {
@@ -67,7 +63,7 @@ export default function CoursePageLayout() {
             setIsLoading(true);
             try {
                 const response = await axiosPrivate.get(`courses/${courseId}/modules`);
-                setModules(response.data);
+                setModules(response.data || []);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -120,7 +116,7 @@ export default function CoursePageLayout() {
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Nội dung Khóa học</h2>
-                        <CourseContent modules={modules} />
+                        <CourseContent />
                     </div>
                 );
             case 1:
@@ -134,6 +130,7 @@ export default function CoursePageLayout() {
                 return (
                     <div className="p-4">
                         <h2 className="text-xl font-bold mb-2">Điểm số</h2>
+                        <CourseGradeChart courseId={courseId} />
                     </div>
                 );
             case 3:

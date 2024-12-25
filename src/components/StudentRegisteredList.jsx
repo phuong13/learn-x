@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, CheckIcon, XIcon, TrashIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useAuth } from '@hooks/useAuth.js';
 
-const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDeleteStudents }) => {
+const StudentRegisteredList = ({ totalStudents, students, paginationInfo, onPageChange, onDeleteStudents }) => {
     const [currentPage, setCurrentPage] = useState(paginationInfo.pageNumber);
     const [selectedStudents, setSelectedStudents] = useState([]);
     const { authUser } = useAuth();
@@ -11,6 +11,7 @@ const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDelet
 
     useEffect(() => {
         setSelectedStudents([]);
+        console.log('students:', students);
     }, [students]);
 
     const handlePageChange = (newPage) => {
@@ -21,10 +22,8 @@ const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDelet
     };
 
     const toggleStudentSelection = (studentEmail) => {
-        setSelectedStudents(prev =>
-            prev.includes(studentEmail)
-                ? prev.filter(id => id !== studentEmail)
-                : [...prev, studentEmail]
+        setSelectedStudents((prev) =>
+            prev.includes(studentEmail) ? prev.filter((id) => id !== studentEmail) : [...prev, studentEmail],
         );
     };
 
@@ -41,14 +40,7 @@ const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDelet
         <div className="w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
             {isTeacher && (
                 <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                    <button
-                        onClick={handleDeleteSelected}
-                        disabled={selectedStudents.length === 0}
-                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <TrashIcon className="inline-block w-4 h-4 mr-2" />
-                        Xóa đã chọn
-                    </button>
+                    <p>Tổng số {totalStudents} thành viên</p>
                 </div>
             )}
             <ul className="divide-y divide-gray-200">
@@ -74,8 +66,7 @@ const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDelet
                         {isTeacher && (
                             <button
                                 onClick={() => handleDeleteStudent(student.email)}
-                                className="p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-                            >
+                                className="p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
                                 <XIcon className="w-4 h-4" />
                             </button>
                         )}
@@ -86,20 +77,18 @@ const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDelet
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 0}
-                    className="px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+                    className="px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
                     <ChevronLeftIcon className="h-4 w-4 mr-2 inline-block" />
-                    Previous
+                    Trang trước
                 </button>
                 <span className="text-sm text-gray-700">
-                    Page {currentPage + 1} of {paginationInfo.totalPages}
+                    Trang {currentPage + 1}/{paginationInfo.totalPages}
                 </span>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === paginationInfo.totalPages - 1}
-                    className="px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    Next
+                    className="px-3 py-1 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Trang kế
                     <ChevronRightIcon className="h-4 w-4 ml-2 inline-block" />
                 </button>
             </div>
@@ -108,19 +97,21 @@ const StudentRegisteredList = ({ students, paginationInfo, onPageChange, onDelet
 };
 
 StudentRegisteredList.propTypes = {
-    students: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        fullName: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-        role: PropTypes.string.isRequired,
-    })).isRequired,
+    students: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            fullName: PropTypes.string.isRequired,
+            email: PropTypes.string.isRequired,
+            role: PropTypes.string.isRequired,
+        }),
+    ).isRequired,
     paginationInfo: PropTypes.shape({
         pageNumber: PropTypes.number.isRequired,
         totalPages: PropTypes.number.isRequired,
     }).isRequired,
     onPageChange: PropTypes.func.isRequired,
     onDeleteStudents: PropTypes.func.isRequired,
+    totalStudents: PropTypes.number.isRequired,
 };
 
 export default StudentRegisteredList;
-

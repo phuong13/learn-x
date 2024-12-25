@@ -66,7 +66,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 setIsAuthenticated(true);
                 navigate('/my-course');
             } else {
-                toast(result.message, { type: 'error' });
+                toast(result.response.data.message, { type: 'error' });
             }
         } catch (error) {
             toast(error.response.data.message, { type: 'error' });
@@ -88,11 +88,12 @@ const AuthLayout = ({ type = 'login' }) => {
                 setIsAuthenticated(true);
                 navigate('/my-course');
             } else {
-                toast(result.message, { type: 'error' });
+                console.log(result);
+
+                toast(result.response.data.message, { type: 'error' });
             }
         } catch (error) {
-            console.log(error);
-            toast(error.response.data.message, { type: 'error' });
+            toast(error.response, { type: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -156,9 +157,11 @@ const AuthLayout = ({ type = 'login' }) => {
                                             {...register('fullName', { required: 'Tên đầy đủ là bắt buộc!' })}
                                             onKeyDown={handleKeyDown}
                                         />
-                                        {errors.fullName &&
-                                            <p className="text-sm text-rose-500 dark:text-red-500"><span
-                                                className="font-medium">{errors.fullName.message}</span></p>}
+                                        {errors.fullName && (
+                                            <p className="text-sm text-rose-500 dark:text-red-500">
+                                                <span className="font-medium">{errors.fullName.message}</span>
+                                            </p>
+                                        )}
                                     </div>
                                 )}
                                 <div className="field-wrapper">
@@ -171,14 +174,19 @@ const AuthLayout = ({ type = 'login' }) => {
                                         type="email"
                                         name="email"
                                         placeholder="Nhập địa chỉ email"
-                                        {...register('email', { required: 'Email là bắt buộc!', validate:
-                                            (value) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) || 'Email không hợp lệ!'
+                                        {...register('email', {
+                                            required: 'Email là bắt buộc!',
+                                            validate: (value) =>
+                                                /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ||
+                                                'Email không hợp lệ!',
                                         })}
                                         onKeyDown={handleKeyDown}
                                     />
-                                    {errors.email &&
-                                        <p className="text-sm text-rose-500 dark:text-red-500"><span
-                                            className="font-medium">{errors.email.message}</span></p>}
+                                    {errors.email && (
+                                        <p className="text-sm text-rose-500 dark:text-red-500">
+                                            <span className="font-medium">{errors.email.message}</span>
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="field-wrapper relative">
                                     <label htmlFor="password" className="field-label">
@@ -187,17 +195,22 @@ const AuthLayout = ({ type = 'login' }) => {
                                     <input
                                         className={classNames('field-input', { 'field-input--error': errors.password })}
                                         id="password"
-                                        type="password"
+                                        type={showPassword ? 'text' : 'password'}
                                         name="password"
                                         placeholder="Nhập mật khẩu"
                                         onKeyDown={handleKeyDown}
                                         {...register('password', {
                                             required: 'Mật khẩu là bắt buộc!',
                                             validate: {
-                                                minLength: (value) => value.length >= 6 || 'Mật khẩu phải có ít nhất 6 kí tự!',
-                                                hasSpecialChar: (value) => /[!@#$%^&*(),.?":{}|<>]/.test(value) || 'Mật khẩu phải chứa ít nhất 1 kí tự đặc biệt!',
-                                                hasUpperCase: (value) => /[A-Z]/.test(value) || 'Mật khẩu phải chứa ít nhất 1 kí tự viết hoa!',
-                                            }
+                                                minLength: (value) =>
+                                                    value.length >= 6 || 'Mật khẩu phải có ít nhất 6 kí tự!',
+                                                hasSpecialChar: (value) =>
+                                                    /[!@#$%^&*(),.?":{}|<>]/.test(value) ||
+                                                    'Mật khẩu phải chứa ít nhất 1 kí tự đặc biệt!',
+                                                hasUpperCase: (value) =>
+                                                    /[A-Z]/.test(value) ||
+                                                    'Mật khẩu phải chứa ít nhất 1 kí tự viết hoa!',
+                                            },
                                         })}
                                     />
                                     <button
@@ -206,9 +219,11 @@ const AuthLayout = ({ type = 'login' }) => {
                                         onClick={() => setShowPassword(!showPassword)}>
                                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
-                                    {errors.password &&
-                                        <p className="text-sm text-rose-500 dark:text-red-500"><span
-                                            className="font-medium">{errors.password.message}</span></p>}
+                                    {errors.password && (
+                                        <p className="text-sm text-rose-500 dark:text-red-500">
+                                            <span className="font-medium">{errors.password.message}</span>
+                                        </p>
+                                    )}
                                 </div>
                                 {form === 'register' && (
                                     <div className="field-wrapper relative">
@@ -220,7 +235,7 @@ const AuthLayout = ({ type = 'login' }) => {
                                                 'field-input--error': errors.confirmPassword,
                                             })}
                                             id="confirmPassword"
-                                            type={showConfirmPassword ? "text" : "password"}
+                                            type={showConfirmPassword ? 'text' : 'password'}
                                             name="confirmPassword"
                                             placeholder="Nhập lại mật khẩu"
                                             {...register('confirmPassword', {
@@ -233,13 +248,14 @@ const AuthLayout = ({ type = 'login' }) => {
                                         <button
                                             type="button"
                                             className="absolute right-3 top-[38px] text-gray-500"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        >
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                                             {showConfirmPassword ? <EyeOff size={20} /> : <Eye siznve={20} />}
                                         </button>
-                                        {errors.confirmPassword &&
-                                            <p className="text-sm text-rose-500 dark:text-red-500"><span
-                                                className="font-medium">{errors.confirmPassword.message}</span></p>}
+                                        {errors.confirmPassword && (
+                                            <p className="text-sm text-rose-500 dark:text-red-500">
+                                                <span className="font-medium">{errors.confirmPassword.message}</span>
+                                            </p>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -306,4 +322,3 @@ AuthLayout.propTypes = {
 };
 
 export default AuthLayout;
-
