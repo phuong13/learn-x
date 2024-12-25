@@ -42,6 +42,19 @@ class ModuleService {
             });
     }
 
+    static async getAllAssignmentsByModuleId(moduleId) {
+        return await axiosPrivate
+            .get(`${BASE_URL}/${moduleId}/assignments`, {
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then((res) => {
+                return res.data.data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     static async getAssignmentById(assignmentId) {
         return await axiosPrivate
             .get(`${BASE_URL}/assignments/${assignmentId}`, {

@@ -34,9 +34,9 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
 }
 
 SubmissionHeader.propTypes = {
-    courseID: PropTypes.number,
+    courseID: PropTypes.string.isRequired,
     id: PropTypes.number,
     title: PropTypes.string.isRequired,
-    startDate: PropTypes.string.isRequired,
-    endDate: PropTypes.string.isRequired,
+    startDate: PropTypes.number.isRequired,
+    endDate: PropTypes.number.isRequired,
 };

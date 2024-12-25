@@ -16,8 +16,15 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     const [uploadedFile, setUploadedFile] = useState(null); // Trạng thái cho tệp đã tải lên
     const [course, setCourse] = useState(null);
-    const formattedStartDate = format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
-    const formattedEndDate = format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
+
+    const formattedStartDate =
+        startDate && !isNaN(new Date(startDate))
+            ? format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi })
+            : 'Invalid date';
+    const formattedEndDate =
+        endDate && !isNaN(new Date(endDate))
+            ? format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi })
+            : 'Invalid date';
 
     const { authUser } = useAuth();
 
@@ -56,6 +63,15 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             );
         }
     };
+
+    const formatDateArray = (dateArray) => {
+        if (Array.isArray(dateArray) && dateArray.length >= 6) {
+            const [year, month, day, hour, minute, second] = dateArray;
+            return new Date(year, month - 1, day, hour, minute, second);
+        }
+        return null;
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             const response = await axiosPrivate.get(`courses/${courseId}`);
@@ -78,7 +94,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                         setAssignmentSubmission(null);
                     }
                 })
-                .catch((err) => {
+                .catch(() => {
                     setAssignmentSubmission(null);
                 });
         };
@@ -93,7 +109,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             // Xử lý dữ liệu khi đã fetch
             console.log(assignmentSubmission);
         }
-    }, [assignmentId]);
+    }, [assignmentId, assignmentSubmission]);
 
     const calculateRemainingTime = (endDate) => {
         const now = new Date();
@@ -313,8 +329,12 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                         {assignmentSubmission ? (
                                             <>
                                                 {assignmentSubmission.updatedAt
-                                                    ? calculateSubmissionTime(assignmentSubmission.updatedAt)
-                                                    : calculateSubmissionTime(assignmentSubmission.createdAt)}
+                                                    ? calculateSubmissionTime(
+                                                          formatDateArray(assignmentSubmission.updatedAt),
+                                                      )
+                                                    : calculateSubmissionTime(
+                                                          formatDateArray(assignmentSubmission.createdAt),
+                                                      )}
                                             </>
                                         ) : (
                                             <td className="py-3 text-gray-600">Chưa nộp bài</td>
@@ -357,13 +377,13 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                         <td className="py-3 text-gray-600">
                                             {assignmentSubmission && assignmentSubmission.updatedAt
                                                 ? format(
-                                                      new Date(assignmentSubmission.updatedAt),
+                                                      formatDateArray(assignmentSubmission.updatedAt),
                                                       "EEEE, dd 'tháng' MM yyyy, hh:mm a",
                                                       { locale: vi },
                                                   )
                                                 : assignmentSubmission &&
                                                   format(
-                                                      new Date(assignmentSubmission.createdAt),
+                                                      formatDateArray(assignmentSubmission.createdAt),
                                                       "EEEE, dd 'tháng' MM yyyy, hh:mm a",
                                                       { locale: vi },
                                                   )}

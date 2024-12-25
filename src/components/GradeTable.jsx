@@ -1,88 +1,64 @@
-import React, { useState ,useEffect } from 'react';
-import {  useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ChevronDown, FileText } from 'lucide-react';
 import { axiosPrivate } from '@/axios/axios.js';
+import ModuleService from '../services/modules/module.service';
+import CourseService from '../services/courses/course.service';
+import React, { useState, useEffect } from 'react';
 
 export default function GradeTable() {
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [expandedModules, setExpandedModules] = useState({});
     const { courseId } = useParams();
+    const [modules, setModules] = useState([]);
+    const [assignmentsWithSubmissions, setAssignmentsWithSubmissions] = useState({});
 
-    const [course, setCourse] = useState(null);
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await axiosPrivate.get(`courses/${courseId}`);
-            if (response.status === 200) {
-                setCourse(response.data.data);
+        const fetchModulesAndAssignments = async () => {
+            const response = await CourseService.getModulesByCourseId(courseId);
+
+            if (response) {
+                const modulesData = response;
+                setModules(modulesData);
+
+                const assignmentsPromises = modulesData.map(async (module) => {
+                    const assignmentsResponse = await ModuleService.getAllAssignmentsByModuleId(module.id);
+                    console.log(assignmentsResponse);
+
+                    if (assignmentsResponse.length > 0) {
+                        const assignmentsWithSubmissionsPromises = assignmentsResponse.map(async (assignment) => {
+                            const submissionResponse = await axiosPrivate.get(
+                                `/assignment-submissions/${assignment.id}/logged-in`,
+                            );
+                            console.log(submissionResponse);
+
+                            if (submissionResponse.status === 200) {
+                                const submissionData = submissionResponse.data.data;
+                                return { assignment, submission: submissionData };
+                            }
+                            return { assignment, submission: null };
+                        });
+                        const assignmentsWithSubmissions = await Promise.all(assignmentsWithSubmissionsPromises);
+                        return { moduleId: module.id, assignmentsWithSubmissions };
+                    }
+                    return { moduleId: module.id, assignmentsWithSubmissions: [] };
+                });
+
+                const allAssignmentsWithSubmissions = await Promise.all(assignmentsPromises);
+                const assignmentsMap = {};
+                allAssignmentsWithSubmissions.forEach(({ moduleId, assignmentsWithSubmissions }) => {
+                    assignmentsMap[moduleId] = assignmentsWithSubmissions;
+                });
+                setAssignmentsWithSubmissions(assignmentsMap);
             }
         };
-        fetchData();
+        fetchModulesAndAssignments();
     }, [courseId]);
 
-    const assignments = [
-        {
-            id: 1,
-            content: "<p>Work in registered groups.</p><p><strong>Only ONE submission needed</strong> for each group.</p><p>File name: Nhomxx_A03_TestCase1.XLS/XLSX</p>",
-            startDate: "2024-12-11T06:30:00.000+00:00",
-            endDate: "2024-12-11T16:30:00.000+00:00",
-            state: "OPEN",
-            title: "Nộp bài chương 1",
-            urlDocument: null,
-            moduleId: 10,
-        },
-        {
-            id: 2,
-            content: "<p>Work in registered groups.</p><p><strong>Only ONE submission needed</strong> for each group.</p><p>File name: Nhomxx_A03_TestCase1.XLS/XLSX</p>",
-            startDate: "2024-12-11T06:30:00.000+00:00",
-            endDate: "2024-12-11T16:30:00.000+00:00",
-            state: "OPEN",
-            title: "Nộp bài chương 2",
-            urlDocument: null,
-            moduleId: 10,
-        },
-        {
-            id: 3,
-            content: "<p>Work in registered groups.</p><p><strong>Only ONE submission needed</strong> for each group.</p><p>File name: Nhomxx_A03_TestCase1.XLS/XLSX</p>",
-            startDate: "2024-12-11T06:30:00.000+00:00",
-            endDate: "2024-12-11T16:30:00.000+00:00",
-            state: "OPEN",
-            title: "Nộp bài chương 3",
-            urlDocument: null,
-            moduleId: 10,
-        },
-    ];
-
-    const submission = [
-        {
-            createdAt: "2024-12-19T21:45:55.746807",
-            updatedAt: "2024-12-21T17:02:43.554083",
-            createdBy: 9,
-            updatedBy: 2,
-            id: 1,
-            score: null,
-            textSubmission: "",
-            fileSubmissionUrl: "",
-        },
-        {
-            createdAt: "2024-12-19T21:45:55.746807",
-            updatedAt: "2024-12-21T17:02:43.554083",
-            createdBy: 9,
-            updatedBy: 2,
-            id: 2,
-            score: 7.5,
-            textSubmission: "",
-            fileSubmissionUrl: "http://res.cloudinary.com/dnarlcqth/raw/upload/v1734619558/Mau-5-TrinhBay-KLTN.pdf",
-        },
-        {
-            createdAt: "2024-12-19T21:45:55.746807",
-            updatedAt: "2024-12-21T17:02:43.554083",
-            createdBy: 9,
-            updatedBy: 2,
-            id: 3,
-            score: 10,
-            textSubmission: "",
-            fileSubmissionUrl: "http://res.cloudinary.com/dnarlcqth/raw/upload/v1734619558/Mau-5-TrinhBay-KLTN.pdf",
-        },
-    ];
+    const toggleModuleExpansion = (moduleId) => {
+        setExpandedModules((prev) => ({
+            ...prev,
+            [moduleId]: !prev[moduleId],
+        }));
+    };
 
     return (
         <div className="max-w-full overflow-x-auto">
@@ -94,54 +70,54 @@ export default function GradeTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr className="border-t border-b">
-                        <td colSpan={7} className="p-0">
-                            <button
-                                onClick={() => setIsExpanded(!isExpanded)}
-                                className="flex items-center w-full p-4 hover:bg-gray-50 text-left"
-                            >
-                                <ChevronDown
-                                    className={`w-5 h-5 mr-2 transition-transform ${isExpanded ? 'transform rotate-0' : 'transform -rotate-90'
-                                        }`}
-                                />
-                                <span className="font-medium">{course?.name}</span>
-                            </button>
-                        </td>
-                    </tr>
-                    {isExpanded &&
-                        assignments.map((assignment) => {
-                            const relatedSubmission = submission.find(
-                                (sub) => sub.id === assignment.id
-                            );
-
-                            return (
-                                <tr key={assignment.id} className="border-t hover:bg-gray-50">
-                                    <td className="p-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="text-xs text-gray-500">BÀI TẬP</div>
-                                            <FileText className="w-4 h-4 text-gray-400" />
-                                            <a
-                                                href={relatedSubmission?.fileSubmissionUrl || '#'}
-                                                className="text-blue-600 hover:underline"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                {assignment.title}
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td className="text-center pr-8 ">
-                                        {relatedSubmission
-                                            ? relatedSubmission.textSubmission === '' && relatedSubmission.fileSubmissionUrl === ''
-                                                ? 'Chưa nộp bài'
-                                                : relatedSubmission.score !== null
-                                                    ? relatedSubmission.score
+                    {modules.map((module) => (
+                        <React.Fragment key={module.id}>
+                            <tr className="border-t border-b">
+                                <td colSpan={7} className="p-0">
+                                    <button
+                                        onClick={() => toggleModuleExpansion(module.id)}
+                                        className="flex items-center w-full p-4 hover:bg-gray-50 text-left">
+                                        <ChevronDown
+                                            className={`w-5 h-5 mr-2 transition-transform ${
+                                                expandedModules[module.id]
+                                                    ? 'transform rotate-0'
+                                                    : 'transform -rotate-90'
+                                            }`}
+                                        />
+                                        <span className="font-medium">{module.name}</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            {expandedModules[module.id] &&
+                                assignmentsWithSubmissions[module.id]?.map(({ assignment, submission }) => (
+                                    <tr key={assignment.id} className="border-t hover:bg-gray-50">
+                                        <td className="p-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className="text-xs text-gray-500">BÀI TẬP</div>
+                                                <FileText className="w-4 h-4 text-gray-400" />
+                                                <a
+                                                    href={submission?.fileSubmissionUrl || '#'}
+                                                    className="text-blue-600 hover:underline"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer">
+                                                    {assignment.title}
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td className="text-center pr-8 ">
+                                            {submission
+                                                ? submission.textSubmission === '' &&
+                                                  submission.fileSubmissionUrl === ''
+                                                    ? 'Chưa nộp bài'
+                                                    : submission.score !== null
+                                                    ? submission.score
                                                     : 'Chưa chấm điểm'
-                                            : '-'}
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                                                : '-'}
+                                        </td>
+                                    </tr>
+                                ))}
+                        </React.Fragment>
+                    ))}
                 </tbody>
             </table>
         </div>
