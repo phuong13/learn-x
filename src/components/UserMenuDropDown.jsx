@@ -57,7 +57,9 @@ export default function UserMenuDropdown() {
                         <img src={avatar} alt="User Avatar" className="h-8 w-8 rounded-full object-cover" />
                         <ChevronDown
                             size={20}
-                            className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                            className={`transform text-white transition-transform duration-200 ${
+                                isOpen ? 'rotate-180' : ''
+                            }`}
                         />
                     </>
                 ) : (

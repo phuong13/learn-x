@@ -19,11 +19,11 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
 
     const formattedStartDate =
         startDate && !isNaN(new Date(startDate))
-            ? format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi })
+            ? format(new Date(startDate), 'EEEE, dd \'tháng\' MM yyyy, hh:mm a', { locale: vi })
             : 'Invalid date';
     const formattedEndDate =
         endDate && !isNaN(new Date(endDate))
-            ? format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi })
+            ? format(new Date(endDate), 'EEEE, dd \'tháng\' MM yyyy, hh:mm a', { locale: vi })
             : 'Invalid date';
 
     const { authUser } = useAuth();
@@ -109,7 +109,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             // Xử lý dữ liệu khi đã fetch
             console.log(assignmentSubmission);
         }
-    }, [assignmentId, assignmentSubmission]);
+    }, [assignmentId]);
 
     const calculateRemainingTime = (endDate) => {
         const now = new Date();
@@ -324,71 +324,71 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                         {isStatusDropdownOpen && (
                             <table className="w-full">
                                 <tbody>
-                                    <tr className="border-b">
-                                        <td className="py-3 font-medium text-gray-700">Trạng thái bài nộp</td>
-                                        {assignmentSubmission ? (
-                                            <>
-                                                {assignmentSubmission.updatedAt
-                                                    ? calculateSubmissionTime(
-                                                          formatDateArray(assignmentSubmission.updatedAt),
-                                                      )
-                                                    : calculateSubmissionTime(
-                                                          formatDateArray(assignmentSubmission.createdAt),
-                                                      )}
-                                            </>
-                                        ) : (
-                                            <td className="py-3 text-gray-600">Chưa nộp bài</td>
-                                        )}
-                                    </tr>
-                                    <tr className="border-b">
-                                        <td className="py-3 font-medium text-gray-700">File đã nộp</td>
-                                        {assignmentSubmission && assignmentSubmission.fileSubmissionUrl ? (
-                                            <td className="py-3 text-gray-600">
-                                                <div className="flex my-4">
-                                                    <Upload className="mr-2 text-[#CD4F2E]" size={18} />
-                                                    <span className="text-blue-500">
+                                <tr className="border-b">
+                                    <td className="py-3 font-medium text-gray-700">Trạng thái bài nộp</td>
+                                    {assignmentSubmission ? (
+                                        <>
+                                            {assignmentSubmission.updatedAt
+                                                ? calculateSubmissionTime(
+                                                    formatDateArray(assignmentSubmission.updatedAt),
+                                                )
+                                                : calculateSubmissionTime(
+                                                    formatDateArray(assignmentSubmission.createdAt),
+                                                )}
+                                        </>
+                                    ) : (
+                                        <td className="py-3 text-gray-600">Chưa nộp bài</td>
+                                    )}
+                                </tr>
+                                <tr className="border-b">
+                                    <td className="py-3 font-medium text-gray-700">File đã nộp</td>
+                                    {assignmentSubmission && assignmentSubmission.fileSubmissionUrl ? (
+                                        <td className="py-3 text-gray-600">
+                                            <div className="flex my-4">
+                                                <Upload className="mr-2 text-[#CD4F2E]" size={18} />
+                                                <span className="text-blue-500">
                                                         {assignmentSubmission.fileSubmissionUrl.split('/').pop()}
                                                     </span>
-                                                </div>
-                                            </td>
-                                        ) : (
-                                            <td className="py-3 text-gray-600"></td>
-                                        )}
-                                    </tr>
-                                    <tr className="border-b">
-                                        <td className="py-3 font-medium text-gray-700">Trạng thái chấm điểm</td>
-                                        <td className="py-3 text-gray-600">
-                                            {assignmentSubmission
+                                            </div>
+                                        </td>
+                                    ) : (
+                                        <td className="py-3 text-gray-600"></td>
+                                    )}
+                                </tr>
+                                <tr className="border-b">
+                                    <td className="py-3 font-medium text-gray-700">Trạng thái chấm điểm</td>
+                                    <td className="py-3 text-gray-600">
+                                        {assignmentSubmission
+                                            ? assignmentSubmission.score
                                                 ? assignmentSubmission.score
-                                                    ? assignmentSubmission.score
-                                                    : 'Chưa chấm điểm'
-                                                : '...'}
-                                        </td>
-                                    </tr>
-                                    <tr className="border-b">
-                                        <td className="py-3 font-medium text-gray-700">Thời gian còn lại</td>
-                                        <td className="py-3 text-gray-600 flex items-center">
-                                            <Clock className="mr-2" size={16} />
-                                            {calculateRemainingTime(endDate)}
-                                        </td>
-                                    </tr>
-                                    <tr className="border-b">
-                                        <td className="py-3 font-medium text-gray-700">Chỉnh sửa lần cuối</td>
-                                        <td className="py-3 text-gray-600">
-                                            {assignmentSubmission && assignmentSubmission.updatedAt
-                                                ? format(
-                                                      formatDateArray(assignmentSubmission.updatedAt),
-                                                      "EEEE, dd 'tháng' MM yyyy, hh:mm a",
-                                                      { locale: vi },
-                                                  )
-                                                : assignmentSubmission &&
-                                                  format(
-                                                      formatDateArray(assignmentSubmission.createdAt),
-                                                      "EEEE, dd 'tháng' MM yyyy, hh:mm a",
-                                                      { locale: vi },
-                                                  )}
-                                        </td>
-                                    </tr>
+                                                : 'Chưa chấm điểm'
+                                            : '...'}
+                                    </td>
+                                </tr>
+                                <tr className="border-b">
+                                    <td className="py-3 font-medium text-gray-700">Thời gian còn lại</td>
+                                    <td className="py-3 text-gray-600 flex items-center">
+                                        <Clock className="mr-2" size={16} />
+                                        {calculateRemainingTime(endDate)}
+                                    </td>
+                                </tr>
+                                <tr className="border-b">
+                                    <td className="py-3 font-medium text-gray-700">Chỉnh sửa lần cuối</td>
+                                    <td className="py-3 text-gray-600">
+                                        {assignmentSubmission && assignmentSubmission.updatedAt
+                                            ? format(
+                                                formatDateArray(assignmentSubmission.updatedAt),
+                                                'EEEE, dd \'tháng\' MM yyyy, hh:mm a',
+                                                { locale: vi },
+                                            )
+                                            : assignmentSubmission &&
+                                            format(
+                                                formatDateArray(assignmentSubmission.createdAt),
+                                                'EEEE, dd \'tháng\' MM yyyy, hh:mm a',
+                                                { locale: vi },
+                                            )}
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         )}

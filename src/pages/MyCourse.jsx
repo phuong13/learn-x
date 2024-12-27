@@ -26,7 +26,6 @@ const MyCourse = () => {
             page,
             size: pageSize,
         };
-        console.log(pageable);
 
         const fetchCourses = async () => {
             try {
