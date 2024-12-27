@@ -5,7 +5,8 @@ import UserMenuDropdown from '../components/UserMenuDropDown';
 import { axiosPrivate } from '@/axios/axios.js';
 import { useAuth } from '@hooks/useAuth.js';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 
 function Header() {
     const stompClient = useRef(null);
@@ -37,16 +38,17 @@ function Header() {
     const [unreadCount, setUnreadCount] = useState(() => loadUnreadCount());
     const [showNotifications, setShowNotifications] = useState(false);
 
+    const navigate = useNavigate();
     useEffect(() => {
         let ws = new SockJS('http://localhost:9191/ws');
         stompClient.current = Stomp.over(ws);
         stompClient.current.connect({}, () => {
             console.log('WebSocket connected');
             stompClient.current.subscribe(`/user/${authUser.email}/notifications`, (message) => {
-                if (message.body) {
-                    const newNotification = JSON.parse(message.body);
+                const body = JSON.parse(message.body);
+                if (body.message) {
                     setNotifications((prevNotifications) => {
-                        const updatedNotifications = [newNotification, ...prevNotifications];
+                        const updatedNotifications = [body.message, ...prevNotifications];
                         saveNotifications(updatedNotifications);
                         return updatedNotifications;
                     });
@@ -56,9 +58,30 @@ function Header() {
                         return newCount;
                     });
                 }
+                console.log('Received message: ', message);
+                toast(body.message, {
+                    autoClose: false,
+                    type: 'info',
+                    onClick: () => {
+                        navigate(body.url);
+                    },
+                    closeButton: (
+                        <button onClick={() => toast.dismiss()}>
+                            <X size={24} className="mr-2" />
+                        </button>
+                    ),
+                });
             });
         });
 
+        return () => {
+            if (stompClient.current) {
+                stompClient.current.disconnect();
+            }
+        };
+    }, []);
+
+    useEffect(() => {
         const fetchNotifications = async () => {
             try {
                 const response = await axiosPrivate.get('/notifications/user/logged-in');
@@ -74,13 +97,7 @@ function Header() {
         };
 
         fetchNotifications();
-
-        return () => {
-            if (stompClient.current) {
-                stompClient.current.disconnect();
-            }
-        };
-    }, [authUser.email]);
+    }, []);
 
     useEffect(() => {
         saveNotifications(notifications);
@@ -127,12 +144,9 @@ function Header() {
                         <div className="relative">
                             <i
                                 className="fas fa-bell text-gray cursor-pointer relative hover:text-slate-300"
-                                onClick={toggleNotifications}
-                            ></i>
+                                onClick={toggleNotifications}></i>
                             {unreadCount > 0 && (
-                                <span
-                                    className="absolute inline-flex items-center justify-center w-4 h-4 text-xs font-bold leading-none text-white bg-[#f66754] rounded-full -bottom-1 -right-3"
-                                >
+                                <span className="absolute inline-flex items-center justify-center w-4 h-4 text-xs font-bold leading-none text-white bg-[#f66754] rounded-full -bottom-1 -right-3">
                                     {unreadCount}
                                 </span>
                             )}
@@ -143,8 +157,7 @@ function Header() {
                                             notifications.map((notification, index) => (
                                                 <div
                                                     key={index}
-                                                    className="text-sm p-2 border-b border-gray-200 hover:bg-slate-300"
-                                                >
+                                                    className="text-sm p-2 border-b border-gray-200 hover:bg-slate-300">
                                                     {notification.message}
                                                 </div>
                                             ))
