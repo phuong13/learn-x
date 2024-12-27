@@ -15,7 +15,14 @@ function Header() {
     const loadNotifications = () => {
         const key = `notifications_${authUser.email}`;
         const savedNotifications = localStorage.getItem(key);
-        return savedNotifications ? JSON.parse(savedNotifications) : [];
+        console.log('savedNotifications', savedNotifications);
+
+        try {
+            return savedNotifications ? JSON.parse(savedNotifications) : [];
+        } catch (error) {
+            console.error('Error parsing saved notifications:', error);
+            return [];
+        }
     };
 
     const loadUnreadCount = () => {
@@ -50,12 +57,10 @@ function Header() {
                     setNotifications((prevNotifications) => {
                         const updatedNotifications = [body.message, ...prevNotifications];
                         saveNotifications(updatedNotifications);
-                        return updatedNotifications;
                     });
                     setUnreadCount((prevCount) => {
                         const newCount = prevCount + 1;
                         saveUnreadCount(newCount);
-                        return newCount;
                     });
                 }
                 console.log('Received message: ', message);
@@ -64,12 +69,14 @@ function Header() {
                     type: 'info',
                     onClick: () => {
                         navigate(body.url);
+                        deleteNotification(body.id);
                     },
                     closeButton: (
                         <button onClick={() => toast.dismiss()}>
                             <X size={24} className="mr-2" />
                         </button>
                     ),
+                    onClose: () => toast.dismiss(),
                 });
             });
         });
@@ -86,11 +93,11 @@ function Header() {
             try {
                 const response = await axiosPrivate.get('/notifications/user/logged-in');
                 const fetchedNotifications = response.data || [];
-                setNotifications((prevNotifications) => {
-                    const mergedNotifications = [...fetchedNotifications, ...prevNotifications];
-                    saveNotifications(mergedNotifications);
-                    return mergedNotifications;
-                });
+                console.log('fetchedNotifications', response);
+
+                setNotifications(fetchedNotifications);
+                saveNotifications(fetchedNotifications);
+                setUnreadCount(fetchedNotifications.length);
             } catch (error) {
                 console.error(error);
             }
@@ -125,6 +132,14 @@ function Header() {
         toast.success('Đã reset thông báo!');
     };
 
+    const deleteNotification = async (id) => {
+        await axiosPrivate.delete(`/notifications/${id}`).then((res) => {
+            const newNotifications = notifications.filter((notification) => notification.id !== id);
+            setNotifications(newNotifications ? newNotifications : []);
+            setUnreadCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
+        });
+    };
+
     return (
         <nav>
             <div className="bg-gradient-to-r from-[#45DFB1] to-[#213A57] p-2 px-4 sticky top-0 z-50">
@@ -143,7 +158,9 @@ function Header() {
                         </button> */}
                         <div className="relative">
                             <i
-                                className="fas fa-bell text-gray cursor-pointer relative hover:text-slate-300"
+                                className={`fas fa-bell text-gray cursor-pointer relative hover:text-slate-300 ${
+                                    showNotifications ? 'text-slate-300' : ''
+                                } `}
                                 onClick={toggleNotifications}></i>
                             {unreadCount > 0 && (
                                 <span className="absolute inline-flex items-center justify-center w-4 h-4 text-xs font-bold leading-none text-white bg-[#f66754] rounded-full -bottom-1 -right-3">
@@ -152,20 +169,25 @@ function Header() {
                             )}
                             {showNotifications && (
                                 <div className="relative">
-                                    <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                                        {notifications.length > 0 ? (
+                                    <div className="absolute right-[-6px] mt-2 w-64 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                                        {notifications && notifications.length > 0 ? (
                                             notifications.map((notification, index) => (
                                                 <div
                                                     key={index}
+                                                    onClick={() => {
+                                                        deleteNotification(notification.id);
+                                                        navigate(notification.url);
+                                                        toggleNotifications();
+                                                    }}
                                                     className="text-sm p-2 border-b border-gray-200 hover:bg-slate-300">
                                                     {notification.message}
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="p-2 text-gray-500">Không có thông báo mới</div>
+                                            <div className="p-2 text-sm text-gray-500">Không có thông báo mới</div>
                                         )}
                                     </div>
-                                    <div className="absolute right-1.5 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-300 z-0"></div>
+                                    <div className="absolute right-[0.5px] w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-300 z-0"></div>
                                 </div>
                             )}
                         </div>
