@@ -1,8 +1,8 @@
 // components
 import DocumentTitle from '@components/DocumentTitle';
 import IdentifyEmail from '../components/IdentifyEmail';
-import Header from '../layout/Header';
-import Footer from '../layout/Footer.jsx';
+import Header from '@layout/Header';
+import Footer from '@layout/Footer.jsx';
 
 const IdentifyAccount = () => {
     return (

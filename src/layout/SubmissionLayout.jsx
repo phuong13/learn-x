@@ -8,7 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import Loader from '@components/Loader.jsx';
 import { toast } from 'react-toastify';
-import GradingSummary from './GradingSummary';
+import GradingSummary from '../components/GradingSummary';
 import { useAuth } from '@hooks/useAuth.js';
 
 export default function SubmissionLayout({ title, content, startDate, endDate }) {
@@ -198,7 +198,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                 <div className="absolute inset-0 bg-black bg-opacity-30" />
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
                     <div className="flex items-center">
-                        <div className="bg-[#14919B] text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md">
+                        <div className="bg-primaryDark text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md">
                             <nav aria-label="breadcrumb">
                                 <ol className="flex items-center space-x-2">
                                     <i className="fa-solid fa-file-arrow-up text-white text-xl mr-2"></i>

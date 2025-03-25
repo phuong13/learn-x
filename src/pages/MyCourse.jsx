@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
 import CourseCard from '../components/CourseCard';
 import CourseFilter from '../components/CourseFilter';
@@ -80,7 +80,7 @@ const MyCourse = () => {
                 <Pagination
                     count={totalPages}
                     page={page + 1}
-                    color="#45DFB1"
+                    color="primary"
                     className="flex justify-center my-4"
                     onChange={handlePageChange}
                 />

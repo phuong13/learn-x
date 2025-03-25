@@ -1,5 +1,5 @@
 import DocumentTitle from '../components/DocumentTitle';
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
 import Navbar from '@layout/NavBar.jsx';
 import InteractiveStepProgress from '@components/StepProgress.jsx';

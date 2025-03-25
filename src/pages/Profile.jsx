@@ -1,6 +1,6 @@
 import DocumentTitle from '@components/DocumentTitle';
 import ProfileInfo from '../components/ProfileInfo';
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Navbar from '@layout/NavBar.jsx';
 import Footer from '@layout/Footer.jsx';
 

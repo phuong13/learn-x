@@ -1,6 +1,6 @@
 import DocumentTitle from '@components/DocumentTitle';
 import ConfirmOTP from '../components/ConfirmOTP';
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
 
 const ConfirmRegister = () => {

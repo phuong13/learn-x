@@ -1,9 +1,9 @@
 import React from 'react';
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
 import Navbar from '@layout/NavBar.jsx';
-import CourseLayout from '../components/CourseLayout';
-import SideBar from '../layout/Sidebar';
+import CourseLayout from '../layout/CourseLayout';
+import SideBar from '@layout/Sidebar';
 const DetailCourse = () => {
     return (
         <div className="flex flex-col min-h-screen">

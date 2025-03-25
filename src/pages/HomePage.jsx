@@ -1,4 +1,4 @@
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
 import IntroBackround from '../components/IntroBackround';
 import Navbar from '@layout/NavBar.jsx';

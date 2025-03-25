@@ -4,6 +4,10 @@ export default {
     theme: {
         extend: {
             colors: {
+                primary: 'var(--primary)',
+                secondary: 'var(--secondary)',
+                primaryDark: 'var(--primary-dark)',
+                secondaryDark: 'var(--secondary-dark)',
                 body: 'var(--body)',
                 'body-text': 'var(--text)',
                 widget: 'var(--widget)',

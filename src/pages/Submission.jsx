@@ -1,8 +1,8 @@
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
-import SideBar from '../layout/Sidebar';
+import SideBar from '@layout/Sidebar';
 import Navbar from '@layout/NavBar.jsx';
-import SubmissionLayout from '../components/SubmissionLayout';
+import SubmissionLayout from '../layout/SubmissionLayout';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { axiosPrivate } from '@/axios/axios.js';
