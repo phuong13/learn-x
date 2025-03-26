@@ -11,7 +11,7 @@ export default function Component() {
     return (
         <div className="flex flex-wrap gap-4 items-center p-4 bg-neutral-100 rounded-lg">
             {/*<div className="relative">*/}
-            {/*    <select className="bg-neutral-200 appearance-none border rounded-md py-2 px-3 pr-8 leading-tight focus:outline-none focus:shadow-outline hover:bg-[#14919B]">*/}
+            {/*    <select className="bg-neutral-200 appearance-none border rounded-md py-2 px-3 pr-8 leading-tight focus:outline-none focus:shadow-outline hover:bg-[primary-dark]">*/}
             {/*        <option>Tất cả</option>*/}
             {/*        /!* Add more options as needed *!/*/}
             {/*    </select>*/}
@@ -31,7 +31,7 @@ export default function Component() {
             {/*</div>*/}
 
             {/*<div className="relative">*/}
-            {/*    <select className="bg-neutral-200 appearance-none border rounded-md py-2 px-3 pr-8 leading-tight focus:outline-none focus:shadow-outline hover:bg-[#14919B]">*/}
+            {/*    <select className="bg-neutral-200 appearance-none border rounded-md py-2 px-3 pr-8 leading-tight focus:outline-none focus:shadow-outline hover:bg-[primary-dark]">*/}
             {/*        <option>Sắp xếp theo tên</option>*/}
             {/*        /!* Add more sorting options as needed *!/*/}
             {/*    </select>*/}
@@ -46,7 +46,7 @@ export default function Component() {
                     <a href="/add-course">
                     <button
                         onClick={() => handleAddCourse()}
-                        className="bg-neutral-200 appearance-none border rounded-md py-2 px-3 leading-tight focus:outline-none focus:shadow-outline hover:bg-[#14919B]">
+                        className="bg-neutral-200 appearance-none border rounded-md py-2 px-3 leading-tight focus:outline-none focus:shadow-outline hover:bg-[primary-dark]">
                         Thêm khóa học
                         {/* Add more sorting options as needed */}
                     </button>

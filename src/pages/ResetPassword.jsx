@@ -8,7 +8,7 @@ import Loader from '../components/Loader';
 import classNames from 'classnames';
 import DocumentTitle from '@components/DocumentTitle.jsx';
 import { toast } from 'react-toastify';
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
 import { Eye, EyeOff } from 'lucide-react';
 const ResetPassword = () => {

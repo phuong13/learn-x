@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
-import UserMenuDropdown from '../components/UserMenuDropDown';
+import UserMenuDropdown from '../../components/UserMenuDropDown';
 import { axiosPrivate } from '@/axios/axios.js';
 import { useAuth } from '@hooks/useAuth.js';
 import { toast } from 'react-toastify';
@@ -64,20 +64,20 @@ function Header() {
                     });
                 }
                 console.log('Received message: ', message);
-                toast(body.message, {
-                    autoClose: false,
-                    type: 'info',
-                    onClick: () => {
-                        navigate(body.url);
-                        deleteNotification(body.id);
-                    },
-                    closeButton: (
-                        <button onClick={() => toast.dismiss()}>
-                            <X size={24} className="mr-2" />
-                        </button>
-                    ),
-                    onClose: () => toast.dismiss(),
-                });
+                // toast(body.message, {
+                //     autoClose: false,
+                //     type: 'info',
+                //     onClick: () => {
+                //         navigate(body.url);
+                //         deleteNotification(body.id);
+                //     },
+                //     closeButton: (
+                //         <button onClick={() => toast.dismiss()}>
+                //             <X size={24} className="mr-2" />
+                //         </button>
+                //     ),
+                //     onClose: () => toast.dismiss(),
+                // });
             });
         });
 
@@ -142,7 +142,7 @@ function Header() {
 
     return (
         <nav>
-            <div className="bg-gradient-to-r from-[#45DFB1] to-[#213A57] p-2 px-4 sticky top-0 z-50">
+            <div className="bg-gradient-to-r from-primary to-secondary p-2 px-4 sticky top-0 z-50">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex space-x-4">
                         <a href="" className="hover:text-slate-300">

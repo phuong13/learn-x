@@ -17,7 +17,7 @@ import { GoogleLogin } from '@react-oauth/google';
 
 import PropTypes from 'prop-types';
 import { useAuth } from '@hooks/useAuth.js';
-import Loader from './Loader';
+import Loader from '../components/Loader';
 import { toast } from 'react-toastify';
 import { Eye, EyeOff } from 'lucide-react';
 

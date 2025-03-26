@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { CalendarIcon, Edit, Trash2 } from 'lucide-react';
-import CourseContent from './CourseContent';
-import StudentRegisteredLayout from './StudentRegisteredLayout.jsx';
+import CourseContent from '../components/CourseContent.jsx';
+import StudentRegisteredLayout from '../components/StudentRegisteredLayout.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { axiosPrivate } from '@/axios/axios.js';
 import { useAuth } from '@hooks/useAuth.js';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import CourseGradeChart from './CourseGradeChart.jsx';
+import CourseGradeChart from '../components/CourseGradeChart.jsx';
 import GradeTable from '@components/GradeTable.jsx';
 
 export default function CoursePageLayout() {
@@ -192,7 +192,7 @@ export default function CoursePageLayout() {
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                    <div className="bg-[#14919B] text-white px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+                    <div className="bg-primaryDark text-white px-4 py-2 rounded-lg text-sm font-semibold mb-2">
                         <nav aria-label="breadcrumb">
                             <ol className="flex items-center space-x-2">
                                 <li>
@@ -234,7 +234,7 @@ export default function CoursePageLayout() {
                     </div>
                 </div>
                 {teacher && (
-                    <div className="absolute bottom-4 left-4 text-white bg-[#14919B] px-4 py-2 rounded-lg text-sm font-semibold">
+                    <div className="absolute bottom-4 left-4 text-white bg-primaryDark px-4 py-2 rounded-lg text-sm font-semibold">
                         Giảng viên: {teacher.fullName}
                     </div>
                 )}

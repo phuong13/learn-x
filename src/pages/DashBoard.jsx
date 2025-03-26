@@ -1,4 +1,4 @@
-import Header from '../layout/Header';
+import Header from '@layout/Header';
 import Footer from '@layout/Footer.jsx';
 import CourseFilter from '../components/CourseFilter';
 import Navbar from '@layout/NavBar.jsx';

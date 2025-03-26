@@ -59,7 +59,7 @@
 
         &:hover,
         &:focus {
-            background-color: #14919B;
+            background-color: primaryDark;
         }
     }
 
@@ -812,3 +812,31 @@
 .leaflet-popup-close-button {
     display: none;
 }
+
+@layer utilities {
+
+    /* Tùy chỉnh thanh cuộn */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      /* Độ rộng */
+    }
+  
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+      /* Nền trong suốt */
+    }
+  
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(150, 150, 150, 0.5);
+      /* Màu xám mờ */
+      border-radius: 6px;
+      /* Bo góc */
+      transition: background 0.3s;
+    }
+  
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 100, 100, 0.8);
+      /* Đậm hơn khi hover */
+    }
+    
+  }

@@ -1,6 +1,6 @@
 // components
 import DocumentTitle from '@components/DocumentTitle';
-import AuthLayout from '@components/AuthLayout';
+import AuthLayout from '../layout/AuthLayout';
 
 const Login = () => {
     return (

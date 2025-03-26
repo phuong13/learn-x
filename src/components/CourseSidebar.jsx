@@ -22,11 +22,11 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
             {isOpen && (
                 <div className={`${isOpen ? '' : 'hidden'} bg-slate-200 rounded-lg`}>
                     <div className="flex justify-evenly">
-                        <button className=" w-full bg-[#02a189] text-white px-4 py-2 rounded-lg mr-1  hover:bg-[#14919B] transition-colors"
+                        <button className=" w-full bg-[#02a189] text-white px-4 py-2 rounded-lg mr-1  hover:bg-[primaryDark] transition-colors"
                             onClick={expandAll}>
                             Mở rộng
                         </button>
-                        <button className="w-full  bg-[#02a189] text-white px-4 py-2 rounded-lg ml-1 hover:bg-[#14919B] transition-colors"
+                        <button className="w-full  bg-[#02a189] text-white px-4 py-2 rounded-lg ml-1 hover:bg-[primaryDark] transition-colors"
                             onClick={collapseAll}>
                             Thu nhỏ
                         </button>
