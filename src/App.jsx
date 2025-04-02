@@ -24,6 +24,7 @@ const Submission = lazy(() => import('./pages/Submission'));
 const AddCourse = lazy(() => import('./pages/AddCourse'));
 const EditCourseContent = lazy(() => import('./components/EditCourseContent'));
 const Grading = lazy(() => import('./pages/Grade'));
+const Forum = lazy(() => import('./pages/Forum'));
 // utils
 
 import ProtectedRoute from './utils/ProtectedRoute';
@@ -74,12 +75,12 @@ function App() {
                         <Route path="/register/verify" element={<ConfirmRegister />} />
                         <Route path="/reset-password" element={<ResetPassword />} />
                         <Route path="/identify" element={<IdentifyAccount />} />
-
                         <Route path="/" element={<ProtectedRoute><HomePage/></ProtectedRoute>} />
                         <Route path="/public" element={<ProtectedRoute><HomePage/></ProtectedRoute>} />
                         <Route path="/my-course" element={<ProtectedRoute><MyCourse/></ProtectedRoute>} />
                         <Route path="/dashboard" element={<ProtectedRoute><DashBoard/></ProtectedRoute>} />
                         <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
+                        <Route path="/forum" element={<Forum/>} />
                         <Route path="/course-detail/:courseId" element={<ProtectedRoute><DetailCourse/></ProtectedRoute>} />
                         <Route path="/course-detail/:courseId/edit" element={<ProtectedRoute><EditCourseContent/></ProtectedRoute>} />
                         <Route path="/submission/:courseId/:assignmentId" element={<ProtectedRoute><Submission/></ProtectedRoute>} />
