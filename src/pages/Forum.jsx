@@ -9,13 +9,13 @@ const Forum = () => {
     return (
         <div className="flex flex-col h-full overflow-hidden">
             <div className="sticky top-0 z-50">
-                {/* <Header />
-                <Navbar /> */}
+                <Header />
+                <Navbar />
             </div>
             <div className="flex-grow">
                 <ForumLayout />
             </div>
-            {/* <Footer /> */}
+            <Footer />
         </div>
     )
 }
