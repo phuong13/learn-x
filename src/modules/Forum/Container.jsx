@@ -51,7 +51,7 @@ const Container = () => {
         Create Topic
       </button>
 
-      <div className="flex flex-col gap-4 h-[400px] overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col gap-4 ">
         {topics.map((topic, index) => (
           <Topic key={index} user={topic.user} content={topic.content} comments={topic.comments} />
         ))}
