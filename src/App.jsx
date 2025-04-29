@@ -25,6 +25,7 @@ const AddCourse = lazy(() => import('./pages/AddCourse'));
 const EditCourseContent = lazy(() => import('./components/EditCourseContent'));
 const Grading = lazy(() => import('./pages/Grade'));
 const Forum = lazy(() => import('./pages/Forum'));
+const AddQuiz = lazy(()=>import('./pages/AddQuiz'))
 // utils
 
 import ProtectedRoute from './utils/ProtectedRoute';
@@ -81,6 +82,9 @@ function App() {
                         <Route path="/dashboard" element={<ProtectedRoute><DashBoard/></ProtectedRoute>} />
                         <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
                         <Route path="/forum" element={<Forum/>} />
+
+                        <Route path="/forum/:forumId" element={<Forum/>} />
+                        <Route path="/add-quiz" element={<AddQuiz/>} />
                         <Route path="/course-detail/:courseId" element={<ProtectedRoute><DetailCourse/></ProtectedRoute>} />
                         <Route path="/course-detail/:courseId/edit" element={<ProtectedRoute><EditCourseContent/></ProtectedRoute>} />
                         <Route path="/submission/:courseId/:assignmentId" element={<ProtectedRoute><Submission/></ProtectedRoute>} />

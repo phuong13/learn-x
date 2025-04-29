@@ -440,10 +440,11 @@ export default function EditCourseContent() {
 
             <div className="max-w-4xl my-8 mx-auto p-6 bg-white shadow-md rounded-lg">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold flex items-center mb-6">
-                        <List className="mr-2" />Chỉnh sửa nội dung khóa học
+                    <div className="text-2xl font-bold flex items-center ">
+                        <List className="mr-2" />
+                        Chỉnh sửa nội dung khóa học
 
-                    </h1>
+                    </div>
                     <button
                         onClick={addSection}
                         className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
@@ -476,9 +477,9 @@ export default function EditCourseContent() {
                                     </button>
                                 </div>
                             ) : (
-                                <h2 className="text-xl font-semibold flex items-center">
+                                <div className="text-xl font-semibold flex items-center">
                                     <List className="mr-2" /> {section.title}
-                                </h2>
+                                </div>
                             )}
 
                             {!savedSections[section.id] && (
@@ -660,7 +661,7 @@ export default function EditCourseContent() {
 
 
                         {!savedSections[section.id] && (
-                            <div className="bg-[#02a189] p-4 rounded-lg flex justify-around mt-4">
+                            <div className="bg-[#02a189] p-2 rounded-lg flex justify-around mt-4">
                                 <button
                                     onClick={() => addItem(section.id, 'lecture')}
                                     className="text-white flex items-center justify-between"
@@ -688,9 +689,9 @@ export default function EditCourseContent() {
                                 <button
                                     data-tooltip-id="my-tooltip" data-tooltip-content="Kiểm tra kĩ thông tin trước khi lưu!"
                                     onClick={() => handleUpdateModule(section.id)}
-                                    className="p-2 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg"
+                                    className="p-1 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg"
                                 >
-                                    <Check size={24} />
+                                    <Check size={20} />
                                 </button>
                                 <Tooltip id="my-tooltip" />
                             </div>

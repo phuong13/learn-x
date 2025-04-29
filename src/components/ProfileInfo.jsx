@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@hooks/useAuth.js';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import { useTranslation } from 'react-i18next';
 
 import Loader from './Loader';
 
@@ -16,7 +17,7 @@ const ProfileInfo = () => {
     const [role, setRole] = useState('');
     const [errors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-
+    const { t } = useTranslation();
     const axiosPrivate = useAxiosPrivate();
 
     const { authUser } = useAuth();
@@ -153,23 +154,23 @@ const ProfileInfo = () => {
                 draggable
                 pauseOnHover
                 theme="light"
-                transition: Bounce
+                transition:Bounce
             />
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Thông tin cá nhân</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">{t('personal_information')}</h1>
                 </div>
             </header>
             {isOpenRequestRole && (
                 <div className="z-50 fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center">
                     <div className="bg-white p-6 rounded-lg z-50">
-                        <h2 className="text-xl font-bold mb-4">Yêu cầu quyền giảng viên</h2>
+                        <h2 className="text-xl font-bold mb-4">{t('teacher_requests')}</h2>
                         <div className="flex justify-end space-x-2">
                             <button className="btn btn--secondary text-btn hover:bg-emerald-400"
-                                    onClick={() => setIsOpenRequestRole(false)}>Không
+                                onClick={() => setIsOpenRequestRole(false)}>{t('no')}
                             </button>
                             <button className="btn btn--primary hover:bg-emerald-400"
-                                    onClick={handleConfirmRequestRole}>Có
+                                onClick={handleConfirmRequestRole}>{t('yes')}
                             </button>
                         </div>
                     </div>
@@ -231,9 +232,8 @@ const ProfileInfo = () => {
                                                 <input
                                                     type="email"
                                                     aria-disabled={true}
-                                                    className={`z-auto w-full disabled:opacity-60 px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d] ${
-                                                        errors.email ? 'border-red-500' : ''
-                                                    }`}
+                                                    className={`z-auto w-full disabled:opacity-60 px-3 py-2 border rounded-md focus:outline-none focus:ring-[#00ba9d] focus:border-[#00ba9d] ${errors.email ? 'border-red-500' : ''
+                                                        }`}
                                                     value={email}
                                                     disabled
                                                     aria-label="Email address"
@@ -247,7 +247,7 @@ const ProfileInfo = () => {
                                             className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                             <dt className="text-sm font-medium text-gray-500 flex items-center">
                                                 <FaUser className="mr-2 text-[#00ba9d]" />
-                                                Tên đầy đủ
+                                                {t('full_name')}
                                             </dt>
                                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                                 <input
@@ -266,7 +266,7 @@ const ProfileInfo = () => {
                                             className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                             <dt className="text-sm font-medium text-gray-500 flex items-center">
                                                 <FaBriefcase className="mr-2 text-[#00ba9d]" />
-                                                Quyền
+                                                {t('role')}
                                             </dt>
                                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                                 <input
@@ -291,21 +291,20 @@ const ProfileInfo = () => {
                                                 onClick={handleChangePassword}
                                                 className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 mr-3">
                                                 <FaKey className="mr-2" />
-                                                Đổi mật khẩu
-                                            </button>
+                                                {t('change_password')}                                            </button>
                                             <button
                                                 type="button"
                                                 disabled={authUser.role === 'TEACHER'}
                                                 onClick={() => setIsOpenRequestRole(true)}
                                                 className={`z-99 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 ${authUser.role === 'TEACHER' ? 'bg-neutral-400 text-gray-500' : ''}`}>
                                                 <FaLock className="mr-2" />
-                                                Yêu cầu quyền giảng viên
+                                                {t('teacher_requests')}
                                             </button>
                                         </div>
                                         <button
                                             type="submit"
                                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#00ba9d] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300">
-                                            Lưu thay đổi
+                                            {t('save_changes')}
                                         </button>
                                     </motion.div>
                                 </form>

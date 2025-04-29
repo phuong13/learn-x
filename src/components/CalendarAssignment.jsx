@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
+import { t } from 'i18next';
 
 export default function Calendar() {
     const date = new Date();
@@ -72,7 +73,7 @@ export default function Calendar() {
 
     return (
         <div className="max-w-6xl mx-auto pt-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Lịch</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t('calendar')}</h2>
             <div className="bg-white rounded-lg">
                 {/* Header */}
                 <div className="p-4 flex justify-between items-center">

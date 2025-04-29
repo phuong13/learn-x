@@ -134,7 +134,14 @@ const StudentRegisteredLayout = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full">
+            <div className="flex justify-end items-center mb-4">
+            {authUser.role === 'TEACHER' && (
+                <button className="mb-4 p-2 bg-primaryDark text-white rounded-lg" onClick={handleOpen}>
+                    Thêm sinh viên
+                </button>
+            )}
+            </div>
             <StudentRegisteredList
                 totalStudents={paginationInfo.totalElements}
                 students={students}
@@ -143,11 +150,7 @@ const StudentRegisteredLayout = () => {
                 onDeleteStudents={handleDeleteStudent}
             />
 
-            {authUser.role === 'TEACHER' && (
-                <button className="btn btn--primary mt-4 bg-blue-500 text-white px-4 py-2 rounded" onClick={handleOpen}>
-                    Thêm sinh viên
-                </button>
-            )}
+            
             <Dialog open={showModal} onClose={handleClose} maxWidth="sm" fullWidth hideBackdrop={false}>
                 <div className="relative bg-white rounded-lg shadow-xl">
                     <DialogTitle className="text-xl font-bold mb-4">Thêm sinh viên</DialogTitle>

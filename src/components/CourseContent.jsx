@@ -121,13 +121,17 @@ const CourseContent = () => {
                 expandAll={expandAll}
                 collapseAll={collapseAll}
             />
-            <div className="flex-1 p-6">
+            <div className="flex-1 px-6">
                 {authUser?.role === 'TEACHER' && (
-                    <button
-                        onClick={() => navigate(`/course-detail/${courseId}/edit`)}
-                        className="btn btn--primary mb-4 px-4 py-2 transition-colors">
-                        Chỉnh sửa
-                    </button>
+                 <div className="flex justify-end">
+                 <button
+                   onClick={() => navigate(`/course-detail/${courseId}/edit`)}
+                   className="mb-4 p-2 bg-primaryDark text-white rounded-lg"
+                 >
+                   Chỉnh sửa
+                 </button>
+               </div>
+               
                 )}
                 <Loader isLoading={isLoading} />
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden">

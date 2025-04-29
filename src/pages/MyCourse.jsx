@@ -9,13 +9,14 @@ import { useAuth } from '@hooks/useAuth.js';
 import DocumentTitle from '@components/DocumentTitle';
 import Loader from '../components/Loader';
 import { Pagination } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const MyCourse = () => {
     const { authUser } = useAuth();
 
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    // const [pageSize, setPageSize] = useState(9);
+    const {t}=useTranslation();
     const pageSize = 9;
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -58,12 +59,12 @@ const MyCourse = () => {
                 </div>
                 <Navbar />
                 <div>
-                    <h2 className="font-bold text-lg pl-6 pt-6">Khoá học của tôi</h2>
+                    <div className="font-bold text-lg pl-6 pt-4">{t('my_courses')}</div>
                 </div>
-                <div className="flex-grow p-6 bg-white shadow-sm mx-4 my-4">
-                    <CourseFilter />
-                    {!(courses.length > 0) && <h2 className="mt-4">Bạn chưa đăng ký khóa học nào!</h2>}
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                <div className="flex-grow p-3 rounded-lg bg-white shadow-sm mx-4 my-2">
+                    {/* <CourseFilter /> */}
+                    {!(courses.length > 0) && <div className="text-center justify-center">Bạn chưa đăng ký khóa học nào!</div>}
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                         {Array.isArray(courses) &&
                             courses.length > 0 &&
                             courses.map((course) => (
@@ -81,7 +82,7 @@ const MyCourse = () => {
                     count={totalPages}
                     page={page + 1}
                     color="primary"
-                    className="flex justify-center my-4"
+                    className="flex justify-center mb-2"
                     onChange={handlePageChange}
                 />
                 <Footer />

@@ -11,7 +11,7 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
     };
 
     return (
-        <div className={` p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-8'} bg-gray-200 h-screen overflow-y-auto relative`}>
+        <div className={` p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-8'}  relative`}>
             <IconButton
                 onClick={toggleSidebar}
                 className="absolute top-0 right-2 "
@@ -20,13 +20,13 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
                 {isOpen ? <ChevronLeft /> : <Menu />}
             </IconButton>
             {isOpen && (
-                <div className={`${isOpen ? '' : 'hidden'} bg-slate-200 rounded-lg`}>
+                <div className={`${isOpen ? '' : 'hidden'} bg-slate-100 rounded-lg`}>
                     <div className="flex justify-evenly">
-                        <button className=" w-full bg-[#02a189] text-white px-4 py-2 rounded-lg mr-1  hover:bg-[primaryDark] transition-colors"
+                        <button className=" w-full  text-white p-2 rounded-lg mr-1  bg-primaryDark transition-colors"
                             onClick={expandAll}>
                             Mở rộng
                         </button>
-                        <button className="w-full  bg-[#02a189] text-white px-4 py-2 rounded-lg ml-1 hover:bg-[primaryDark] transition-colors"
+                        <button className="w-full   text-white p-2 rounded-lg ml-1 bg-primaryDark transition-colors"
                             onClick={collapseAll}>
                             Thu nhỏ
                         </button>
@@ -62,7 +62,7 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
                 </div>
             )}
             {!isOpen && (
-                <div className="flex flex-col items-center pt-16">
+                <div className="flex flex-col w-full items-center pt-16">
                     {modules.map((module) => (
                         <IconButton
                             key={module.id}
@@ -70,9 +70,9 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
                                 toggleSection(module);
                                 scrollToModule(module.id);
                             }}
-                            className="my-2"
+                            className=""
                         >
-                            <School />
+                            {/* <School /> */}
                         </IconButton>
                     ))}
                 </div>

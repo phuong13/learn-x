@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { ThemeProvider } from '@mui/material';
+import './config/i18n.js';
 
 import { BrowserRouter } from 'react-router-dom';
 

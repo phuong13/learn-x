@@ -7,12 +7,12 @@ import Footer from '@layout/Footer.jsx';
 const IdentifyAccount = () => {
     return (
         <>
-            <div className="sticky top-0 z-50">
+            {/* <div className="sticky top-0 z-50">
                 <Header />
-            </div>
+            </div> */}
             <DocumentTitle title="Đặt lại mật khẩu" />
             <IdentifyEmail />
-            <Footer />
+            {/* <Footer /> */}
         </>
     );
 };

@@ -3,7 +3,7 @@ import { ChevronDown, Search } from 'lucide-react'
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import SubmissionHeader from '@components/SubmissionHeader.jsx';
-
+import { t } from 'i18next';
 export default function AssignmentControlPanel() {
   let [timeFilter, setTimeFilter] = useState('7')
   let [sortBy, setSortBy] = useState('Sắp xếp theo ngày')
@@ -34,9 +34,8 @@ export default function AssignmentControlPanel() {
   }, [timeFilter]);
 
   return (
-    <div className="bg-gray-100 p-6 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Mốc thời gian</h2>
-
+    <div className="bg-gray-100 px-6 pt-2  shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-800 mb-2">{t('time')}</h2>
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative">
           <select
@@ -56,7 +55,7 @@ export default function AssignmentControlPanel() {
             onChange={(e) => setSortBy(e.target.value)}
             className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option>Sắp xếp theo ngày</option>
+            <option>{t('sort_by_day')}</option>
             {/*<option>Sắp xếp theo khoá học</option>*/}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
