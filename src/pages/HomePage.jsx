@@ -21,17 +21,15 @@ const MyCourse = () => {
       <DocumentTitle title="Trang chủ" />
 
       <div className="sticky top-0 z-50">
-        <Header /> {/* Header gồm các navbar */}
+        <Header />
       </div>
         <Navbar/>
 
-      {/* Các thành phần khác của trang */}
-      <div className="flex-1">
+      <div className="flex-grow">
 
-        <IntroBackround /> {/* Nội dung */}
+        <IntroBackround /> 
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

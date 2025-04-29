@@ -2,15 +2,17 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function UserMenuDropdown() {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const [avatar, setAvatar] = useState(''); // Avatar URL
-
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const { authUser, isAuthenticated } = useAuth();
+    console.log("🚀 ~ UserMenuDropdown ~ authUser:", authUser)
 
     useEffect(() => {
         if (authUser) {
@@ -34,8 +36,8 @@ export default function UserMenuDropdown() {
     }, []);
 
     const menuItems = [
-        { label: 'Hồ sơ', href: '/profile' },
-        { label: 'Đăng xuất', href: '/logout' },
+        { label: t('my_profile') , href: '/profile' },
+        { label: t('logout'), href: '/logout' },
     ];
 
     return (
@@ -55,12 +57,12 @@ export default function UserMenuDropdown() {
                 {avatar ? (
                     <>
                         <img src={avatar} alt="User Avatar" className="h-8 w-8 rounded-full object-cover" />
-                        <ChevronDown
+                        {/* <ChevronDown
                             size={20}
                             className={`transform text-white transition-transform duration-200 ${
                                 isOpen ? 'rotate-180' : ''
                             }`}
-                        />
+                        /> */}
                     </>
                 ) : (
                     <div className="rounded-full text-gray h-8 w-8 flex items-center justify-center">

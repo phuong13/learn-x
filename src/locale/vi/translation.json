@@ -1,0 +1,49 @@
+{
+    "home_page": "Trang chủ",
+    "dashboard": "Bảng điều khiển",
+    "my_courses": "Khóa học của tôi",
+    "manage_courses": "Quản lý khóa học",
+    "my_profile": "Hồ sơ của tôi",
+    "logout": "Đăng xuất",
+    "personal_information": "Thông tin cá nhân",
+    "change_password": "Đổi mật khẩu",
+    "full_name": "Họ và tên",
+    "role": "Quyền",
+    "save_changes": "Lưu thay đổi",
+    "teacher_requests": "Yêu cầu quyền giảng viên",
+    "yes": "Có",
+    "no": "Không",
+    "time": "Thời gian",
+    "sort_by_day": "Sắp xếp theo ngày",
+    "calendar": "Lịch",
+    "course_content": "Nội dung khóa học",
+    "student_list": "Danh sách sinh viên",
+    "grades": "Điểm số",
+    "teacher": "Giảng viên",
+    "tabs": {
+        "courses": "Khóa học",
+        "members": "Danh sách thành viên",
+        "scores": "Điểm số"
+    },
+    "landing": {
+        "title_top": "DẠY HỌC TRỰC TUYẾN",
+        "title_bottom": "LEARN X",
+        "description": "Rút ngắn khoảng cách, tiết kiệm thời gian, hiệu quả cao, hỗ trợ mọi lúc mọi nơi, ...",
+        "button_text": "Xem các khoá học"
+    },
+    "forum": {
+        "create_topic": "Tạo Topic",
+        "please_select_forum": "Vui lòng chọn forum",
+        "new_topic_title": "Tạo Topic Mới",
+        "new_topic_placeholder": "Nhập nội dung topic...",
+        "cancel": "Hủy",
+        "submit": "Tạo",
+        "search_course_placeholder": "Tìm kiếm theo tên khoá học",
+        "no_courses_found": "Không tìm thấy khoá học"
+    },
+    "topic": {
+        "comments_count": "{{count}} bình luận về topic",
+        "no_comments": "Chưa có bình luận nào.",
+        "comment_input_placeholder": "Nhập bình luận về topic..."
+    }
+}

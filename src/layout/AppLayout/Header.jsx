@@ -7,11 +7,13 @@ import { useAuth } from '@hooks/useAuth.js';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
+import LogoLearnX from '@assets/learnX.jsx';
+
+import LanguageSelection from '../../components/LanguageSelection';
 
 function Header() {
     const stompClient = useRef(null);
     const { authUser } = useAuth();
-
     const loadNotifications = () => {
         const key = `notifications_${authUser.email}`;
         const savedNotifications = localStorage.getItem(key);
@@ -94,7 +96,6 @@ function Header() {
                 const response = await axiosPrivate.get('/notifications/user/logged-in');
                 const fetchedNotifications = response.data || [];
                 console.log('fetchedNotifications', response);
-
                 setNotifications(fetchedNotifications);
                 saveNotifications(fetchedNotifications);
                 setUnreadCount(fetchedNotifications.length);
@@ -143,13 +144,16 @@ function Header() {
     return (
         <nav>
             <div className="bg-gradient-to-r from-primary to-secondary p-2 px-4 sticky top-0 z-50">
-                <div className="container mx-auto flex justify-between items-center">
-                    <div className="flex space-x-4">
-                        <a href="" className="hover:text-slate-300">
-                            <i className="fa-solid fa-earth-europe text-2xl"></i>
-                        </a>
-                    </div>
+                <div className="flex justify-between items-center">
+                <div className="text-white text-xl font-bold">
+                    <a href="/" className="hover:text-gray-200">
+                        <img src={LogoLearnX} alt="Logo" width={150} height={40}/>
+                    </a>
+                </div>
+                      
+
                     <div className="flex items-center space-x-4 text-xl">
+                    <LanguageSelection />
                         {/* <button
                             onClick={resetUserNotifications}
                             className="p-2 bg-red-500 text-white rounded hover:bg-red-700"
@@ -187,7 +191,6 @@ function Header() {
                                             <div className="p-2 text-sm text-gray-500">Không có thông báo mới</div>
                                         )}
                                     </div>
-                                    <div className="absolute right-[0.5px] w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-300 z-0"></div>
                                 </div>
                             )}
                         </div>

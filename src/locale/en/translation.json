@@ -1,0 +1,50 @@
+{
+    "home_page": "Home",
+    "dashboard": "Dashboard",
+    "my_courses": "My Courses",
+    "manage_courses": "Manage Courses",
+    "my_profile": "My Profile",
+    "logout": "Logout",
+    "personal_information": "Personal Information",
+    "change_password": "Change Password",
+    "full_name": "Full Name",
+    "role": "Role",
+    "save_changes": "Save Changes",
+    "teacher_requests": "Teacher Requests",
+    "yes": "Yes",
+    "no": "No",
+    "time": "Time",
+    "sort_by_day": "Sort by Day",
+    "calendar": "Calendar",
+    "course_content": "Course Content",
+    "student_list": "Student List",
+    "grades": "Grades",
+    "teacher": "Teacher",
+    "tabs": {
+      "courses": "Courses",
+      "members": "Members",
+      "scores": "Scores"
+    },
+    "landing": {
+      "title_top": "ONLINE LEARNING",
+      "title_bottom": "LEARN X",
+      "description": "Bridging distances, saving time, high efficiency, support anytime, anywhere, ...",
+      "button_text": "View Courses"
+    },
+    "forum": {
+      "create_topic": "Create Topic",
+      "please_select_forum": "Please select a forum",
+      "new_topic_title": "Create New Topic",
+      "new_topic_placeholder": "Enter topic content...",
+      "cancel": "Cancel",
+      "submit": "Create",
+      "search_course_placeholder": "Search by course name",
+      "no_courses_found": "No courses found"
+    },
+    "topic": {
+      "comments_count": "{{count}} comments about topic",
+      "no_comments": "No comments yet.",
+      "comment_input_placeholder": "Comment to topic..."
+    }
+  }
+  

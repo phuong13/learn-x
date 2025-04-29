@@ -19,6 +19,9 @@ export const axiosPrivate = axios.create({
 axiosPrivate.interceptors.request.use(
     async (config) => {
         const accessToken = localStorage.getItem('access_token');
+        const lang = localStorage.getItem('lang') || 'vi'; // mặc định là 'vi'
+        config.headers['Accept-Language'] = lang;
+        
         if (accessToken) {
             const decodedToken = jwtDecode(accessToken);
             const currentTime = Date.now() / 1000;

@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
     plugins: [react()],
     server: {
-        port: 3000,
+        port: 3001,
     },
     resolve: {
         alias: {
@@ -22,6 +22,7 @@ export default defineConfig({
             '@widgets': '/src/widgets',
             '@contexts': '/src/contexts',
             '@constants': '/src/constants',
+            '@modules': '/src/modules',
         },
     },
 });

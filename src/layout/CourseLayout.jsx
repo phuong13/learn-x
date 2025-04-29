@@ -10,7 +10,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CourseGradeChart from '../components/CourseGradeChart.jsx';
 import GradeTable from '@components/GradeTable.jsx';
-
+import { useTranslation } from 'react-i18next';
+import { use } from 'react';
 export default function CoursePageLayout() {
     const [selectedTab, setSelectedTab] = useState(0);
     const [course, setCourse] = useState(null);
@@ -24,14 +25,19 @@ export default function CoursePageLayout() {
     const [categories, setCategories] = useState([]);
     const datePickerRef = useRef(null);
     const { authUser } = useAuth();
-    const tabs = ['Khóa học', 'Danh sách thành viên', 'Điểm số'];
-
+   
     const [startDate, setStartDate] = useState(new Date());
     const [courseName, setCourseName] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
     const navigate = useNavigate();
     const { courseId } = useParams();
+    const {t} =useTranslation();
+    const tabs = [
+        t('tabs.courses'),
+        t('tabs.members'),
+        t('tabs.scores')
+      ];
     const inputClassName =
         'mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm';
     const [newCategory, setNewCategory] = useState('');
@@ -116,31 +122,31 @@ export default function CoursePageLayout() {
             case 0:
                 return (
                     <div className="p-4">
-                        <h2 className="text-xl font-bold mb-2">Nội dung Khóa học</h2>
+                        <div className="text-xl font-bold mb-2">{t('course_content')}</div>
                         <CourseContent />
                     </div>
                 );
             case 1:
                 return (
                     <div className="p-4">
-                        <h2 className="text-xl font-bold mb-2">Danh sách thành viên</h2>
+                        <div className="text-xl font-bold mb-2">{t('student_list')}</div>
                         <StudentRegisteredLayout />
                     </div>
                 );
             case 2:
                 return (
                     <div className="p-4">
-                        <h2 className="text-xl font-bold mb-2">Điểm số</h2>
+                        <div className="text-xl font-bold mb-2">{t('grades')}</div>
                         {authUser.role === 'TEACHER' && <CourseGradeChart courseId={courseId} />}
                         {authUser.role === 'STUDENT' && <GradeTable courseId={courseId} />}
                     </div>
                 );
-            case 3:
-                return (
-                    <div className="p-4">
-                        <h2 className="text-xl font-bold mb-2">Năng lực</h2>
-                    </div>
-                );
+            // case 3:
+            //     return (
+            //         <div className="p-4">
+            //             <h2 className="text-xl font-bold mb-2">Năng lực</h2>
+            //         </div>
+            //     );
             default:
                 return null;
         }
@@ -184,7 +190,7 @@ export default function CoursePageLayout() {
     };
 
     return (
-        <div className="bg-gray-100 min-h-screen mb-6">
+        <div className="bg-gray-100 h-full mb-6">
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
                     src={course?.thumbnail}
@@ -197,7 +203,7 @@ export default function CoursePageLayout() {
                             <ol className="flex items-center space-x-2">
                                 <li>
                                     <a href="/" className="text-white hover:underline">
-                                        Trang chủ
+                                        {t('home_page')}
                                     </a>
                                 </li>
                                 <li>
@@ -205,7 +211,7 @@ export default function CoursePageLayout() {
                                 </li>
                                 <li>
                                     <a href="/my-course" className="text-white hover:underline">
-                                        Khóa học
+                                        {t('my_courses')}
                                     </a>
                                 </li>
                                 <li>
@@ -235,7 +241,7 @@ export default function CoursePageLayout() {
                 </div>
                 {teacher && (
                     <div className="absolute bottom-4 left-4 text-white bg-primaryDark px-4 py-2 rounded-lg text-sm font-semibold">
-                        Giảng viên: {teacher.fullName}
+                        {t('teacher')}: {teacher.fullName}
                     </div>
                 )}
             </div>
@@ -256,7 +262,7 @@ export default function CoursePageLayout() {
                 </ul>
             </nav>
 
-            <div className="container mx-auto mt-6 px-4 bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="mt-6 px-4 bg-white rounded-lg shadow-lg overflow-hidden">
                 {renderContentForTab()}
             </div>
 
