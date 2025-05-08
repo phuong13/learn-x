@@ -112,7 +112,7 @@ const CourseContent = () => {
     };
 
     return (
-        <div className="flex">
+        <div className="flex ">
             <CourseSidebar
                 modules={modules}
                 expandedSections={expandedSections}
@@ -121,13 +121,13 @@ const CourseContent = () => {
                 expandAll={expandAll}
                 collapseAll={collapseAll}
             />
-            <div className="flex-1 px-6">
+            <div className="flex-1 px-4 flex flex-col gap-2 ">
                 {authUser?.role === 'TEACHER' && (
                  <div className="flex justify-end">
                  <button
                    onClick={() => navigate(`/course-detail/${courseId}/edit`)}
-                   className="mb-4 p-2 bg-primaryDark text-white rounded-lg"
-                 >
+                   className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                 
                    Chỉnh sửa
                  </button>
                </div>
@@ -138,22 +138,22 @@ const CourseContent = () => {
                     {modules.map((module, index) => (
                         <div
                             key={module.id}
-                            className={`border-b last:border-b-0 ${index % 2 === 0 ? 'bg-blue-50' : 'bg-green-50'}`}
+                            className={`border-b last:border-b-0 ${index % 2 === 0 ? 'bg-blue-50' : ''}`}
                             ref={(el) => (moduleRefs.current[module.id] = el)}>
                             <button
                                 onClick={() => toggleSection(module)}
                                 className="w-full px-4 py-3 flex justify-between items-center hover:bg-opacity-80 focus:outline-none">
-                                <span className="text-xl bold font-extrabold text-gray-700">{`${module.name}`}</span>
+                                <span className="text-base   bold font-semibold text-slate-600">{`${module.name}`}</span>
                                 <div className="flex items-center">
                                     {expandedSections.includes(module.id) ? (
-                                        <ChevronDown className="h-5 w-5 text-gray-400" />
+                                        <ChevronDown className="h-5 w-5 text-slate-400" />
                                     ) : (
-                                        <ChevronRight className="h-5 w-5 text-gray-400" />
+                                        <ChevronRight className="h-5 w-5 text-slate-400" />
                                     )}
                                 </div>
                             </button>
                             {expandedSections.includes(module.id) && (
-                                <div className="px-4 py-2">
+                                <div className="px-4">
                                     {module.description && <span>{module.description}</span>}
                                     {moduleData[module.id] && (
                                         <>

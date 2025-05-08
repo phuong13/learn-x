@@ -34,32 +34,21 @@ export default function AssignmentControlPanel() {
   }, [timeFilter]);
 
   return (
-    <div className="bg-gray-100 px-6 pt-2  shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-800 mb-2">{t('time')}</h2>
-      <div className="flex flex-wrap gap-4 mb-6">
+    <div className="bg-white m-4 px-6 py-2  rounded-md">
+      <h2 className="text-lg font-semibold text-slate-800 mb-2">{t('time')}</h2>
+      <div className="flex flex-wrap gap-4">
         <div className="relative">
           <select
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value)}
-            className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="appearance-none bg-white border border-slate-400 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-1 focus:ring-primaryDark focus:border-primaryDark"
           >
-            <option value={'7'} selected={true}>7 ngày tiếp theo</option>
+            <option className='' value={'7'} selected={true}>7 ngày tiếp theo</option>
             <option value={'30'}>30 ngày tiếp theo</option>
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
         </div>
 
-        <div className="relative">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option>{t('sort_by_day')}</option>
-            {/*<option>Sắp xếp theo khoá học</option>*/}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        </div>
 
         <div className="relative flex-grow">
           <input
@@ -67,9 +56,9 @@ export default function AssignmentControlPanel() {
             placeholder="Search by activity type or name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full bg-white border border-slate-400 rounded-md py-2 pl-10 pr-3 text-sm leading-5 focus:outline-none focus:ring-1 focus:ring-primaryDark focus:border-primaryDark"
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
         </div>
       </div>
 
@@ -77,28 +66,6 @@ export default function AssignmentControlPanel() {
           <SubmissionHeader courseID={assignment.courseId} key={assignment.id} id={assignment.id} title={`${assignment.courseName} - ${assignment.title}`} startDate={assignment.startDate} endDate={assignment.endDate} />
       ))}
 
-      {/*<div className="bg-white rounded-lg shadow overflow-hidden">*/}
-      {/*  <div className="p-4 border-b border-gray-200">*/}
-      {/*    <h3 className="text-lg font-semibold text-gray-800">Thứ Ba, 1 tháng 10 2024</h3>*/}
-      {/*  </div>*/}
-
-      {/*  <div className="p-4 border-b border-gray-200 flex items-start justify-between">*/}
-      {/*    <div className="flex items-start">*/}
-      {/*      <span className="text-gray-600 mr-4">18:44</span>*/}
-      {/*      <Upload className="h-5 w-5 text-gray-400 mr-4 mt-1" />*/}
-      {/*      <div>*/}
-      {/*        <h6 className="text-blue-600 font-medium">Group Assignment No 04b submission (at home)</h6>*/}
-      {/*        <p className="text-sm text-gray-600">Bài tập tới hạn - Kiem thu phan mem_ Nhom 03</p>*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*    <a href="/submission">*/}
-      {/*      <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">*/}
-      {/*        Thêm bài nộp*/}
-      {/*      </button>*/}
-      {/*    </a>*/}
-
-      {/*  </div>*/}
-      {/*</div>*/}
     </div>
   )
 }

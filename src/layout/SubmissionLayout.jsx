@@ -13,7 +13,7 @@ import { useAuth } from '@hooks/useAuth.js';
 
 export default function SubmissionLayout({ title, content, startDate, endDate }) {
     const [isFolderVisible, setIsFolderVisible] = useState(false);
-    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
     const [uploadedFile, setUploadedFile] = useState(null); // Trạng thái cho tệp đã tải lên
     const [course, setCourse] = useState(null);
 
@@ -186,7 +186,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
     };
 
     return (
-        <div className="bg-gray-100 min-h-screen">
+        <div className="">
             <Loader isLoading={isLoading} />
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
@@ -235,10 +235,10 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             </div>
 
             {/* Main Content */}
-            <div className="pt-6 relative hover:shadow-xl">
-                <div className="bg-white shadow-lg overflow-hidden">
+            <div className="pt-4 relative">
+                <div className="bg-white shadow-lg overflow-hidden rounded-lg">
                     {/* Assignment Details */}
-                    <div className="p-6 border-b border-gray-200">
+                    <div className="p-4 border-b border-gray-200">
                         <h2 className="text-lg font-semibold mb-2 text-gray-800">Thời gian</h2>
                         <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-600">
                             <p className="mb-2 sm:mb-0">
@@ -251,31 +251,31 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                     </div>
 
                     {/* Submission Instructions */}
-                    <div className="p-6 border-b border-gray-200">
-                        <h2 className="text-lg font-semibold mb-4 text-gray-800">Hướng dẫn nộp bài</h2>
-                        <div className="pb-4" dangerouslySetInnerHTML={{ __html: content }} />
+                    <div className="p-4 border-b border-slate-700">
+                        <h2 className="text-lg font-semibold mb-2 text-slate-700">Hướng dẫn nộp bài</h2>
+                        <div className="pb-2" dangerouslySetInnerHTML={{ __html: content }} />
 
                         {authUser.role === 'TEACHER' ? (
-                            <button className={'btn btn--primary mt-2'}>
+                            <button
+                                className="py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
                                 <Link to={`/grading/${courseId}/${assignmentId}`} className="text-white">
                                     Chấm điểm
                                 </Link>
                             </button>
                         ) : (
                             <button
-                                // className="bg-[#02a189] text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
                                 onClick={toggleFolderVisibility}
-                                className={'btn btn--primary'}>
+                                className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
                                 {assignmentSubmission ? 'Sửa bài nộp' : 'Thêm bài nộp'}
                             </button>
                         )}
 
                         {/* Folder luôn hiển thị khi người dùng nhấn vào nút */}
                         {isFolderVisible && (
-                            <div className="mt-4 p-4 bg-slate-200 rounded-lg shadow-md">
-                                <h3 className="text-lg font-semibold mb-2 text-gray-800">Tải tệp bài nộp của bạn</h3>
+                            <div className="mt-2 p-4 bg-slate-100 rounded-lg shadow-md">
+                                <div className="text-lg font-semibold mb-2 text-gray-800">Tải tệp bài nộp của bạn</div>
                                 {uploadedFile && (
-                                    <div>
+                                    <div className='mt-2'>
                                         <span className="text-gray-700 mr-4">File đã chọn: </span>
                                         <span className="text-blue-700 mr-4">{uploadedFile.name}</span>
                                     </div>
@@ -289,7 +289,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                     />
                                 )}
                                 {assignmentSubmission && !uploadedFile && assignmentSubmission.fileSubmissionUrl && (
-                                    <div>
+                                    <div className='mt-2'>
                                         <span className="text-gray-700 mr-4">File đã nộp: </span>
                                         <span className="text-blue-700 mr-4">
                                             {assignmentSubmission.fileSubmissionUrl.split('/').pop()}
@@ -303,9 +303,9 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                         Nộp bài
                                     </button>
                                     <button
-                                        className="mr-4 bg-rose-400 text-white text-m px-3 py-1 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+                                        className="mr-4 bg-rose-400 text-white text-m px-3 py-1 rounded-lg hover:bg-rose-700 transition-colors shadow-md"
                                         onClick={handleFileDelete}>
-                                        Xoá
+                                        Huỷ chọn
                                     </button>
                                 </div>
                             </div>
@@ -313,86 +313,89 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                     </div>
 
                     {/* Submission Status with Dropdown */}
-                    <div className="p-6">
+                    {authUser.role === 'STUDENT' && (
+                        <div className="p-6">
                         <div
-                            className="flex justify-between items-center mb-4 cursor-pointer"
+                            className="flex justify-between items-center mb-2 cursor-pointer"
                             onClick={toggleStatusDropdown}>
-                            <h3 className="text-lg font-semibold text-gray-800">Trạng thái bài nộp</h3>
+                            <h3 className="text-lg font-semibold text-slate-700">Trạng thái bài nộp</h3>
                             {isStatusDropdownOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </div>
 
                         {isStatusDropdownOpen && (
                             <table className="w-full">
                                 <tbody>
-                                <tr className="border-b">
-                                    <td className="py-3 font-medium text-gray-700">Trạng thái bài nộp</td>
-                                    {assignmentSubmission ? (
-                                        <>
-                                            {assignmentSubmission.updatedAt
-                                                ? calculateSubmissionTime(
-                                                    formatDateArray(assignmentSubmission.updatedAt),
-                                                )
-                                                : calculateSubmissionTime(
-                                                    formatDateArray(assignmentSubmission.createdAt),
-                                                )}
-                                        </>
-                                    ) : (
-                                        <td className="py-3 text-gray-600">Chưa nộp bài</td>
-                                    )}
-                                </tr>
-                                <tr className="border-b">
-                                    <td className="py-3 font-medium text-gray-700">File đã nộp</td>
-                                    {assignmentSubmission && assignmentSubmission.fileSubmissionUrl ? (
-                                        <td className="py-3 text-gray-600">
-                                            <div className="flex my-4">
-                                                <Upload className="mr-2 text-[#CD4F2E]" size={18} />
-                                                <span className="text-blue-500">
+                                    <tr className="border-b border-slate-500">
+                                        <td className="py-3 font-semibold text-gray-700">Thời gian nộp</td>
+                                        {assignmentSubmission ? (
+                                            <>
+                                                {assignmentSubmission.updatedAt
+                                                    ? calculateSubmissionTime(
+                                                        formatDateArray(assignmentSubmission.updatedAt),
+                                                    )
+                                                    : calculateSubmissionTime(
+                                                        formatDateArray(assignmentSubmission.createdAt),
+                                                    )}
+                                            </>
+                                        ) : (
+                                            <td className="py-3 text-gray-600">Chưa nộp bài</td>
+                                        )}
+                                    </tr>
+                                    <tr className="border-b border-slate-500">
+                                        <td className="py-3 font-semibold text-gray-700">File đã nộp</td>
+                                        {assignmentSubmission && assignmentSubmission.fileSubmissionUrl ? (
+                                            <td className=" text-gray-600">
+                                                <div className="flex">
+                                                    <Upload className="mr-2 text-blue-600" size={18} />
+                                                    <span className="text-blue-500">
                                                         {assignmentSubmission.fileSubmissionUrl.split('/').pop()}
                                                     </span>
-                                            </div>
-                                        </td>
-                                    ) : (
-                                        <td className="py-3 text-gray-600"></td>
-                                    )}
-                                </tr>
-                                <tr className="border-b">
-                                    <td className="py-3 font-medium text-gray-700">Trạng thái chấm điểm</td>
-                                    <td className="py-3 text-gray-600">
-                                        {assignmentSubmission
-                                            ? assignmentSubmission.score
+                                                </div>
+                                            </td>
+                                        ) : (
+                                            <td className="py-3 text-gray-600"></td>
+                                        )}
+                                    </tr>
+                                    <tr className="border-b border-slate-500">
+                                        <td className="py-3 font-semibold text-gray-700">Trạng thái chấm điểm</td>
+                                        <td className="py-3 text-gray-600">
+                                            {assignmentSubmission
                                                 ? assignmentSubmission.score
-                                                : 'Chưa chấm điểm'
-                                            : '...'}
-                                    </td>
-                                </tr>
-                                <tr className="border-b">
-                                    <td className="py-3 font-medium text-gray-700">Thời gian còn lại</td>
-                                    <td className="py-3 text-gray-600 flex items-center">
-                                        <Clock className="mr-2" size={16} />
-                                        {calculateRemainingTime(endDate)}
-                                    </td>
-                                </tr>
-                                <tr className="border-b">
-                                    <td className="py-3 font-medium text-gray-700">Chỉnh sửa lần cuối</td>
-                                    <td className="py-3 text-gray-600">
-                                        {assignmentSubmission && assignmentSubmission.updatedAt
-                                            ? format(
-                                                formatDateArray(assignmentSubmission.updatedAt),
-                                                'EEEE, dd \'tháng\' MM yyyy, hh:mm a',
-                                                { locale: vi },
-                                            )
-                                            : assignmentSubmission &&
-                                            format(
-                                                formatDateArray(assignmentSubmission.createdAt),
-                                                'EEEE, dd \'tháng\' MM yyyy, hh:mm a',
-                                                { locale: vi },
-                                            )}
-                                    </td>
-                                </tr>
+                                                    ? assignmentSubmission.score
+                                                    : 'Chưa chấm điểm'
+                                                : '...'}
+                                        </td>
+                                    </tr>
+                                    <tr className="border-b border-slate-500">
+                                        <td className="py-3 font-semibold text-gray-700">Thời gian còn lại</td>
+                                        <td className="py-3 text-gray-600 flex items-center">
+                                            <Clock className="mr-2" size={16} />
+                                            {calculateRemainingTime(endDate)}
+                                        </td>
+                                    </tr>
+                                    <tr className="border-b border-slate-500">
+                                        <td className="py-3 font-semibold text-gray-700">Chỉnh sửa lần cuối</td>
+                                        <td className="py-3 text-gray-600">
+                                            {assignmentSubmission && assignmentSubmission.updatedAt
+                                                ? format(
+                                                    formatDateArray(assignmentSubmission.updatedAt),
+                                                    'EEEE, dd \'tháng\' MM yyyy, hh:mm a',
+                                                    { locale: vi },
+                                                )
+                                                : assignmentSubmission &&
+                                                format(
+                                                    formatDateArray(assignmentSubmission.createdAt),
+                                                    'EEEE, dd \'tháng\' MM yyyy, hh:mm a',
+                                                    { locale: vi },
+                                                )}
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         )}
                     </div>
+                    )}
+                    
                     <div className="">
                         {authUser.role === 'TEACHER' && (
                             <GradingSummary timeRemaining={calculateRemainingTime(endDate)} />

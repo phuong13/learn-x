@@ -1,30 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
-import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
+import { List, FileText, Edit2, Edit3, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-export default function Curriculum({ onPostAllModules }) {
-    const [sections, setSections] = useState(() => {
-        const savedSections = localStorage.getItem('sections');
-        return savedSections
-            ? JSON.parse(savedSections)
-            : [
-                  {
-                      id: '1',
-                      title: 'Introduction',
-                      items: [
-                          { id: '1', type: 'lecture', title: 'Lecture Title', content: '' },
-                          { id: '2', type: 'quiz', title: 'Quiz Title' },
-                          { id: '3', type: 'assignment', title: 'Assignment Title', startDate: null, endDate: null },
-                          { id: '4', type: 'resource', title: 'Resource Title', file: null },
-                      ],
-                  },
-              ];
-    });
-
+export default function Curriculum({ onSubmitSuccess }) {
+    const [sections, setSections] = useState([]);
     const inputRef = useRef(null);
 
     const handlePostModule = async (sectionId) => {
@@ -32,21 +18,6 @@ export default function Curriculum({ onPostAllModules }) {
         setConfirmingSectionId(sectionId);
     };
 
-    const postAllUnsavedModules = async () => {
-        await Promise.all(
-            sections.map(async (section) => {
-                if (!savedSections[section.id]) {
-                    await confirmAndPostModule(section.id);
-                }
-            }),
-        );
-    };
-
-    // useEffect(() => {
-    //   if (onPostAllModules) {
-    //     onPostAllModules(postAllUnsavedModules);
-    //   }
-    // }, [onPostAllModules]);
 
     const confirmAndPostModule = async () => {
         setIsConfirmDialogOpen(false);
@@ -60,7 +31,6 @@ export default function Curriculum({ onPostAllModules }) {
             courseId: courseId,
             name: section.title,
         };
-        console.log('MODULE DATA: ', moduleData);
         const response = await axiosPrivate.post(`/modules`, moduleData);
         let moduleId;
         if (response.status === 200) {
@@ -166,41 +136,40 @@ export default function Curriculum({ onPostAllModules }) {
     const [editingSectionId, setEditingSectionId] = useState(null);
     const [editingItemId, setEditingItemId] = useState(null);
     const [tempTitle, setTempTitle] = useState('');
-    const datePickerRef_starDay = useRef(null);
-    const datePickerRef_endDay = useRef(null);
+
     const [itemContents, setItemContents] = useState({});
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [confirmingSectionId, setConfirmingSectionId] = useState(null);
     const [savedSections, setSavedSections] = useState({});
 
-    useEffect(() => {
-        localStorage.setItem('sections', JSON.stringify(sections));
-    }, [sections]);
+    // useEffect(() => {
+    //     localStorage.setItem('sections', JSON.stringify(sections));
+    // }, [sections]);
 
     const handleDateChange = (sectionId, itemId, field, date) => {
-        // Lấy thời gian hiện tại
+        console.log("🚀 ~ handleDateChange ~ field:", field)
         const now = new Date();
 
-        // Tìm section và item hiện tại để kiểm tra giá trị startDate và endDate
         const section = sections.find((section) => section.id === sectionId);
         const item = section.items.find((item) => item.id === itemId);
 
         // Kiểm tra điều kiện validate
         if (field === 'startDate') {
             if (date <= now) {
-                toast('Ngày giờ bắt đầu phải sau giờ hiện tại!', { type: 'error' });
-                return;
+              toast('Ngày giờ bắt đầu phải sau giờ hiện tại!', { type: 'error' });
+              return false;
             }
-            if (item.endDate && date >= item.endDate) {
-                toast('Ngày giờ bắt đầu phải trước ngày kết thúc!', { type: 'error' });
-                return;
+          }
+        
+          if (field === 'endDate') {
+            if (!item.startDate) {
+              toast('Vui lòng chọn ngày bắt đầu trước!', { type: 'error' });
+              return false;
             }
-        }
-
-        if (field === 'endDate') {
-            if (item.startDate && date <= item.startDate) {
-                toast('Ngày giờ kết thúc phải sau ngày bắt đầu!', { type: 'error' });
-                return;
+        
+            if (date <= new Date(item.startDate)) {
+              toast('Ngày giờ kết thúc phải sau ngày bắt đầu!', { type: 'error' });
+              return false;
             }
         }
 
@@ -210,11 +179,11 @@ export default function Curriculum({ onPostAllModules }) {
             sections.map((section) =>
                 section.id === sectionId
                     ? {
-                          ...section,
-                          items: section.items.map((item) =>
-                              item.id === itemId ? { ...item, [field]: utcDate.toISOString() } : item,
-                          ),
-                      }
+                        ...section,
+                        items: section.items.map((item) =>
+                            item.id === itemId ? { ...item, [field]: utcDate.toISOString() } : item,
+                        ),
+                    }
                     : section,
             ),
         );
@@ -302,13 +271,13 @@ export default function Curriculum({ onPostAllModules }) {
             const updatedSections = prevSections.map((section) =>
                 section.id === sectionId
                     ? {
-                          ...section,
-                          items: section.items.map((item) =>
-                              item.id === editingItemId
-                                  ? { ...item, title: tempTitle, content: itemContents[editingItemId] }
-                                  : item,
-                          ),
-                      }
+                        ...section,
+                        items: section.items.map((item) =>
+                            item.id === editingItemId
+                                ? { ...item, title: tempTitle, content: itemContents[editingItemId] }
+                                : item,
+                        ),
+                    }
                     : section,
             );
             localStorage.setItem('sections', JSON.stringify(updatedSections));
@@ -327,11 +296,11 @@ export default function Curriculum({ onPostAllModules }) {
                 sections.map((section) =>
                     section.id === sectionId
                         ? {
-                              ...section,
-                              items: section.items.map((item) =>
-                                  item.id === itemId ? { ...item, title: fileName } : item,
-                              ),
-                          }
+                            ...section,
+                            items: section.items.map((item) =>
+                                item.id === itemId ? { ...item, title: fileName } : item,
+                            ),
+                        }
                         : section,
                 ),
             );
@@ -343,22 +312,23 @@ export default function Curriculum({ onPostAllModules }) {
     };
 
     return (
-        <>
-            <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <div className="mx-64 border rounded-lg p-6 bg-white shadow-md">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold flex items-center">
+                    <div className="text-xl font-bold flex items-center ">
                         <List className="mr-2" />
                         Thêm nội dung khóa học
-                    </h1>
+                    </div>
                     <button
                         onClick={addSection}
-                        className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors">
+                        className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
                         Thêm chương mới
                     </button>
                 </div>
 
                 {sections.map((section) => (
-                    <div key={section.id} className="mb-6">
+                    <div key={section.id}
+                        className="mb-4 border border-slate-400 p-4 rounded-lg bg-slate-50">
                         <div className="flex justify-between items-center mb-2">
                             {editingSectionId === section.id ? (
                                 <div className="flex items-center space-x-2">
@@ -366,21 +336,22 @@ export default function Curriculum({ onPostAllModules }) {
                                         type="text"
                                         value={tempTitle || ''}
                                         onChange={(e) => setTempTitle(e.target.value)}
-                                        className="border border-gray-300 p-1 rounded"
+                                        className="border border-slate-300 p-1 rounded-md"
                                         onKeyDown={(e) => handleKeyDown(e, saveSection)}
                                         ref={inputRef}
                                     />
-                                    <button onClick={saveSection} className="text-green-500 hover:text-green-700">
+                                    <button onClick={saveSection}
+                                    >
                                         <Check size={18} />
                                     </button>
                                     <button
                                         onClick={() => setEditingSectionId(null)}
-                                        className="text-red-500 hover:text-red-700">
+                                    >
                                         <X size={18} />
                                     </button>
                                 </div>
                             ) : (
-                                <h2 className="text-xl font-semibold flex items-center">
+                                <h2 className="text-lg font-semibold flex items-center">
                                     <List className="mr-2" /> {section.title}
                                 </h2>
                             )}
@@ -389,12 +360,14 @@ export default function Curriculum({ onPostAllModules }) {
                                 <div>
                                     <button
                                         onClick={() => startEditingSection(section.id, section.title)}
-                                        className="p-1 bg-cyan-400 text-green-500 hover:text-green-700 rounded-full mr-2">
-                                        <Edit2 size={18} />
+                                        className="p-1 text-green-500 hover:text-green-700 rounded-full mr-2"
+                                    >
+                                        <Edit3 size={18} />
                                     </button>
                                     <button
                                         onClick={() => deleteSection(section.id)}
-                                        className="p-1 bg-rose-400 text-green-500 hover:text-green-700 rounded-full mr-2">
+                                        className="p-1  text-green-500 hover:text-green-700 rounded-full mr-2"
+                                    >
                                         <Trash2 size={18} />
                                     </button>
                                 </div>
@@ -402,7 +375,8 @@ export default function Curriculum({ onPostAllModules }) {
                         </div>
 
                         {section.items.map((item) => (
-                            <div key={item.id} className="bg-slate-200 p-3 mb-2 rounded flex flex-col group relative">
+                            <div key={item.id}
+                                className="bg-slate-200 p-3 mb-2 rounded flex flex-col group relative">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
                                         {item.type === 'lecture' && (
@@ -499,49 +473,23 @@ export default function Curriculum({ onPostAllModules }) {
                                     <div className="mt-4">
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
                                             <p>Ngày và giờ bắt đầu</p>
-                                            <div
-                                                className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                onClick={() => datePickerRef_starDay.current.setOpen(true)}>
-                                                <DatePicker
-                                                    dateFormat="yyyy-MM-dd hh:mm aa"
-                                                    showTimeSelect
-                                                    timeFormat="hh:mm aa"
-                                                    locale={'vi'}
-                                                    selected={item.startDate ? new Date(item.startDate) : null}
-                                                    ref={datePickerRef_starDay}
-                                                    onChange={(date) =>
-                                                        handleDateChange(section.id, item.id, 'startDate', date)
-                                                    }
-                                                    showMonthYearDropdown
-                                                />
-                                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                                    <Calendar className="h-5 w-5 text-gray-400" />
-                                                </div>
-                                            </div>
+                                            <DateTimePicker
+                                                className="w-full rounded-xl bg-white"
+                                                value={item.startDate ? new Date(item.startDate) : null}
+                                                onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
+                                                ampm={false} 
+                                            />
+
                                         </div>
 
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
                                             <p>Ngày và giờ kết thúc</p>
-                                            <div
-                                                className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
-      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                onClick={() => datePickerRef_endDay.current.setOpen(true)}>
-                                                <DatePicker
-                                                    dateFormat="yyyy-MM-dd hh:mm aa"
-                                                    showTimeSelect
-                                                    timeFormat="hh:mm aa"
-                                                    locale={'vi'}
-                                                    selected={item.endDate ? new Date(item.endDate) : null}
-                                                    ref={datePickerRef_endDay}
-                                                    onChange={(date) =>
-                                                        handleDateChange(section.id, item.id, 'endDate', date)
-                                                    }
-                                                />
-                                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                                    <Calendar className="h-5 w-5 text-gray-400" />
-                                                </div>
-                                            </div>
+                                            <DateTimePicker
+                                                className="w-full rounded-xl bg-white"
+                                                value={item.endDate ? new Date(item.endDate) : null}
+                                                onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
+                                                ampm={false} 
+                                            />
                                         </div>
 
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
@@ -562,7 +510,7 @@ export default function Curriculum({ onPostAllModules }) {
                         ))}
 
                         {!savedSections[section.id] && (
-                            <div className="bg-[#02a189] p-4 rounded-lg flex justify-around mt-4">
+                            <div className="bg-primaryDark p-2 rounded-lg flex justify-between mt-2 mx-64">
                                 <button
                                     onClick={() => addItem(section.id, 'lecture')}
                                     className="text-white flex items-center justify-between">
@@ -586,13 +534,25 @@ export default function Curriculum({ onPostAllModules }) {
                                 </button>
                                 <button
                                     onClick={() => handlePostModule(section.id)}
-                                    className="p-2 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg">
+                                    className="p-1 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg">
                                     <Check size={24} />
                                 </button>
                             </div>
                         )}
+
                     </div>
+
                 ))}
+                <div className="flex justify-end">
+                    <button
+                        className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
+                        onClick={onSubmitSuccess}
+                    >
+                        Xong
+                    </button>
+                </div>
+
+
             </div>
             {isConfirmDialogOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -614,7 +574,8 @@ export default function Curriculum({ onPostAllModules }) {
                     </div>
                 </div>
             )}
-        </>
+
+        </LocalizationProvider>
     );
 }
 

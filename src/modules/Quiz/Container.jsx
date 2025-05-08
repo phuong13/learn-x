@@ -44,7 +44,6 @@ const Container = () => {
   return (
     <form className="flex flex-col p-6" onSubmit={handleSubmit}>
       <h1 className="text-2xl font-bold">Tạo Quiz</h1>
-
       <Input
         label="Title"
         value={title}

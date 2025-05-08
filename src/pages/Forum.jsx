@@ -7,17 +7,12 @@ import ForumLayout from '../layout/ForumLayout.jsx';
 
 const Forum = () => {
     return (
-        <div className="flex flex-col min-h-screen">
-            <div className="sticky top-0">
-                <Header />
-                <Navbar />
-            </div>
-
-            <div className="flex-grow h-0 overflow-hidden">
+        <div className="flex flex-col min-h-[calc(100vh-193px)] ">
+    
+            <div className="flex-grow h-0 overflow-hidden bg-slate-200">
                 <ForumLayout />
             </div>
 
-            <Footer />
         </div>
     );
 };

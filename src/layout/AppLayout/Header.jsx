@@ -65,7 +65,7 @@ function Header() {
                         saveUnreadCount(newCount);
                     });
                 }
-                console.log('Received message: ', message);
+                //console.log('Received message: ', message);
                 // toast(body.message, {
                 //     autoClose: false,
                 //     type: 'info',
@@ -154,12 +154,6 @@ function Header() {
 
                     <div className="flex items-center space-x-4 text-xl">
                     <LanguageSelection />
-                        {/* <button
-                            onClick={resetUserNotifications}
-                            className="p-2 bg-red-500 text-white rounded hover:bg-red-700"
-                        >
-                            Reset Notifications
-                        </button> */}
                         <div className="relative">
                             <i
                                 className={`fas fa-bell text-gray cursor-pointer relative hover:text-slate-300 ${
@@ -173,7 +167,7 @@ function Header() {
                             )}
                             {showNotifications && (
                                 <div className="relative">
-                                    <div className="absolute right-[-6px] mt-2 w-64 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                                    <div className="absolute right-[-6px] mt-2 w-64 bg-white rounded-md shadow-lg z-10">
                                         {notifications && notifications.length > 0 ? (
                                             notifications.map((notification, index) => (
                                                 <div

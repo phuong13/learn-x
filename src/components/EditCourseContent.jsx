@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
+import { List, FileText, Edit2, Trash2, Plus, Check, X, Upload, Calendar, Edit3 } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
@@ -113,7 +113,7 @@ export default function EditCourseContent() {
             }
 
             // Update or create items
-            const updateModulePromise = new Promise( (resolve, reject) => {
+            const updateModulePromise = new Promise((resolve, reject) => {
                 try {
                     Promise.all(section.items.map(async item => {
                         let formData = new FormData();
@@ -295,7 +295,7 @@ export default function EditCourseContent() {
             case 'lecture':
                 axiosPrivate.delete(`/lectures/${id}`)
                     .then(() => {
-                        toast.success('Xóa lecture thành công');
+                        // toast.success('Xóa lecture thành công');
                     })
                     .catch((error) => {
                         console.error('Error deleting lecture:', error);
@@ -305,7 +305,7 @@ export default function EditCourseContent() {
             case 'assignment':
                 axiosPrivate.delete(`/assignments/${id}`)
                     .then(() => {
-                        toast.success('Xóa assignment thành công');
+                        // toast.success('Xóa assignment thành công');
                     })
                     .catch((error) => {
                         console.error('Error deleting assignment:', error);
@@ -315,7 +315,7 @@ export default function EditCourseContent() {
             case 'resource':
                 axiosPrivate.delete(`/resources/${id}`)
                     .then(() => {
-                        toast.success('Xóa resource thành công');
+                        // toast.success('Xóa resource thành công');
                     })
                     .catch((error) => {
                         console.error('Error deleting resource:', error);
@@ -425,11 +425,7 @@ export default function EditCourseContent() {
     };
 
     return (
-        <>
-            <div className="sticky top-0 z-50">
-                <Header />
-            </div>
-            <NavBar />
+        <div>
             <button
                 onClick={() => window.history.back()}
                 className="text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-6 py-2  flex items-center space-x-2"
@@ -438,23 +434,21 @@ export default function EditCourseContent() {
                 <span>Back</span>
             </button>
 
-            <div className="max-w-4xl my-8 mx-auto p-6 bg-white shadow-md rounded-lg">
+            <div className="m-4 p-6 bg-white shadow-md rounded-lg">
                 <div className="flex justify-between items-center mb-6">
-                    <div className="text-2xl font-bold flex items-center ">
-                        <List className="mr-2" />
+                    <div className="text-xl font-bold flex items-center ">
                         Chỉnh sửa nội dung khóa học
-
                     </div>
                     <button
                         onClick={addSection}
-                        className="bg-[#02a189] text-white px-4 py-2 rounded-lg hover:bg-[#02a189] transition-colors"
-                    >
+                        className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
                         Thêm chương mới
                     </button>
                 </div>
 
                 {sections.map(section => (
-                    <div key={`section-${section.id}`} className="mb-6">
+                    <div key={`section-${section.id}`} 
+                    className="mb-4 border border-slate-400 p-4 rounded-lg bg-slate-50">
                         <div className="flex justify-between items-center mb-2">
                             {editingSectionId === section.id ? (
                                 <div className="flex items-center space-x-2">
@@ -463,21 +457,21 @@ export default function EditCourseContent() {
                                         value={tempTitle}
                                         onChange={(e) => setTempTitle(e.target.value)}
                                         onKeyDown={(e) => handleKeyDown(e, saveSection)}
-                                        className="border border-gray-300 p-1 rounded"
+                                        className="border border-slate-300 p-1 rounded-md"
                                         ref={inputRef}
                                     />
-                                    <button onClick={saveSection} className="text-green-500 hover:text-green-700">
+                                    <button onClick={saveSection} 
+                                    >
                                         <Check size={18} />
                                     </button>
                                     <button
                                         onClick={() => setEditingSectionId(null)}
-                                        className="text-red-500 hover:text-red-700"
                                     >
                                         <X size={18} />
                                     </button>
                                 </div>
                             ) : (
-                                <div className="text-xl font-semibold flex items-center">
+                                <div className="text-lg font-semibold flex items-center">
                                     <List className="mr-2" /> {section.title}
                                 </div>
                             )}
@@ -486,13 +480,13 @@ export default function EditCourseContent() {
                                 <div>
                                     <button
                                         onClick={() => startEditingSection(section.id, section.title)}
-                                        className="p-1 bg-cyan-400 text-green-500 hover:text-green-700 rounded-full mr-2"
+                                        className="p-1 text-green-500 hover:text-green-700 rounded-full mr-2"
                                     >
-                                        <Edit2 size={18} />
+                                        <Edit3 size={18} />
                                     </button>
                                     <button
                                         onClick={() => deleteSection(section.id)}
-                                        className="p-1 bg-rose-400 text-green-500 hover:text-green-700 rounded-full mr-2"
+                                        className="p-1  text-green-500 hover:text-green-700 rounded-full mr-2"
                                     >
                                         <Trash2 size={18} />
                                     </button>
@@ -600,7 +594,7 @@ export default function EditCourseContent() {
                                 {item.type === 'assignment' && editingItemId === item.typeId && (
                                     <div className="mt-4">
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày và giờ bắt đầu</p>
+                                            <p>Ngày và giờ bắt đầu1</p>
                                             <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
                       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                                 onClick={() => datePickerRef_startDay.current.setOpen(true)}>
@@ -611,7 +605,8 @@ export default function EditCourseContent() {
                                                     locale={'vi'}
                                                     selected={item.startDate ? new Date(item.startDate) : null}
                                                     ref={datePickerRef_startDay}
-                                                    onChange={(date) => handleDateChange(section.id, item.typeId, 'startDate', date)}
+                                                    onChange={(date) =>
+                                                         handleDateChange(section.id, item.typeId, 'startDate', date)}
                                                     showMonthYearDropdown
                                                 />
 
@@ -661,7 +656,7 @@ export default function EditCourseContent() {
 
 
                         {!savedSections[section.id] && (
-                            <div className="bg-[#02a189] p-2 rounded-lg flex justify-around mt-4">
+                            <div className="bg-primaryDark p-2 rounded-lg flex justify-around mt-2 mx-64">
                                 <button
                                     onClick={() => addItem(section.id, 'lecture')}
                                     className="text-white flex items-center justify-between"
@@ -707,8 +702,12 @@ export default function EditCourseContent() {
                         <h2 className="text-xl font-bold mb-4">Xác nhận lưu chương</h2>
                         <p className="mb-4">Bạn có muốn lưu chương này? (Nội dung chương có thể thay đổi sau hành động này)</p>
                         <div className="flex justify-end space-x-2">
-                            <button className="btn btn--secondary text-btn hover:bg-emerald-400" onClick={() => setIsConfirmDialogOpen(false)}>Không</button>
-                            <button className="btn btn--primary hover:bg-emerald-400" onClick={confirmAndUpdateModule}>Có</button>
+                            <button
+                                className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                                onClick={() => setIsConfirmDialogOpen(false)}>Không</button>
+                            <button
+                                className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                                onClick={confirmAndUpdateModule}>Có</button>
                         </div>
                     </div>
                 </div>
@@ -719,16 +718,18 @@ export default function EditCourseContent() {
                         <h2 className="text-xl font-bold mb-4">Xác nhận xóa chương</h2>
                         <p className="mb-4">Bạn có muốn xóa chương này? (Hành động này không thể undo)</p>
                         <div className="flex justify-end space-x-2">
-                            <button className="btn btn--secondary text-btn hover:bg-emerald-400"
+                            <button
+                                className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
                                 onClick={() => setIsDeleteConfirmDialogOpen(false)}>Không
                             </button>
-                            <button className="btn btn--primary hover:bg-emerald-400"
+                            <button
+                                className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
                                 onClick={confirmAndDeleteSection}>Có
                             </button>
                         </div>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }

@@ -84,30 +84,40 @@ const CourseGradeChart = ({ courseId }) => {
     };
 
     return (
-        <div className="p-4">
-            <select
+        <div className="">
+            {assignments.length > 0 ? (<select
                 onChange={handleAssignmentChange}
                 value={selectedAssignment}
-                className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                className="block w-32 p-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-slate-300 focus:slate-300 sm:text-sm">
+
                 {assignments.map((assignment) => (
                     <option key={assignment.id} value={assignment.id}>
                         {assignment.title}
                     </option>
                 ))}
-            </select>
+            </select>)
+                :
+                (<div className="text-slate-700 text-center">Chưa có bài tập trong môn học này</div>)}
+
             {chartData.labels.length > 0 && (
-                <BarChart
-                    xAxis={[{ scaleType: 'band', data: chartData.labels, label: 'Scores', width: 50 }]}
-                    // yAxis={[{ tickFormat: (value) => Math.floor(value) }]}
-                    series={chartData.series}
-                    width={500}
-                    height={300}
-                    style={{ marginTop: '20px' }}
-                    barLabel="value"
-                    yAxisProps={{
-                        tickFormat: (value) => (Number.isInteger(value) ? value : ''),
-                    }}
-                />
+                <div className='mx-64'>
+                    <BarChart
+                        xAxis={[{ scaleType: 'band', data: chartData.labels, label: 'Thống kê điểm số', width: 20 }]}
+                        series={[
+                            {
+                                ...chartData.series[0],
+                                barThickness: 10, // 👈 Độ dày mỗi cột
+                            },
+                        ]}
+                        width={500}
+                        height={400}
+                        barLabel="value"
+                        barGapRatio={0.1} // 👈 Làm cột nhỏ lại
+                        yAxisProps={{
+                            tickFormat: (value) => (Number.isInteger(value) ? value : ''),
+                        }}
+                    />
+                </div>
             )}
         </div>
     );

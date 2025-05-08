@@ -15,7 +15,7 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
 
             {/* Content */}
             <div className="flex-1">
-                <h2 className="text-blue-600 text-sm font-medium hover:text-blue-700 cursor-pointer mb-1">
+                <h2 className="text-blue-600 text-sm font-bold hover:text-blue-700 cursor-pointer mb-1">
                     <a href={`/submission/${courseID}/${id}`}>{title}</a>
                 </h2>
                 <div className="text-sm text-gray-600">
@@ -33,10 +33,4 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
     );
 }
 
-SubmissionHeader.propTypes = {
-    courseID: PropTypes.string.isRequired,
-    id: PropTypes.number,
-    title: PropTypes.string.isRequired,
-    startDate: PropTypes.number.isRequired,
-    endDate: PropTypes.number.isRequired,
-};
+

@@ -60,26 +60,26 @@ const Container = () => {
 
       {/* Popup Create Topic */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg h-[200px] w-[400px]">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50  z-30">
+          <div className="bg-white p-4 rounded-lg shadow-lg h-[405px] w-[600px]">
             <h2 className="text-lg font-semibold mb-2">{t('forum.new_topic_title')}</h2>
             <textarea
-              className="w-full border p-2 rounded-md"
+              className="w-full h-[300px] border p-2 rounded-md"
               rows="3"
               placeholder={t('forum.new_topic_placeholder')}
               value={newTopic}
               onChange={(e) => setNewTopic(e.target.value)}
             />
-            <div className="flex justify-end gap-2 mt-3">
+            <div className="flex justify-end gap-2 ">
               <button
-                className="px-3 py-1 bg-gray-300 rounded-md"
+                 className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
                 onClick={() => setShowPopup(false)}
               >
                 {t('forum.cancel')}
               </button>
               <button
-                className="px-3 py-1 bg-blue-500 text-white rounded-md"
-                onClick={handleCreateTopic}
+                 className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                 onClick={handleCreateTopic}
               >
                 {t('forum.submit')}
               </button>

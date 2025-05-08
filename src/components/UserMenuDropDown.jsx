@@ -12,7 +12,6 @@ export default function UserMenuDropdown() {
     const navigate = useNavigate();
 
     const { authUser, isAuthenticated } = useAuth();
-    console.log("🚀 ~ UserMenuDropdown ~ authUser:", authUser)
 
     useEffect(() => {
         if (authUser) {

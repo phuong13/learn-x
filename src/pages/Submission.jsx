@@ -1,7 +1,4 @@
-import Header from '@layout/Header';
-import Footer from '@layout/Footer.jsx';
-import SideBar from '@layout/Sidebar';
-import Navbar from '@layout/NavBar.jsx';
+
 import SubmissionLayout from '../layout/SubmissionLayout';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -43,18 +40,8 @@ const Submission = () => {
     return (
         <>
             <DocumentTitle title="Nộp bài" />
-            <div className="flex flex-col min-h-screen">
-                <div className="sticky top-0 z-50">
-                    <Header />
-                    <Navbar />
-                </div>
-
-                {/* Nội dung chính */}
-                <div className="flex-grow pr-6 pl-6">
-                    {/*<SideBar>*/}
-                    {/*    {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}*/}
-                    {/*                                     startDate={assignment.startDate} endDate={assignment.endDate}/>}*/}
-                    {/*</SideBar>*/}
+            <div className="flex flex-col min-h-[calc(100vh-193px)]">
+                <div className="flex-1 pr-6 pl-6">
                     {assignment && (
                         <SubmissionLayout
                             title={assignment.title}
@@ -64,9 +51,7 @@ const Submission = () => {
                         />
                     )}
                 </div>
-                <div className="sticky">
-                    <Footer />
-                </div>
+
             </div>
         </>
     );

@@ -7,11 +7,11 @@ import { axiosPrivate } from '@/axios/axios.js';
 import DocumentTitle from '@components/DocumentTitle.jsx';
 import GradingInterface from '../components/GradeForStudent';
 const Grading = () => {
-    const { courseId} = useParams();
+    const { courseId } = useParams();
     const { assignmentId } = useParams();
     const [assignment, setAssignment] = useState(null);
     const [course, setCourse] = useState(null);
-      // const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
             const response = await axiosPrivate.get(`courses/${courseId}`);
@@ -22,7 +22,7 @@ const Grading = () => {
         };
         fetchData();
     }, [courseId]);
-    useEffect( () => {
+    useEffect(() => {
         const fetchData = async () => {
             const response = await axiosPrivate
                 .get(`/assignments/${assignmentId}`, {
@@ -39,29 +39,14 @@ const Grading = () => {
         fetchData();
     }, [assignmentId]);
 
-      return (
+    return (
         <>
-          <DocumentTitle title="Nộp bài" />
-          <div className="flex flex-col min-h-screen">
-                    <div className="sticky top-0 z-50">
-                        <Header />
-                        <Navbar />
-                    </div>
-
-                    {/* Nội dung chính */}
-                    <div className="flex-grow pr-6 pl-6">
-                        {/*<SideBar>*/}
-                        {/*    {assignment && <SubmissionLayout title={assignment.title} content={assignment.content}*/}
-                        {/*                                     startDate={assignment.startDate} endDate={assignment.endDate}/>}*/}
-                        {/*</SideBar>*/}
-                        {assignment && <GradingInterface title={assignment.title} startDate={assignment.startDate} endDate={assignment.endDate}/>}
-                    </div>
-                    <div className="sticky">
-                        <Footer />
-                    </div>
-                </div>
+            <DocumentTitle title="Nộp bài" />
+            <div className="flex flex-col min-h-[calc(100vh-193px)]">
+                {assignment && <GradingInterface title={assignment.title} startDate={assignment.startDate} endDate={assignment.endDate} />}
+            </div>
         </>
-      );
+    );
 };
 
 export default Grading;

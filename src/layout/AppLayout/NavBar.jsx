@@ -1,41 +1,59 @@
 import { useAuth } from '@hooks/useAuth.js';
 import { useTranslation } from 'react-i18next';
-import LogoLearnX from '@assets/learnX.jsx';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import Tabs from '@mui/material/Tabs';
 
+function LinkTab(props) {
+  return (
+    <Tab
+      component={Link}
+      to={props.href}
+      aria-current={props.selected && 'page'}
+      {...props}
+    />
+  );
+}
 
 function Navbar() {
+  const { authUser } = useAuth();
+  const { t } = useTranslation();
+  const location = useLocation();
 
-    const { authUser } = useAuth();
-    const { t } = useTranslation();
-    return (
-        <nav className='bg-slate-200 shadow-lg py-2'>
-            <div className=" flex justify-end items-center p-2 px-6">
-                {/* Logo bên trái
-                <div className="text-white text-xl font-bold">
-                    <a href="/" className="hover:text-gray-200">
-                        <img src={LogoLearnX} alt="Logo" width={150} height={40}/>
-                    </a>
-                </div> */}
+  // Map pathname to tab index
+  const tabPaths = ['/', '/my-course', '/dashboard', '/forum'];
+  const currentTab = tabPaths.indexOf(location.pathname);
 
-                {/* Menu bên phải */}
-                <div className="flex gap-4">
-                    <Link to="/" className="font-medium hover:text-slate-500 text-lg">
-                        {t('home_page')}
-                    </Link>
-                    <Link to="/my-course" className="font-medium hover:text-slate-500 text-lg">
-                        {authUser.role === "TEACHER" ? t('manage_courses') : t('my_courses')}
-                    </Link>
-                    <Link to="/dashboard" className="font-medium hover:text-slate-500 text-lg">
-                        {t('dashboard')}
-                    </Link>
-                    <Link to="/forum" className="font-medium hover:text-slate-500 text-lg">
-                        Forum
-                    </Link>
-                </div>
-            </div>
-        </nav>
-    );
+  return (
+    <nav className="bg-slate-200 shadow-lg pt-2">
+      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', px: 3 }}>
+        <Tabs
+          value={currentTab === -1 ? false : currentTab}
+          aria-label="nav tabs"
+          textColor="primary"
+          indicatorColor="primary"
+          sx={{
+            '& .MuiTab-root': {
+              fontSize: '1rem',
+              fontWeight: 600,
+              fontFamily: 'Inter, sans-serif',
+              textTransform: 'none',
+            },
+          }}
+        >
+          <LinkTab label={t('home_page')} href="/" />
+          <LinkTab
+            label={authUser.role === "TEACHER" ? t('manage_courses') : t('my_courses')}
+            href="/my-course"
+          />
+          <LinkTab label={t('dashboard')} href="/dashboard" />
+          <LinkTab label="Forum" href="/forum" />
+        </Tabs>
+      </Box>
+    </nav>
+
+  );
 }
 
 export default Navbar;

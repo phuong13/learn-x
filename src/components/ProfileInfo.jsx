@@ -133,11 +133,11 @@ const ProfileInfo = () => {
     };
 
     return (
-        <div
+        <div 
             // initial={{ opacity: 0 }}
             // animate={{ opacity: 1 }}
             // transition={{ duration: 0.5 }}
-            className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+            className="min-h-[calc(100vh-223px)] bg-gradient-to-br from-gray-100 to-gray-200">
             <ChangePasswordModal
                 visible={showChangePassword}
                 onClose={() => setShowChangePassword(false)}
@@ -156,15 +156,13 @@ const ProfileInfo = () => {
                 theme="light"
                 transition:Bounce
             />
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold text-gray-900">{t('personal_information')}</h1>
-                </div>
-            </header>
+            <div className="mx-8 py-2 sm:px-3 lg:px-4 bg-white rounded-md my-4">
+                    <h1 className="text-xl font-bold text-gray-900">{t('personal_information')}</h1>
+            </div>
             {isOpenRequestRole && (
                 <div className="z-50 fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center">
                     <div className="bg-white p-6 rounded-lg z-50">
-                        <h2 className="text-xl font-bold mb-4">{t('teacher_requests')}</h2>
+                        <h2 className="text-xl font-bold mb-2">{t('teacher_requests')}</h2>
                         <div className="flex justify-end space-x-2">
                             <button className="btn btn--secondary text-btn hover:bg-emerald-400"
                                 onClick={() => setIsOpenRequestRole(false)}>{t('no')}
@@ -177,13 +175,13 @@ const ProfileInfo = () => {
                 </div>
             )}
             <main>
-                <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                <div className="mx-8 py-2 sm:px-3 lg:px-4 bg-white rounded-md my-4">
                     <Loader isLoading={isLoading} />
                     <div
                         // initial={{ y: 20, opacity: 0 }}
                         // animate={{ y: 0, opacity: 1 }}
                         // transition={{ delay: 0.2, duration: 0.5 }}
-                        className="px-4 py-6 sm:px-0">
+                        className="">
                         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                             <div className="px-4 py-5 sm:px-6">
                                 <div className="flex items-center">
