@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { ChevronDown } from "lucide-react"
 import i18n from 'i18next'
 
@@ -24,7 +24,7 @@ const vnFlag = (
       </clipPath>
     </defs><g fill-rule="evenodd"
       clip-path="url(#vn-a)" transform="translate(-128)scale(.72249)">
-        <path fill="#da251d" d="M0 0h1063v708.7H0z"></path><path fill="#ff0" d="m661 527.5-124-92.6-123.3 93.5 45.9-152-123.2-93.8 152.4-1.3L536 129.8 584.3 281l152.4.2-122.5 94.7z"></path></g></svg>
+      <path fill="#da251d" d="M0 0h1063v708.7H0z"></path><path fill="#ff0" d="m661 527.5-124-92.6-123.3 93.5 45.9-152-123.2-93.8 152.4-1.3L536 129.8 584.3 281l152.4.2-122.5 94.7z"></path></g></svg>
 )
 
 const languages = [
@@ -33,8 +33,23 @@ const languages = [
 ]
 
 export default function LanguageSelection() {
+  const dropdownRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0])
+
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const savedLangCode = localStorage.getItem("lang")
@@ -54,7 +69,7 @@ export default function LanguageSelection() {
   }
 
   return (
-    <div className="text-left">
+    <div className="text-left" ref={dropdownRef}>
       <button
         type="button"
         className="flex items-center gap-2 py-2 text-sm font-medium text-white "

@@ -11,7 +11,7 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
     };
 
     return (
-        <div className={` p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-8'}  relative`}>
+        <div className={` p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-fit' : 'w-8'}  relative`}>
             <IconButton
                 onClick={toggleSidebar}
                 className="absolute top-0 right-2 "
@@ -22,11 +22,13 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
             {isOpen && (
                 <div className={`${isOpen ? '' : 'hidden'} bg-slate-100 rounded-lg`}>
                     <div className="flex justify-evenly">
-                        <button className=" w-full  text-white p-2 rounded-lg mr-1  bg-primaryDark transition-colors"
+                        <button
+                            className="p-2 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors mr-2"
                             onClick={expandAll}>
                             Mở rộng
                         </button>
-                        <button className="w-full   text-white p-2 rounded-lg ml-1 bg-primaryDark transition-colors"
+                        <button 
+                            className="p-2 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
                             onClick={collapseAll}>
                             Thu nhỏ
                         </button>

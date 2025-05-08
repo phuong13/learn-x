@@ -61,9 +61,7 @@ const ResetPassword = () => {
 
     return (
         <>
-            <div className="sticky top-0 z-50">
-                <Header />
-            </div>
+            
             <DocumentTitle title="Quên mật khẩu" />
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <Loader isLoading={isLoading} />
@@ -156,7 +154,6 @@ const ResetPassword = () => {
                     </form>
                 </div>
             </div>
-            <Footer />
         </>
     );
 };

@@ -137,7 +137,9 @@ const StudentRegisteredLayout = () => {
         <div className="w-full">
             <div className="flex justify-end items-center mb-4">
             {authUser.role === 'TEACHER' && (
-                <button className="mb-4 p-2 bg-primaryDark text-white rounded-lg" onClick={handleOpen}>
+                <button 
+                className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                 onClick={handleOpen}>
                     Thêm sinh viên
                 </button>
             )}
@@ -156,7 +158,6 @@ const StudentRegisteredLayout = () => {
                     <DialogTitle className="text-xl font-bold mb-4">Thêm sinh viên</DialogTitle>
                     <button onClick={handleClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
                         <X className="h-6 w-6" />
-                        <span className="sr-only">Đóng</span>
                     </button>
                     <DialogContent>
                         <div className="mt-2 space-y-4">
@@ -173,7 +174,7 @@ const StudentRegisteredLayout = () => {
                                 onChange={handleTextareaChange}></textarea>
                             <button
                                 onClick={handleSumbit}
-                                className="btn btn--primary w-full font-bold py-2 px-4 rounded">
+                                className="w-full py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
                                 Gửi
                             </button>
                         </div>

@@ -28,12 +28,18 @@ const StudentRegisteredList = ({ totalStudents, students, paginationInfo, onPage
     };
 
     const handleDeleteSelected = () => {
-        onDeleteStudents(selectedStudents);
-        setSelectedStudents([]);
+        const confirmDelete = window.confirm('Bạn có chắc chắn muốn xóa tất cả học sinh đã chọn?');
+        if (confirmDelete) {
+            onDeleteStudents(selectedStudents);
+            setSelectedStudents([]);
+        }
     };
 
     const handleDeleteStudent = (studentEmail) => {
-        onDeleteStudents([studentEmail]);
+        const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa học sinh ${studentEmail}?`);
+        if (confirmDelete) {
+            onDeleteStudents([studentEmail]);
+        }
     };
 
     return (
@@ -73,6 +79,15 @@ const StudentRegisteredList = ({ totalStudents, students, paginationInfo, onPage
                     </li>
                 ))}
             </ul>
+            {isTeacher && selectedStudents.length > 0 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    <button
+                        onClick={handleDeleteSelected}
+                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                        Xóa tất cả đã chọn
+                    </button>
+                </div>
+            )}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}

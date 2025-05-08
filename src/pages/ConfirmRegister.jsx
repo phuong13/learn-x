@@ -7,7 +7,7 @@ const ConfirmRegister = () => {
     return (
         <>
             <div className="sticky top-0 z-50">
-                <Header />
+                {/* <Header /> */}
             </div>
             {/*<Navbar />*/}
             <DocumentTitle title="Xác nhận tài khoản" />

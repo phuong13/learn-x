@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function Component({ id, name, description, thumbnail }) {
   return (
-    <div key={id} className="max-w-md rounded-lg overflow-hidden shadow-md bg-white hover:shadow-xl">
+    <div key={id} className="w-full rounded-lg overflow-hidden shadow-md bg-white hover:shadow-xl ">
       <Link to={`/course-detail/${id}`}>
         <div className="relative h-36 bg-green-100">
           <img src={thumbnail} alt="Online learning illustration" className="w-full h-full object-cover" />
