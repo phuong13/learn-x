@@ -138,12 +138,12 @@ const CourseContent = () => {
                     {modules.map((module, index) => (
                         <div
                             key={module.id}
-                            className={`border-b last:border-b-0 ${index % 2 === 0 ? 'bg-blue-50' : ''}`}
+                            className={`border-b last:border-b-0 ${index % 2 === 0 ? '' : ''}`}
                             ref={(el) => (moduleRefs.current[module.id] = el)}>
                             <button
                                 onClick={() => toggleSection(module)}
-                                className="w-full px-4 py-3 flex justify-between items-center hover:bg-opacity-80 focus:outline-none">
-                                <span className="text-base   bold font-semibold text-slate-600">{`${module.name}`}</span>
+                                className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none">
+                                <span className="text-base  bold font-semibold text-slate-600">{`${module.name}`}</span>
                                 <div className="flex items-center">
                                     {expandedSections.includes(module.id) ? (
                                         <ChevronDown className="h-5 w-5 text-slate-400" />
@@ -153,7 +153,7 @@ const CourseContent = () => {
                                 </div>
                             </button>
                             {expandedSections.includes(module.id) && (
-                                <div className="px-4">
+                                <div className="px-4 pb-2">
                                     {module.description && <span>{module.description}</span>}
                                     {moduleData[module.id] && (
                                         <>

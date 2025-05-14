@@ -142,7 +142,7 @@ export default function MUICalendar() {
                                                     sx={{
                                                         display: 'block',
                                                         color: 'primary.main',
-                                                        fontSize: '0.675rem',
+                                                        fontSize: '0.75rem',
                                                         mt: 0.3,
                                                         lineHeight: 1.2,
                                                     }}
