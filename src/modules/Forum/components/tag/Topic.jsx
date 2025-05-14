@@ -2,6 +2,7 @@ import { Send } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useTopicComment } from "../../../../store/useTopicComment";
+import profileUser from "../../../../assets/profile-user.png";
 
 const Topic = ({ user, content, createAt, topicId }) => {
   const me = JSON.parse(localStorage.getItem("user") || "{}");
@@ -33,9 +34,9 @@ const Topic = ({ user, content, createAt, topicId }) => {
     <div className="w-full p-4 bg-white rounded-lg shadow-lg">
       {/* User info and post header */}
       <div className="px-4 flex items-start gap-3">
-        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border">
+        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-700">
           <img
-            src={user.avatarUrl || "/placeholder.svg"}
+            src={user.avatarUrl || profileUser}
             alt=""
             className="w-full h-full object-cover"
           />
@@ -68,13 +69,13 @@ const Topic = ({ user, content, createAt, topicId }) => {
         {showComments && (
           <div className="px-4 my-2 space-y-2">
             {comment.length === 0 ? (
-              <p className="text-gray-400 text-sm">{t('topic.no_comments')}</p>
+              <p className="text-slate-400 text-sm">{t('topic.no_comments')}</p>
             ) : (
               comment.map((item) => (
                 <div key={item.id} className="flex items-start gap-2">
-                  <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border">
+                  <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-700">
                     <img
-                      src={item.account.avatarUrl || "/placeholder.svg"}
+                      src={profileUser}
                       alt=""
                       className="w-full h-full object-cover"
                     />
@@ -84,7 +85,7 @@ const Topic = ({ user, content, createAt, topicId }) => {
                       <div className="font-semibold text-sm">{item.account.email}</div>
                       <div className="text-sm">{formatDateTime(item.createdAt)}</div>
                     </div>
-                    <p className="text-gray-700 text-sm">{item.content}</p>
+                    <p className="text-slate-700 text-sm">{item.content}</p>
                   </div>
                 </div>
               ))
@@ -95,9 +96,9 @@ const Topic = ({ user, content, createAt, topicId }) => {
 
       {/* Comment input */}
       <div className="px-4 flex items-center gap-3 mt-2">
-        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border">
+        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-700">
           <img
-            src={me.avatar || "/placeholder.svg"}
+            src={me.avatar || profileUser}
             alt=""
             className="w-full h-full object-cover"
           />

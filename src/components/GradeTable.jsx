@@ -62,64 +62,61 @@ export default function GradeTable() {
 
     return (
         <div className="max-w-full overflow-x-auto">
-            <table className="w-full min-w-[800px] border-collapse">
-                <thead>
-                    <tr className="bg-gray-50">
-                        <th className="text-left p-4 font-medium text-gray-600">Mục điểm</th>
-                        <th className="text-center p-4 pr-16 font-medium text-gray-600">Điểm</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {modules.map((module) => (
-                        <React.Fragment key={module.id}>
-                            <tr className="border-t border-b">
-                                <td colSpan={7} className="p-0">
-                                    <button
-                                        onClick={() => toggleModuleExpansion(module.id)}
-                                        className="flex items-center w-full p-4 hover:bg-gray-50 text-left">
-                                        <ChevronDown
-                                            className={`w-5 h-5 mr-2 transition-transform ${
-                                                expandedModules[module.id]
-                                                    ? 'transform rotate-0'
-                                                    : 'transform -rotate-90'
-                                            }`}
-                                        />
-                                        <span className="font-medium">{module.name}</span>
-                                    </button>
-                                </td>
-                            </tr>
-                            {expandedModules[module.id] &&
-                                assignmentsWithSubmissions[module.id]?.map(({ assignment, submission }) => (
-                                    <tr key={assignment.id} className="border-t hover:bg-gray-50">
-                                        <td className="p-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="text-xs text-gray-500">BÀI TẬP</div>
-                                                <FileText className="w-4 h-4 text-gray-400" />
-                                                <a
-                                                    href={submission?.fileSubmissionUrl || '#'}
-                                                    className="text-blue-600 hover:underline"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer">
-                                                    {assignment.title}
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td className="text-center pr-8 ">
-                                            {submission
-                                                ? submission.textSubmission === '' &&
-                                                  submission.fileSubmissionUrl === ''
-                                                    ? 'Chưa nộp bài'
-                                                    : submission.score !== null
-                                                    ? submission.score
-                                                    : 'Chưa chấm điểm'
-                                                : '-'}
-                                        </td>
-                                    </tr>
-                                ))}
-                        </React.Fragment>
-                    ))}
-                </tbody>
-            </table>
+        <div className="min-w-[800px]">
+            {/* Header */}
+            <div className="flex bg-slate-100  font-semibold text-slate-600 rounded-lg mb-2">
+                <div className="flex-1 p-4 text-left">Mục điểm</div>
+                <div className="w-40 p-4 text-center">Điểm</div>
+            </div>
+    
+            {modules.map((module) => (
+                <div key={module.id} className="">
+                    {/* Module title row */}
+                    <button
+                        onClick={() => toggleModuleExpansion(module.id)}
+                        className="flex items-center w-full p-3 hover:bg-slate-50 text-left border-b bg-blue-50">
+                        <ChevronDown
+                            className={`w-5 h-5 mr-2 transition-transform ${
+                                expandedModules[module.id]
+                                    ? 'transform rotate-0'
+                                    : 'transform -rotate-90'
+                            }`}
+                        />
+                        <span className="text-base font-semibold text-slate-600">{module.name}</span>
+                    </button>
+    
+                    {/* Assignment rows */}
+                    {expandedModules[module.id] &&
+                        assignmentsWithSubmissions[module.id]?.map(({ assignment, submission }) => (
+                            <div key={assignment.id} className="flex items-start border-b hover:bg-gray-50">
+                                <div className="flex-1 p-2">
+                                    <div className="flex items-center gap-2">
+                                        {/* <div className="text-xs text-gray-500">BÀI TẬP</div> */}
+                                        <FileText className="w-4 h-4 text-slate-600" />
+                                        <a
+                                            href={submission?.fileSubmissionUrl || '#'}
+                                            className="text-blue-600 text-sm font-semibold hover:underline"
+                                            target="_blank"
+                                            rel="noopener noreferrer">
+                                            {assignment.title}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="w-40 p-2 text-center text-sm text-slate-600 font-semibold">
+                                    {submission
+                                        ? submission.textSubmission === '' && submission.fileSubmissionUrl === ''
+                                            ? 'Chưa nộp bài'
+                                            : submission.score !== null
+                                            ? submission.score
+                                            : 'Chưa chấm điểm'
+                                        : '-'}
+                                </div>
+                            </div>
+                        ))}
+                </div>
+            ))}
         </div>
+    </div>
+    
     );
 }

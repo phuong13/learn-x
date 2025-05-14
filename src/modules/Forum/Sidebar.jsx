@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import TagCourse from './components/tag/TagCourse';
-import { SearchInput } from './components/input/SearchInput';
 import { useCourses } from '../../store/useCourses';
 import { useForum } from '../../store/useForum';
+
+import { TextField, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 export const Sidebar = () => {
   const { courses } = useCourses();
@@ -30,12 +32,22 @@ export const Sidebar = () => {
   }, [courses, searchTerm]);
 
   return (
-    <div className="h-full flex flex-col gap-4 ">
+    <div className="h-full flex flex-col gap-4">
       <div className="p-2">
-        <SearchInput
+        <TextField
+          fullWidth
+          placeholder={t('forum.search_course_placeholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder={t('forum.search_course_placeholder')}
+          variant="outlined"
+          size="small"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
         />
       </div>
 

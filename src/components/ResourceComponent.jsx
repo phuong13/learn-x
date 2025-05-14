@@ -11,9 +11,9 @@ export default function Resource({ type, title, link }) {
   };
 
   return (
-    <div className="flex items-start gap-4 pt-2 border-t border-slate-400">
+    <div className="flex items-start gap-4 py-1  border-t border-slate-400">
       {/* Icon */}
-      <div className="mt-1">
+      <div className="">
         <i className={`fa-solid ${icons[type]} text-2xl`}></i>
       </div>
 

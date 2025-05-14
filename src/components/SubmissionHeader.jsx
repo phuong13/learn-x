@@ -7,7 +7,7 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
     const formattedEndDate = format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
 
     return (
-        <div className="flex items-start gap-4 mt-2 pt-2 border-t border-slate-400">
+        <div className="flex items-start gap-4 border-t py-1 border-slate-400">
             {/* Icon */}
             <div className="text-pink-500 mt-1">
                 <i className="fa-solid fa-file-arrow-up text-2xl"></i>
@@ -15,7 +15,7 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
 
             {/* Content */}
             <div className="flex-1">
-                <h2 className="text-blue-600 text-sm font-bold hover:text-blue-700 cursor-pointer mb-1">
+                <h2 className="text-blue-600 text-sm font-bold hover:text-blue-700 cursor-pointer ">
                     <a href={`/submission/${courseID}/${id}`}>{title}</a>
                 </h2>
                 <div className="text-sm text-gray-600">

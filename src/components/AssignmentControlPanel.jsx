@@ -20,14 +20,14 @@ export default function AssignmentControlPanel() {
       urlParams.append('year', date.getFullYear().toString());
       const url = `/assignments/get-by-next-x-day?${urlParams.toString()}`;
       await axiosPrivate.get(`${url}`)
-          .then((res) => {
-            setAssignments(res.data.data);
-            console.log(res.data.data);
-          })
-          .catch((err) => {
-            console.log(err);
-            toast(err.response.data.message, { type: 'error' });
-          });
+        .then((res) => {
+          setAssignments(res.data.data);
+          console.log(res.data.data);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast(err.response.data.message, { type: 'error' });
+        });
     }
 
     fetchAssignments();
@@ -43,8 +43,9 @@ export default function AssignmentControlPanel() {
             onChange={(e) => setTimeFilter(e.target.value)}
             className="appearance-none bg-white border border-slate-400 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-1 focus:ring-primaryDark focus:border-primaryDark"
           >
-            <option className='' value={'7'} selected={true}>7 ngày tiếp theo</option>
-            <option value={'30'}>30 ngày tiếp theo</option>
+            <option value="7">7 ngày tiếp theo</option>
+            <option value="30">30 ngày tiếp theo</option>
+
           </select>
           <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
         </div>
@@ -63,7 +64,7 @@ export default function AssignmentControlPanel() {
       </div>
 
       {assignments.map((assignment) => (
-          <SubmissionHeader courseID={assignment.courseId} key={assignment.id} id={assignment.id} title={`${assignment.courseName} - ${assignment.title}`} startDate={assignment.startDate} endDate={assignment.endDate} />
+        <SubmissionHeader courseID={assignment.courseId} key={assignment.id} id={assignment.id} title={`${assignment.courseName} - ${assignment.title}`} startDate={assignment.startDate} endDate={assignment.endDate} />
       ))}
 
     </div>

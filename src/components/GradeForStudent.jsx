@@ -29,11 +29,11 @@ export default function GradingInterface({ title, startDate, endDate }) {
         const diffInSeconds = differenceInSeconds(date, submissionDate) % 60;
 
         if (submissionDate < date) {
-            return <td className="py-3 text-blue-500">Nộp
-                sớm {diffInDays > 0 ? `${diffInDays} ngày ` : ''} {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</td>;
+            return <div className="py-3 text-blue-500">Nộp
+                sớm {diffInDays > 0 ? `${diffInDays} ngày ` : ''} {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</div>;
         } else {
-            return <td className="py-3 text-rose-600">Nộp
-                trễ {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</td>;
+            return <div className="py-3 text-rose-600">Nộp
+                trễ {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</div>;
         }
     };
 
@@ -112,7 +112,6 @@ export default function GradingInterface({ title, startDate, endDate }) {
         }
 
         if (assignmentSubmission) {
-            // Xử lý dữ liệu khi đã fetch
             console.log(assignmentSubmission);
         }
     }, [assignmentId]);
@@ -193,97 +192,107 @@ export default function GradingInterface({ title, startDate, endDate }) {
                     </div>
                 </div>
             )}
-            <div className='border border-slate-400 bg-slate-100 rounded-lg mx-64'>
-                <div className="p-4">
-                    <div className="mt-4">
-                        <Calendar className="inline mb-1 mr-2" size={16} />Hạn chót: {formattedEndDate}
-                        <div className="flex items-center gap-2">
-                            <Clock className="" size={16} />
-                            <div className="py-2 text-gray-700">Thời gian còn lại:</div>
-                            <td className=" flex items-center">
-                                {calculateRemainingTime(endDate)}
-                            </td>
+
+
+            {currentStudent ? (
+                <div className='border border-slate-400 bg-slate-100 rounded-lg mx-64'>
+                    <div className="p-4">
+                        <div className="mt-4">
+                            <Calendar className="inline mb-1 mr-2" size={16} />Hạn chót: {formattedEndDate}
+                            <div className="flex items-center gap-2">
+                                <Clock className="" size={16} />
+                                <div className="py-2 text-gray-700">Thời gian còn lại:</div>
+                                <div className=" flex items-center">
+                                    {calculateRemainingTime(endDate)}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {/* Student Info */}
-                {currentStudent && (
-                    <div className=" shadow rounded-lg p-4">
-                        <div className="flex items-center gap-3">
+                    {/* Student Info */}
+                    {currentStudent && (
+                        <div className=" shadow rounded-lg p-4">
+                            <div className="flex items-center gap-3">
                                 <User className="w-6 h-6 text-gray-400" />
-                            <div>
-                                <h2 className="text-xl font-semibold">{currentStudent.studentName}</h2>
-                                <div className="text-sm text-gray-600">{currentStudent.studentEmail}</div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Submission Status */}
-                {currentStudent && (
-                    <div className=" shadow rounded-lg p-4">
-                        <h2 className="text-xl font-semibold mb-2">Bài nộp</h2>
-                        <div className="space-y-4">
-                            {currentStudent.fileSubmissionUrl && (
-                                <div className="flex items-center gap-2">
-                                    <div>File đã nộp:</div>
-                                    <a href={`http://docs.google.com/gview?url=${currentStudent.fileSubmissionUrl}&embedded=true`}
-                                        target="_blank" rel="noopener noreferrer"
-                                        className="hover:underline text-blue-500">
-                                        {currentStudent.fileSubmissionUrl.split('/').pop()}
-                                    </a>
+                                <div>
+                                    <h2 className="text-xl font-semibold">{currentStudent.studentName}</h2>
+                                    <div className="text-sm text-gray-600">{currentStudent.studentEmail}</div>
                                 </div>
-                            )}
-                            {currentStudent.textSubmission && (
-                                <div className="text-sm text-gray-600">
-                                    {currentStudent.textSubmission}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Submission Status */}
+                    {currentStudent && (
+                        <div className=" shadow rounded-lg p-4">
+                            <h2 className="text-xl font-semibold mb-2">Bài nộp</h2>
+                            <div className="space-y-4">
+                                {currentStudent.fileSubmissionUrl && (
+                                    <div className="flex items-center gap-2">
+                                        <div>File đã nộp:</div>
+                                        <a href={`http://docs.google.com/gview?url=${currentStudent.fileSubmissionUrl}&embedded=true`}
+                                            target="_blank" rel="noopener noreferrer"
+                                            className="hover:underline text-blue-500">
+                                            {currentStudent.fileSubmissionUrl.split('/').pop()}
+                                        </a>
+                                    </div>
+                                )}
+                                {currentStudent.textSubmission && (
+                                    <div className="text-sm text-gray-600">
+                                        {currentStudent.textSubmission}
+                                    </div>
+                                )}
+
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Grading Section */}
+                    {currentStudent && (
+                        <div className=" shadow rounded-lg p-6">
+                            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                                Chấm điểm
+                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                            </h2>
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label htmlFor="grade" className="block text-sm font-medium text-gray-700">Thang điểm
+                                        10</label>
+                                    <input
+                                        type="number"
+                                        id="grade"
+                                        max="10"
+                                        value={currentStudent.score || ''}
+                                        className="p-2 mt-1 block w-full rounded-md border focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        onChange={(e) => {
+                                            const newScore = e.target.value ? parseFloat(e.target.value) : null;
+                                            const updatedSummaryData = [...summaryData];
+                                            updatedSummaryData[currentStudentIndex].score = newScore;
+                                            setSummaryData(updatedSummaryData);
+                                        }}
+                                    />
                                 </div>
-                            )}
 
-                        </div>
-                    </div>
-                )}
-
-                {/* Grading Section */}
-                {currentStudent && (
-                    <div className=" shadow rounded-lg p-6">
-                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                            Chấm điểm
-                            <HelpCircle className="w-4 h-4 text-gray-400" />
-                        </h2>
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label htmlFor="grade" className="block text-sm font-medium text-gray-700">Thang điểm
-                                    10</label>
-                                <input
-                                    type="number"
-                                    id="grade"
-                                    max="10"
-                                    value={currentStudent.score || ''}
-                                    className="p-2 mt-1 block w-full rounded-md border focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                                    onChange={(e) => {
-                                        const newScore = e.target.value ? parseFloat(e.target.value) : null;
-                                        const updatedSummaryData = [...summaryData];
-                                        updatedSummaryData[currentStudentIndex].score = newScore;
-                                        setSummaryData(updatedSummaryData);
-                                    }}
-                                />
-                            </div>
-
-                            <div className="flex justify-end gap-2">
-                                <button className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                    Hủy
-                                </button>
-                                <button
-                                    onClick={handlePostGrade}
-                                    className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                    Lưu thay đổi
-                                </button>
+                                <div className="flex justify-end gap-2">
+                                    <button className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                        Hủy
+                                    </button>
+                                    <button
+                                        onClick={handlePostGrade}
+                                        className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                        Lưu thay đổi
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </div>
+                    )}
+
+                </div>) : (
+
+                <div className="text-slate-600 font-bold text-center flex justify-center items-center">Chưa có học sinh nào nộp bài</div>
+            )}
+
+
+
 
         </div>
     );

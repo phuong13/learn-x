@@ -8,13 +8,12 @@ import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
-import Header from '@layout/Header.jsx';
-import NavBar from '@layout/NavBar.jsx';
-import { Tooltip } from 'react-tooltip'
+import EditQuizModal from './EditQuizModal';
 import 'react-tooltip/dist/react-tooltip.css'
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [sections, setSections] = useState([]);
     const [editingSectionId, setEditingSectionId] = useState(null);
     const [editingItemId, setEditingItemId] = useState(null);
@@ -322,6 +321,17 @@ export default function EditCourseContent() {
                         toast.error(error.response.data.message);
                     });
                 break;
+            case 'quiz':
+                axiosPrivate.delete(`/quizzes/${id}`)
+                    .then(() => {
+                        // toast.success('Xóa quiz thành công');
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting quiz:', error);
+                        toast.error(error.response.data.message);
+                    });
+                break;
+
         }
     };
 
@@ -447,8 +457,8 @@ export default function EditCourseContent() {
                 </div>
 
                 {sections.map(section => (
-                    <div key={`section-${section.id}`} 
-                    className="mb-4 border border-slate-400 p-4 rounded-lg bg-slate-50">
+                    <div key={`section-${section.id}`}
+                        className="mb-4 border border-slate-400 p-4 rounded-lg bg-slate-50">
                         <div className="flex justify-between items-center mb-2">
                             {editingSectionId === section.id ? (
                                 <div className="flex items-center space-x-2">
@@ -459,8 +469,9 @@ export default function EditCourseContent() {
                                         onKeyDown={(e) => handleKeyDown(e, saveSection)}
                                         className="border border-slate-300 p-1 rounded-md"
                                         ref={inputRef}
+
                                     />
-                                    <button onClick={saveSection} 
+                                    <button onClick={saveSection}
                                     >
                                         <Check size={18} />
                                     </button>
@@ -541,7 +552,7 @@ export default function EditCourseContent() {
                                                     type="text"
                                                     value={tempTitle}
                                                     onChange={(e) => setTempTitle(e.target.value)}
-                                                    className="border border-gray-300 p-1 rounded"
+                                                    className="border border-slate-300 p-1 outline-none rounded-lg ml-0"
                                                     onKeyDown={(e) => handleKeyDown(e, () => saveItem(section.id))}
                                                     ref={inputRef}
                                                 />
@@ -606,7 +617,7 @@ export default function EditCourseContent() {
                                                     selected={item.startDate ? new Date(item.startDate) : null}
                                                     ref={datePickerRef_startDay}
                                                     onChange={(date) =>
-                                                         handleDateChange(section.id, item.typeId, 'startDate', date)}
+                                                        handleDateChange(section.id, item.typeId, 'startDate', date)}
                                                     showMonthYearDropdown
                                                 />
 
@@ -651,45 +662,66 @@ export default function EditCourseContent() {
 
                                     </div>
                                 )}
+
+                                {item.type === 'quiz' && editingItemId === item.typeId && (
+                                    <div className="mt-4">
+                                        <button
+                                            onClick={() => setIsModalOpen(true)}
+                                            className="px-4 py-1.5 bg-blue-500 text-white rounded-lg"
+                                        >
+                                            Chỉnh sửa Quiz
+                                        </button>
+                                    </div>
+                                )}
+
+
                             </div>
                         ))}
 
 
                         {!savedSections[section.id] && (
-                            <div className="bg-primaryDark p-2 rounded-lg flex justify-around mt-2 mx-64">
+                            <div className="bg-primaryDark rounded-lg grid grid-cols-5 divide-x-2 gap-4 mt-2 mx-64">
                                 <button
                                     onClick={() => addItem(section.id, 'lecture')}
-                                    className="text-white flex items-center justify-between"
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
                                 >
                                     Lecture <Plus size={18} className="ml-1" />
                                 </button>
-                                {/*<button*/}
-                                {/*    onClick={() => addItem(section.id, 'quiz')}*/}
-                                {/*    className="text-white flex items-center justify-between"*/}
-                                {/*>*/}
-                                {/*    Quiz <Plus size={18} className="ml-1" />*/}
-                                {/*</button>*/}
+
+                                <button
+                                    onClick={() => addItem(section.id, 'quiz')}
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
+                                >
+                                    Quiz <Plus size={18} className="ml-1" />
+                                </button>
+
                                 <button
                                     onClick={() => addItem(section.id, 'assignment')}
-                                    className="text-white flex items-center justify-between"
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
                                 >
                                     Assignment <Plus size={18} className="ml-1" />
                                 </button>
+
                                 <button
                                     onClick={() => addItem(section.id, 'resource')}
-                                    className="text-white flex items-center justify-between"
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
                                 >
                                     Resource <Plus size={18} className="ml-1" />
                                 </button>
+
                                 <button
-                                    data-tooltip-id="my-tooltip" data-tooltip-content="Kiểm tra kĩ thông tin trước khi lưu!"
+                                    data-tooltip-id="my-tooltip"
+                                    data-tooltip-content="Kiểm tra kĩ thông tin trước khi lưu!"
                                     onClick={() => handleUpdateModule(section.id)}
-                                    className="p-1 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg"
+                                    className="text-white hover:text-green-700 rounded-full flex items-center justify-center transition"
                                 >
                                     <Check size={20} />
                                 </button>
-                                <Tooltip id="my-tooltip" />
+
+                                {/* Tooltip (nếu bạn dùng react-tooltip) */}
+                                {/* <Tooltip id="my-tooltip" /> */}
                             </div>
+
                         )}
                     </div>
                 ))}
@@ -730,6 +762,12 @@ export default function EditCourseContent() {
                     </div>
                 </div>
             )}
+            {isModalOpen && (
+                <EditQuizModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
+            )}
+
+
         </div>
     );
 }
