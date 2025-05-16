@@ -29,6 +29,19 @@ class ModuleService {
             });
     }
 
+    static async getQuizzesByModuleId(moduleId) {
+        return await axiosPrivate
+            .get(`${BASE_URL}/${moduleId}/quizzes`, {
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then((res) => {
+                return res.data.data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     static async getAssignmentsByModuleId(moduleId) {
         return await axiosPrivate
             .get(`${BASE_URL}/${moduleId}/assignments`, {
