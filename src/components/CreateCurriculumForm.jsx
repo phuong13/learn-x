@@ -8,16 +8,50 @@ import PropTypes from 'prop-types';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import EditQuizModal from './EditQuizModal';
 
 export default function Curriculum({ onSubmitSuccess }) {
     const [sections, setSections] = useState([]);
     const inputRef = useRef(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [quizEditing, setQuizEditing] = useState({ sectionId: null, itemId: null });
 
     const handlePostModule = async (sectionId) => {
         setIsConfirmDialogOpen(true);
         setConfirmingSectionId(sectionId);
     };
 
+    const handleQuizSubmit = (quizData, questions) => {
+        setSections(prev =>
+            prev.map(section =>
+                section.id === quizEditing.sectionId
+                    ? {
+                        ...section,
+                        items: section.items.map(item =>
+                            item.id === quizEditing.itemId
+                                ? {
+                                    ...item,
+                                    // gán tất cả fields backend cần
+                                    title: quizData.title,
+                                    description: quizData.description,
+                                    startDate: convertUTCToLocal(quizData.startDate).toISOString(),
+                                    endDate: convertUTCToLocal(quizData.endDate).toISOString(),
+                                    attemptLimit: quizData.attemptLimit,
+                                    timeLimit: quizData.timeLimit,
+                                    shuffled: quizData.shuffled,
+                                    questions,      // mảng câu hỏi UI (chứa type, answers,…)
+                                }
+                                : item
+                        ),
+                    }
+                    : section
+            )
+        );
+        setIsModalOpen(false);
+    };
+
+
+    let moduleId;
 
     const confirmAndPostModule = async () => {
         setIsConfirmDialogOpen(false);
@@ -32,7 +66,6 @@ export default function Curriculum({ onSubmitSuccess }) {
             name: section.title,
         };
         const response = await axiosPrivate.post(`/modules`, moduleData);
-        let moduleId;
         if (response.status === 200) {
             toast(response.data.message, {});
             moduleId = response.data.data.id;
@@ -59,8 +92,53 @@ export default function Curriculum({ onSubmitSuccess }) {
                                 });
                             break;
                         }
-                        case 'quiz':
+                        case 'quiz': {
+                            try {
+                                // Tạo quiz trước, lấy quizId
+                                const quizPayload = {
+                                    title: item.title,
+                                    description: item.description || '',
+                                    startDate: convertUTCToLocal(item.startDate).toISOString(),
+                                    endDate: convertUTCToLocal(item.endDate).toISOString(),
+                                    attemptLimit: Number(item.attemptLimit || 1),
+                                    timeLimit: Number(item.timeLimit || 0),
+                                    shuffled: item.shuffled || false,
+                                    moduleId: moduleId,
+                                };
+
+                                const quizRes = await axiosPrivate.post('/quizzes', quizPayload);
+                                const quizId = quizRes.data.data.id;
+
+                                // Duyệt câu hỏi trong quiz
+                                await Promise.all(item.questions.map(async (q) => {
+
+                                    if (q.type === 'single') {
+                                        const questionSCQPayload = {
+                                            content: q.content || '',
+                                            quizId: quizId,
+                                            options: q.options,
+                                            answer: q.answer
+                                        };
+                                        await axiosPrivate.post('/question-quizzes/scq', questionSCQPayload);
+                                    } else if (q.type === 'multiple') {
+                                        const questionMCQPayload = {
+                                            content: q.content || '',
+                                            quizId: quizId,
+                                            options: q.options,
+                                            answers: q.answer
+                                        };
+                                        await axiosPrivate.post('/question-quizzes/mcq', questionMCQPayload);
+                                    }
+                                }));
+
+                                toast('Tạo quiz thành công');
+                            } catch (e) {
+                                console.error(e.response?.data?.message || e.message);
+                                toast(e.response?.data?.message || 'Lỗi tạo quiz');
+                            }
                             break;
+                        }
+
                         case 'assignment': {
                             let utcStartDate = convertUTCToLocal(item.startDate);
                             let utcEndDate = convertUTCToLocal(item.endDate);
@@ -142,34 +220,32 @@ export default function Curriculum({ onSubmitSuccess }) {
     const [confirmingSectionId, setConfirmingSectionId] = useState(null);
     const [savedSections, setSavedSections] = useState({});
 
-    // useEffect(() => {
-    //     localStorage.setItem('sections', JSON.stringify(sections));
-    // }, [sections]);
+    useEffect(() => {
+        localStorage.setItem('sections', JSON.stringify(sections));
+    }, [sections]);
 
     const handleDateChange = (sectionId, itemId, field, date) => {
-        console.log("🚀 ~ handleDateChange ~ field:", field)
         const now = new Date();
-
         const section = sections.find((section) => section.id === sectionId);
         const item = section.items.find((item) => item.id === itemId);
 
         // Kiểm tra điều kiện validate
         if (field === 'startDate') {
             if (date <= now) {
-              toast('Ngày giờ bắt đầu phải sau giờ hiện tại!', { type: 'error' });
-              return false;
+                toast('Ngày giờ bắt đầu phải sau giờ hiện tại!', { type: 'error' });
+                return false;
             }
-          }
-        
-          if (field === 'endDate') {
+        }
+
+        if (field === 'endDate') {
             if (!item.startDate) {
-              toast('Vui lòng chọn ngày bắt đầu trước!', { type: 'error' });
-              return false;
+                toast('Vui lòng chọn ngày bắt đầu trước!', { type: 'error' });
+                return false;
             }
-        
+
             if (date <= new Date(item.startDate)) {
-              toast('Ngày giờ kết thúc phải sau ngày bắt đầu!', { type: 'error' });
-              return false;
+                toast('Ngày giờ kết thúc phải sau ngày bắt đầu!', { type: 'error' });
+                return false;
             }
         }
 
@@ -313,7 +389,7 @@ export default function Curriculum({ onSubmitSuccess }) {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <div className="mx-64 border rounded-lg p-6 bg-white shadow-md">
+            <div className="mr-8 border rounded-lg p-6 bg-white shadow-md">
                 <div className="flex justify-between items-center mb-6">
                     <div className="text-xl font-bold flex items-center ">
                         <List className="mr-2" />
@@ -477,7 +553,7 @@ export default function Curriculum({ onSubmitSuccess }) {
                                                 className="w-full rounded-xl bg-white"
                                                 value={item.startDate ? new Date(item.startDate) : null}
                                                 onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
-                                                ampm={false} 
+                                                ampm={false}
                                             />
 
                                         </div>
@@ -488,7 +564,7 @@ export default function Curriculum({ onSubmitSuccess }) {
                                                 className="w-full rounded-xl bg-white"
                                                 value={item.endDate ? new Date(item.endDate) : null}
                                                 onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
-                                                ampm={false} 
+                                                ampm={false}
                                             />
                                         </div>
 
@@ -510,33 +586,49 @@ export default function Curriculum({ onSubmitSuccess }) {
                         ))}
 
                         {!savedSections[section.id] && (
-                            <div className="bg-primaryDark p-2 rounded-lg flex justify-between mt-2 mx-64">
+                            <div className="bg-primaryDark rounded-lg grid grid-cols-5 divide-x-2 gap-4 mt-2 mx-64">
                                 <button
                                     onClick={() => addItem(section.id, 'lecture')}
-                                    className="text-white flex items-center justify-between">
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
+                                >
                                     Lecture <Plus size={18} className="ml-1" />
                                 </button>
-                                {/*<button*/}
-                                {/*  onClick={() => addItem(section.id, 'quiz')}*/}
-                                {/*  className="text-white flex items-center justify-between"*/}
-                                {/*>*/}
-                                {/*  Quiz <Plus size={18} className="ml-1" />*/}
-                                {/*</button>*/}
+
+                                <button
+                                    onClick={() => {
+                                        const newItemId = Date.now().toString(); // hoặc chính item.id bạn mới tạo
+                                        setQuizEditing({ sectionId: section.id, itemId: newItemId });
+                                        addItem(section.id, 'quiz');
+                                        setIsModalOpen(true);
+                                    }}
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
+                                >
+                                    Quiz <Plus size={18} className="ml-1" />
+                                </button>
+
                                 <button
                                     onClick={() => addItem(section.id, 'assignment')}
-                                    className="text-white flex items-center justify-between">
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
+                                >
                                     Assignment <Plus size={18} className="ml-1" />
                                 </button>
+
                                 <button
                                     onClick={() => addItem(section.id, 'resource')}
-                                    className="text-white flex items-center justify-between">
+                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
+                                >
                                     Resource <Plus size={18} className="ml-1" />
                                 </button>
+
                                 <button
+                                    data-tooltip-id="my-tooltip"
+                                    data-tooltip-content="Kiểm tra kĩ thông tin trước khi lưu!"
                                     onClick={() => handlePostModule(section.id)}
-                                    className="p-1 bg-[#beede6] text-green-500 hover:text-green-700 rounded-full text-lg">
-                                    <Check size={24} />
+                                    className="text-white hover:text-green-700 rounded-full flex items-center justify-center transition"
+                                >
+                                    <Check size={20} />
                                 </button>
+
                             </div>
                         )}
 
@@ -574,6 +666,19 @@ export default function Curriculum({ onSubmitSuccess }) {
                     </div>
                 </div>
             )}
+
+            {isModalOpen && (
+                <EditQuizModal
+                    open={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    initialData={
+                       {}
+                    }
+                    onSubmit={handleQuizSubmit}
+
+                />
+            )}
+
 
         </LocalizationProvider>
     );

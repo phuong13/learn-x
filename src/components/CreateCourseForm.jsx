@@ -85,7 +85,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
    >
       <div className="px-4 sm:px-6 lg:px-8">
         <Loader isLoading={isLoading} />
-        <div className="mx-64 border border-slate-300 rounded-lg ">
+        <div className="mx-4 border border-slate-300 rounded-lg ">
           <form
             onSubmit={handleOnSubmit}
             className="bg-white shadow-xl rounded-lg overflow-hidden"

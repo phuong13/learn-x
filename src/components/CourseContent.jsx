@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import SubmissionHeader from '../components/SubmissionHeader';
+import QuizzHeader from '../components/QuizzHeader';
 import CourseService from '@/services/courses/course.service.js';
 import Loader from './Loader';
 import { useParams } from 'react-router-dom';
@@ -47,14 +48,15 @@ const CourseContent = () => {
             setExpandedSections((prev) => [...prev, module.id]);
             if (!moduleData[module.id]) {
                 try {
-                    const [lectures, resources, assignments] = await Promise.all([
+                    const [lectures, resources, assignments, quizzes] = await Promise.all([
                         fetchLectures(module.id),
                         fetchResources(module.id),
                         fetchAssignments(module.id),
+                        fetchQuizzes(module.id),
                     ]);
                     setModuleData((prev) => ({
                         ...prev,
-                        [module.id]: { lectures, resources, assignments },
+                        [module.id]: { lectures, resources, assignments,quizzes },
                     }));
                 } catch (err) {
                     console.log(err);
@@ -66,6 +68,14 @@ const CourseContent = () => {
     const fetchLectures = async (moduleId) => {
         try {
             return await ModuleService.getLecturesByModuleId(moduleId);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const fetchQuizzes = async (moduleId) => {
+        try {
+            return await ModuleService.getQuizzesByModuleId(moduleId);
         } catch (err) {
             console.log(err);
         }
@@ -189,6 +199,17 @@ const CourseContent = () => {
                                                     title={assignment.title}
                                                     startDate={assignment.startDate}
                                                     endDate={assignment.endDate}
+                                                />
+                                            ))}
+
+                                             {moduleData[module.id].quizzes.map((quiz) => (
+                                                <QuizzHeader
+                                                    courseID={courseId}
+                                                    key={quiz.id}
+                                                    id={quiz.id}
+                                                    title={quiz.title}
+                                                    startDate={quiz.startDate}
+                                                    endDate={quiz.endDate}
                                                 />
                                             ))}
                                         </>

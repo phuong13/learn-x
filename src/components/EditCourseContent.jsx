@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,8 +8,10 @@ import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
-import EditQuizModal from './EditQuizModal';
+import EditQuizModal from './FormQuiz';
 import 'react-tooltip/dist/react-tooltip.css'
+import { Button } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function EditCourseContent() {
     const { courseId } = useParams();
@@ -23,7 +25,9 @@ export default function EditCourseContent() {
     const [confirmingSectionId, setConfirmingSectionId] = useState(null);
     const [savedSections, setSavedSections] = useState({});
     const [files, setFiles] = useState({});
-
+    const [quizEditing, setQuizEditing] = useState({ sectionId: null, itemId: null });
+    
+    const navigate = useNavigate();
     const datePickerRef_startDay = useRef(null);
     const datePickerRef_endDay = useRef(null);
 
@@ -31,6 +35,37 @@ export default function EditCourseContent() {
     const [deletingSectionId, setDeletingSectionId] = useState(null);
 
     const inputRef = useRef(null);
+
+
+    const handleQuizSubmit = (quizData, questions) => {
+        setSections(prev =>
+            prev.map(section =>
+                section.id === quizEditing.sectionId
+                    ? {
+                        ...section,
+                        items: section.items.map(item =>
+                            item.id === quizEditing.itemId
+                                ? {
+                                    ...item,
+                                    title: quizData.title,
+                                    description: quizData.description,
+                                    startDate: convertUTCToLocal(quizData.startDate).toISOString(),
+                                    endDate: convertUTCToLocal(quizData.endDate).toISOString(),
+                                    attemptLimit: quizData.attemptLimit,
+                                    timeLimit: quizData.timeLimit,
+                                    shuffled: quizData.shuffled,
+                                    questions,
+                                    isNew: true,
+                                }
+                                : item
+                        ),
+                    }
+                    : section
+            )
+        );
+        setIsModalOpen(false);
+    };
+
 
     useEffect(() => {
         if (inputRef.current) {
@@ -48,11 +83,13 @@ export default function EditCourseContent() {
                     const lecturesResponse = await axiosPrivate.get(`/modules/${module.id}/lectures`);
                     const resourcesResponse = await axiosPrivate.get(`/modules/${module.id}/resources`);
                     const assignmentsResponse = await axiosPrivate.get(`/modules/${module.id}/assignments`);
+                    const quizzResponse = await axiosPrivate.get(`/modules/${module.id}/quizzes`);
 
                     const items = [
                         ...lecturesResponse.data.data.map(lecture => ({ ...lecture, type: 'lecture', typeId: `lecture-${lecture.id}` })),
                         ...resourcesResponse.data.data.map(resource => ({ ...resource, type: 'resource', typeId: `resource-${resource.id}` })),
                         ...assignmentsResponse.data.data.map(assignment => ({ ...assignment, type: 'assignment', typeId: `assignment-${assignment.id}` })),
+                        ...quizzResponse.data.data.map(quiz => ({ ...quiz, type: 'quiz', typeId: `quiz-${quiz.id}` }))
                     ];
 
                     return {
@@ -77,13 +114,13 @@ export default function EditCourseContent() {
         localStorage.setItem('sections', JSON.stringify(sections));
     }, [sections]);
 
-    const navigate = useNavigate();
 
     useEffect(() => {
         return () => {
             localStorage.removeItem('sections');
         }
     }, [navigate]);
+    let moduleId;
 
     const confirmAndUpdateModule = async () => {
         setIsConfirmDialogOpen(false);
@@ -91,12 +128,9 @@ export default function EditCourseContent() {
         const sectionsLocal = JSON.parse(localStorage.getItem('sections'));
         const section = sectionsLocal.find(section => section.id === sectionId);
 
-        console.log(section);
 
         try {
-            let moduleId;
             if (!section.isNew) {
-                // Update existing module
                 await axiosPrivate.patch(`/modules/${sectionId}`, {
                     name: section.title
                 });
@@ -165,6 +199,65 @@ export default function EditCourseContent() {
                                 }
                                 break;
                             }
+                            case 'quiz': {
+                                try {
+                                    const quizPayload = {
+                                        title: item.title,
+                                        description: item.description || '',
+                                        startDate: convertUTCToLocal(item.startDate).toISOString(),
+                                        endDate: convertUTCToLocal(item.endDate).toISOString(),
+                                        attemptLimit: Number(item.attemptLimit || 1),
+                                        timeLimit: Number(item.timeLimit || 0),
+                                        shuffled: item.shuffled || false,
+                                        moduleId,
+                                    };
+                                    console.log("🚀 ~ updateModulePromise ~ quizPayload:", quizPayload)
+
+                                    let quizId;
+
+                                    if (item.isNew) {
+                                        const quizRes = await axiosPrivate.post('/quizzes', quizPayload);
+                                        quizId = quizRes.data.data.id;
+                                    } else {
+                                        // Cập nhật quiz hiện có
+                                        await axiosPrivate.patch(`/quizzes/${item.id}`, quizPayload);
+                                        quizId = item.id;
+
+                                        // Nếu cần xoá hết câu hỏi cũ (tuỳ theo yêu cầu logic), bạn có thể thêm:
+                                        // await axiosPrivate.delete(`/quizzes/${quizId}/questions`);
+                                    }
+
+                                    // Duyệt qua danh sách câu hỏi để tạo hoặc cập nhật
+                                    await Promise.all(
+                                        item.questions.map(async (q) => {
+                                            const basePayload = {
+                                                content: q.content || '',
+                                                quizId: quizId,
+                                                options: q.options,
+                                            };
+
+                                            if (q.type === 'single') {
+                                                await axiosPrivate.post('/question-quizzes/scq', {
+                                                    ...basePayload,
+                                                    answer: q.answer,
+                                                });
+                                            } else if (q.type === 'multiple') {
+                                                await axiosPrivate.post('/question-quizzes/mcq', {
+                                                    ...basePayload,
+                                                    answers: q.answer,
+                                                });
+                                            }
+                                        })
+                                    );
+
+                                    toast(item.isNew ? 'Tạo quiz thành công' : 'Cập nhật quiz thành công');
+                                } catch (error) {
+                                    console.error(error.response?.data?.message || error.message);
+                                    toast(error.response?.data?.message || 'Lỗi khi xử lý quiz');
+                                }
+                                break;
+                            }
+
                             case 'resource': {
                                 let resourceData = {
                                     title: item.title,
@@ -206,7 +299,6 @@ export default function EditCourseContent() {
             );
             setSavedSections(prev => ({ ...prev, [sectionId]: true }));
 
-            // Update the sections state to reflect that the section is no longer new
             setSections(prevSections =>
                 prevSections.map(s => s.id === sectionId ? { ...s, isNew: false, items: s.items.map(item => ({ ...item, isNew: false })) } : s)
             );
@@ -434,15 +526,37 @@ export default function EditCourseContent() {
         }
     };
 
+    const selectedItem = useMemo(() => {
+      
+
+        return sections
+            .find(s => s.id === quizEditing?.sectionId)
+            ?.items.find(i => i.id === quizEditing?.itemId);
+    }, [sections, quizEditing]);
+      console.log("quizEditing:", quizEditing);
+        console.log("sections:", sections);
+    console.log("🚀 ~ selectedItem ~ selectedItem:", selectedItem)
+
     return (
         <div>
-            <button
+            <Button
                 onClick={() => window.history.back()}
-                className="text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-6 py-2  flex items-center space-x-2"
+                variant="outlined"
+                startIcon={<ArrowBackIcon />}
+                sx={{
+                    color: 'text.primary',
+                    borderColor: 'grey.300',
+                    '&:hover': {
+                        backgroundColor: 'grey.100',
+                        borderColor: 'grey.500',
+                    },
+                    px: 3,
+                    py: 1.5,
+                    textTransform: 'none',
+                }}
             >
-                <i className="fa fa-arrow-left" aria-hidden="true"></i>
-                <span>Back</span>
-            </button>
+                Back
+            </Button>
 
             <div className="m-4 p-6 bg-white shadow-md rounded-lg">
                 <div className="flex justify-between items-center mb-6">
@@ -506,6 +620,7 @@ export default function EditCourseContent() {
                         </div>
 
                         {section.items.map(item => (
+
                             <div
                                 key={`section-${section.id}-item-${item.id}-${item.type}`}
                                 className="bg-slate-200 p-3 mb-2 rounded flex flex-col group relative"
@@ -605,7 +720,7 @@ export default function EditCourseContent() {
                                 {item.type === 'assignment' && editingItemId === item.typeId && (
                                     <div className="mt-4">
                                         <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày và giờ bắt đầu1</p>
+                                            <p>Ngày và giờ bắt đầu</p>
                                             <div className="mt-1 relative w-full px-3 py-2 bg-white rounded-md shadow-sm focus:outline-none
                       focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                                 onClick={() => datePickerRef_startDay.current.setOpen(true)}>
@@ -689,7 +804,12 @@ export default function EditCourseContent() {
                                 </button>
 
                                 <button
-                                    onClick={() => addItem(section.id, 'quiz')}
+                                    onClick={() => {
+                                        const newItemId = Date.now().toString(); // hoặc chính item.id bạn mới tạo
+                                        setQuizEditing({ sectionId: section.id, itemId: newItemId });
+                                        addItem(section.id, 'quiz');
+                                        setIsModalOpen(true);
+                                    }}
                                     className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
                                 >
                                     Quiz <Plus size={18} className="ml-1" />
@@ -762,11 +882,21 @@ export default function EditCourseContent() {
                     </div>
                 </div>
             )}
+
             {isModalOpen && (
-                <EditQuizModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+                <EditQuizModal
+                    open={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    initialData={
+                        sections
+                            .find(s => s.id === quizEditing.sectionId)
+                            ?.items.find(i => i.id === quizEditing.itemId) || {}
+                    }
+                    onSubmit={handleQuizSubmit}
+                    isEdit={true}
 
+                />
             )}
-
 
         </div>
     );
