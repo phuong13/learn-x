@@ -85,8 +85,8 @@ export default function CoursePageLayout() {
             .get('/categories')
             .then((res) => {
                 setCategories(res.data.data);
-                const categoryInCate = categories.find((category) => category.id === course.categoryId);
-                setCategory(categoryInCate.name);
+                const categoryInCate = categories?.find((category) => category.id === course.categoryId);
+                setCategory(categoryInCate?.name);
             })
             .catch((err) => console.error('Failed to fetch categories:', err));
     }, [isOpenEditCourseInfoModal]);

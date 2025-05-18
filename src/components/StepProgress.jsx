@@ -28,7 +28,7 @@ export default function InteractiveStepProgress() {
     }
   };
 
-  
+
 
   const handleRedirectCourseDetail = async () => {
     if (postAllModulesRef.current) {
@@ -62,9 +62,9 @@ export default function InteractiveStepProgress() {
         ))}
       </Stepper>
 
-      <Box sx={{ mt: 2} }>
+      <Box sx={{ mt: 2 }}>
         {currentStep === 0 && <CreateCourseForm onSubmitSuccess={handleNext} />}
-        {currentStep === 1 && <CreateCurriculumForm onSubmitSuccess={handleNext} />}
+        {currentStep === 1 && <CreateCurriculumForm onSubmitSuccess={handleNext} initialModules={[]} />}
         {currentStep === 2 && (
           <div className='flex flex-col items-center justify-center h-64'>
             <div className="text-xl font-bold mb-2">Xác nhận</div>

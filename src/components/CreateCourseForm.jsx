@@ -61,7 +61,6 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
       if (response.status === 200) {
         toast(response.data.message);
         const data = response.data.data;
-        console.log('Course created:', data);
         localStorage.setItem('courseInfo', JSON.stringify(data));
         onSubmitSuccess();
       } else {
