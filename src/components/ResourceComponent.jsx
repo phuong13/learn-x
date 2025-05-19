@@ -27,9 +27,3 @@ export default function Resource({ type, title, link }) {
   );
 }
 
-// PropTypes để kiểm tra kiểu dữ liệu
-Resource.propTypes = {
-  type: PropTypes.oneOf(['word', 'ppt', 'excel']).isRequired,
-  title: PropTypes.string.isRequired,
-  link: PropTypes.string.isRequired,
-};

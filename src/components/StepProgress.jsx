@@ -6,6 +6,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
+import { toast } from 'react-toastify';
 
 const steps = ['Tạo khoá học mới', 'Tạo nội dung khoá học', 'Xác nhận'];
 
@@ -28,7 +29,7 @@ export default function InteractiveStepProgress() {
     }
   };
 
-  
+
 
   const handleRedirectCourseDetail = async () => {
     if (postAllModulesRef.current) {
@@ -62,9 +63,16 @@ export default function InteractiveStepProgress() {
         ))}
       </Stepper>
 
-      <Box sx={{ mt: 2} }>
-        {currentStep === 0 && <CreateCourseForm onSubmitSuccess={handleNext} />}
-        {currentStep === 1 && <CreateCurriculumForm onSubmitSuccess={handleNext} />}
+      <Box sx={{ mt: 2 }}>
+        {currentStep === 1 && <CreateCourseForm onSubmitSuccess={handleNext} />}
+        {currentStep === 0 &&
+          <CreateCurriculumForm
+            onSubmitSuccess={() => {
+              handleNext();
+              toast.success('Tạo module thành công!');
+            }}
+            initialModules={[]}
+          />}
         {currentStep === 2 && (
           <div className='flex flex-col items-center justify-center h-64'>
             <div className="text-xl font-bold mb-2">Xác nhận</div>
