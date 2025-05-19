@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Curriculum from './CreateCurriculumForm';
 import { useSubmitModules } from '../store/useModule';
 import { CircularProgress, Box } from '@mui/material';
+import { toast } from 'react-toastify';
 
 // Hàm chuyển đổi dữ liệu câu hỏi từ API về format form
 function transformQuestionFromApi(raw) {
@@ -67,7 +68,7 @@ const EditModule = () => {
       setLoading(true);
       const res = await getModules(courseId);
       if (res.success) {
-        setModules(transformModulesFromApi(res.modules)); // Áp dụng transform nếu cần
+        setModules(transformModulesFromApi(res.modules)); 
       }
       setLoading(false);
     };
@@ -85,8 +86,14 @@ const EditModule = () => {
 
   return (
     <Curriculum
+      isEdit={true}
       initialModules={modules}
-      onSubmitSuccess={() => alert('Cập nhật module thành công!')}
+      onSubmitSuccess={
+        () =>{ toast.success('Cập nhật module thành công!')
+            window.location.href = `/course-detail/${courseId}`;
+        }
+
+      }
     />
   );
 };

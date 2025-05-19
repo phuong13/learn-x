@@ -90,7 +90,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
             className="bg-white shadow-xl rounded-lg overflow-hidden"
           >
             <div className="px-6 py-8">
-              <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">
+              <h2 className="text-2xl font-bold text-center text-slate-8 00 mb-8">
                 Tạo khóa học mới
               </h2>
               <div className="space-y-6">

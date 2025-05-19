@@ -1,5 +1,5 @@
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
-import { convertUTCToLocal } from '../utils/date';
+import { convertUTCToLocal, parseJavaLocalDateTime } from '../utils/date';
 const typeToEndpoint = {
   lecture: "lectures",
   quiz: "quizzes",
@@ -23,8 +23,7 @@ export const useSubmitModules = () => {
   const axiosPrivate = useAxiosPrivate();
 
   const submitModules = async (modules, courseId) => {
-    modules = sortContentsByType(modules);
-    console.log("🚀 ~ submitModules ~ modules:", modules)
+  
     try {
       const res = await getModules(courseId);
       if (!res.success) {
@@ -296,60 +295,69 @@ export const useSubmitModules = () => {
     }
   };
 
-  const getModules = async (courseId) => {
-    try {
-      const response = await axiosPrivate.get(`/courses/${courseId}/modules`);
-      const modulesData = response.data.data;
+ const getModules = async (courseId) => {
+  try {
+    const response = await axiosPrivate.get(`/courses/${courseId}/modules`);
+    const modulesData = response.data.data;
 
-      const formattedModules = await Promise.all(
-        modulesData.map(async (module) => {
-          const [lecturesRes, resourcesRes, assignmentsRes, quizzesRes] = await Promise.all([
-            axiosPrivate.get(`/modules/${module.id}/lectures`),
-            axiosPrivate.get(`/modules/${module.id}/resources`),
-            axiosPrivate.get(`/modules/${module.id}/assignments`),
-            axiosPrivate.get(`/modules/${module.id}/quizzes`),
-          ]);
+    const formattedModules = await Promise.all(
+      modulesData.map(async (module) => {
+        const [lecturesRes, resourcesRes, assignmentsRes, quizzesRes] = await Promise.all([
+          axiosPrivate.get(`/modules/${module.id}/lectures`),
+          axiosPrivate.get(`/modules/${module.id}/resources`),
+          axiosPrivate.get(`/modules/${module.id}/assignments`),
+          axiosPrivate.get(`/modules/${module.id}/quizzes`),
+        ]);
 
-          const lectures = lecturesRes.data.data.map((lecture) => ({
-            ...lecture,
-            type: 'lecture',
-          }));
+        const lectures = lecturesRes.data.data.map((lecture) => ({
+          ...lecture,
+          type: 'lecture',
+        }));
 
-          const resources = resourcesRes.data.data.map((res) => ({
-            ...res,
-            type: 'resource',
-          }));
+        const resources = resourcesRes.data.data.map((res) => ({
+          ...res,
+          type: 'resource',
+        }));
 
-          const assignments = assignmentsRes.data.data.map((asmt) => ({
-            ...asmt,
-            type: 'assignment',
-          }));
+        const assignments = assignmentsRes.data.data.map((asmt) => ({
+          ...asmt,
+          type: 'assignment',
+        }));
 
-          const quizzes = await Promise.all(
-            quizzesRes.data.data.map(async (quiz) => {
-              const questionsRes = await axiosPrivate.get(`/quizzes/${quiz.id}/questions`);
-              return {
-                ...quiz,
-                type: 'quiz',
-                questions: questionsRes.data.data,
-              };
-            })
-          );
+        const quizzes = await Promise.all(
+          quizzesRes.data.data.map(async (quiz) => {
+            const questionsRes = await axiosPrivate.get(`/quizzes/${quiz.id}/questions`);
+            return {
+              ...quiz,
+              type: 'quiz',
+              questions: questionsRes.data.data,
+            };
+          })
+        );
 
-          return {
-            id: module.id,
-            title: module.name,
-            contents: [...lectures, ...resources, ...assignments, ...quizzes],
-          };
-        })
-      );
+        // Gộp và sắp xếp theo thời gian
+        const combinedContents = [...lectures, ...resources, ...assignments, ...quizzes];
+        combinedContents.sort((a, b) => {
+          const dateA = parseJavaLocalDateTime(a.createdAt);
+          const dateB = parseJavaLocalDateTime(b.createdAt)
+          return dateA - dateB;
+        });
 
-      return { success: true, modules: formattedModules };
-    } catch (error) {
-      console.error(error);
-      return { success: false, modules: [] };
-    }
-  };
+        return {
+          id: module.id,
+          title: module.name,
+          contents: combinedContents,
+        };
+        
+      })
+    );
+    console.log("🚀 ~ getModules ~ formattedModules:", formattedModules);
+    return { success: true, modules: formattedModules };
+  } catch (error) {
+    console.error(error);
+    return { success: false, modules: [] };
+  }
+};
 
   return { submitModules, getModules };
 };

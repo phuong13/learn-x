@@ -11,7 +11,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FormQuiz from './FormQuiz';
 import FormLecture from './FormLecture';
-// import FormAssignment from './FormAssignment';
+import FormAssignment from './FormAssignment';
 import FormResource from './FormResource';
 import Tag from './Tag';
 import { useSubmitModules } from '../store/useModule';
@@ -19,7 +19,7 @@ import { useParams } from 'react-router-dom';
 import { Quiz } from '@mui/icons-material';
 
 
-export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
+export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [] }) {
    const [modules, setModules] = useState([]);
    const [quizDialog, setQuizDialog] = useState({ open: false, moduleId: null, editData: null });
    const [lectureDialog, setLectureDialog] = useState({ open: false, moduleId: null, editData: null });
@@ -75,7 +75,7 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
       else if (type === 'resource') {
          setResourceDialog({ open: true, moduleId, editData: null });
       }
-      
+
    };
 
 
@@ -97,6 +97,9 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
       }
       else if (item.type === 'resource') {
          setResourceDialog({ open: true, moduleId, editData: item });
+      }
+      else if (item.type === 'assignment') {
+         setAssignmentDialog({ open: true, moduleId, editData: item });
       }
    };
 
@@ -130,7 +133,7 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
    };
 
 
-    const handleAddLecture = (moduleId, lectureData) => {
+   const handleAddLecture = (moduleId, lectureData) => {
       setModules(prev =>
          prev.map(mod =>
             mod.id === moduleId
@@ -158,39 +161,92 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
    };
 
    const handleAddResource = (moduleId, resourceData) => {
-  const resourceJson = resourceData.get('resources');
-  let parsedResource = {};
+      let parsedResource = {};
 
-  try {
-    parsedResource = JSON.parse(resourceJson); // { title: "filename.ext" }
-  } catch (err) {
-    console.error('Không thể parse resource data:', err);
-  }
+      if (resourceData instanceof FormData) {
+         const resourceJson = resourceData.get('resources');
+         try {
+            parsedResource = JSON.parse(resourceJson);
+         } catch (err) {
+            console.error('Không thể parse resource data:', err);
+         }
+      } else {
+         parsedResource = resourceData;
+      }
 
-  const newResource = {
-    ...parsedResource,
-    resourceData,
-    id: `temp-${Date.now()}`,
-    type: 'resource',
-  };
+      const newResource = {
+         ...parsedResource,
+         resourceData,
+         id: `temp-${Date.now()}`,
+         type: 'resource',
+      };
 
-  setModules(prev =>
-    prev.map(mod =>
-      mod.id === moduleId
-        ? {
-            ...mod,
-            contents: [...mod.contents, newResource],
-          }
-        : mod
-    )
-  );
+      setModules(prev =>
+         prev.map(mod =>
+            mod.id === moduleId
+               ? {
+                  ...mod,
+                  contents: [...mod.contents, newResource],
+               }
+               : mod
+         )
+      );
 
-  setResourceDialog({ open: false, moduleId: null, editData: null });
-};
+      setResourceDialog({ open: false, moduleId: null, editData: null });
+   };
+
+
+   const handleAddAssignment = (moduleId, assignmentData) => {
+      let parsedAssignment = {};
+
+      if (assignmentData instanceof FormData) {
+         const assignmentJson = assignmentData.get('assignment');
+         try {
+            parsedAssignment = JSON.parse(assignmentJson);
+         } catch (err) {
+            console.error('Không thể parse assignment data:', err);
+            return;
+         }
+      } else {
+         parsedAssignment = assignmentData;
+      }
+
+      const updatedAssignment = {
+         ...parsedAssignment,
+         assignmentData,
+         type: 'assignment',
+         id: parsedAssignment.id || `temp-${Date.now()}`
+      };
+
+      setModules(prev =>
+         prev.map(mod => {
+            if (mod.id !== moduleId) return mod;
+
+            const exists = mod.contents.some(c => c.id === updatedAssignment.id);
+
+            const updatedContents = exists
+               ? mod.contents.map(c =>
+                  c.id === updatedAssignment.id ? updatedAssignment : c
+               )
+               : [...mod.contents, updatedAssignment];
+
+            return {
+               ...mod,
+               contents: updatedContents,
+            };
+         })
+      );
+
+      setAssignmentDialog({ open: false, moduleId: null, editData: null });
+   };
+
+
+
 
 
    const handleDone = async () => {
-      validateForm();
+      const isValid = validateForm();
+      if (!isValid) return;
       const courseInfo = JSON.parse(localStorage.getItem('courseInfo') || '{}');
       const courseId = courseInfo.id ?? courseIdParam;
 
@@ -207,13 +263,19 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
 
 
    return (
-      <Box display="flex" flexDirection="column" gap={3} sx={{ mr: "32px" }}>
-         <Typography variant="h5" fontWeight="bold">Nội dung khoá học</Typography>
-         {/* <Typography color="text.secondary">Tạo nội dung cho khoá học của bạn</Typography> */}
+      <Box display="flex" flexDirection="column" gap={2} sx={{ mx: 'auto', width: '100%' }}>
+         <div className='ml-4 flex flex-col gap-2'>
+            {isEdit
+               ? <Typography variant="h6" fontWeight="bold">Chỉnh sửa nội dung khoá học</Typography>
+               : <Typography variant="h6" fontWeight="bold">Tạo nội dung khoá học</Typography>
+            }
+            {/* <Typography color="text.secondary">Tạo nội dung cho khoá học của bạn</Typography> */}
 
-         <Button startIcon={<AddIcon />} variant="outlined" onClick={handleAddChapter} sx={{ width: 'fit-content' }}>
-            Thêm chương
-         </Button>
+            <Button startIcon={<AddIcon />} variant="outlined" onClick={handleAddChapter} sx={{ width: 'fit-content' }}>
+               Thêm chương
+            </Button>
+         </div>
+
 
          {modules.map((module) => (
             <Box
@@ -250,7 +312,7 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
                         {module.contents.map((item) => (
                            <Tag
                               key={item.id}
-                              icon={item.type === 'quiz' ?  QuizIcon : item.type === 'lecture' ? MenuBookIcon : item.type === 'assignment' ? AssignmentIcon  : InsertDriveFileIcon}
+                              icon={item.type === 'quiz' ? QuizIcon : item.type === 'lecture' ? MenuBookIcon : item.type === 'assignment' ? AssignmentIcon : InsertDriveFileIcon}
                               label={
                                  item.type === 'quiz'
                                     ? `Quiz: ${item.title || 'Không có tiêu đề'}`
@@ -275,9 +337,9 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
                   <Grid item xs={6} md={3}>
                      <Card onClick={() => handleOptionSelect(module.id, 'lecture')}>
                         <CardActionArea>
-                           <CardContent sx={{ textAlign: 'center' }}>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
                               <MenuBookIcon fontSize="large" color="primary" />
-                              <Typography variant="subtitle1">Lecture</Typography>
+                              <Typography variant="subtitle2">Lecture</Typography>
                            </CardContent>
                         </CardActionArea>
                      </Card>
@@ -285,9 +347,9 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
                   <Grid item xs={6} md={3}>
                      <Card onClick={() => handleOptionSelect(module.id, 'quiz')}>
                         <CardActionArea>
-                           <CardContent sx={{ textAlign: 'center' }}>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
                               <QuizIcon fontSize="large" color="primary" />
-                              <Typography variant="subtitle1">Quiz</Typography>
+                              <Typography variant="subtitle2">Quiz</Typography>
                            </CardContent>
                         </CardActionArea>
                      </Card>
@@ -295,9 +357,9 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
                   <Grid item xs={6} md={3}>
                      <Card onClick={() => handleOptionSelect(module.id, 'assignment')}>
                         <CardActionArea>
-                           <CardContent sx={{ textAlign: 'center' }}>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
                               <AssignmentIcon fontSize="large" color="primary" />
-                              <Typography variant="subtitle1">Assignment</Typography>
+                              <Typography variant="subtitle2">Assignment</Typography>
                            </CardContent>
                         </CardActionArea>
                      </Card>
@@ -305,9 +367,9 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
                   <Grid item xs={6} md={3}>
                      <Card onClick={() => handleOptionSelect(module.id, 'resource')}>
                         <CardActionArea>
-                           <CardContent sx={{ textAlign: 'center' }}>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
                               <InsertDriveFileIcon fontSize="large" color="primary" />
-                              <Typography variant="subtitle1">Resource</Typography>
+                              <Typography variant="subtitle2">Resource</Typography>
                            </CardContent>
                         </CardActionArea>
                      </Card>
@@ -349,12 +411,22 @@ export default function Curriculum({ onSubmitSuccess, initialModules = [] }) {
             defaultData={resourceDialog.editData}
          />
 
+         <FormAssignment
+            open={assignmentDialog.open}
+            onClose={() => setAssignmentDialog({ open: false, moduleId: null, editData: null })}
+            onSubmit={(assignmentData) =>
+               handleAddAssignment(assignmentDialog.moduleId, assignmentData)
+            }
+            isEdit={!!assignmentDialog.editData}
+            defaultData={assignmentDialog.editData}
+         />
+
 
          <Button
             variant="contained"
             color="primary"
             onClick={handleDone}
-            sx={{ alignSelf: 'flex-center', mt: 4 }}
+            sx={{ alignSelf: 'flex-center', mx: 'auto', mb: 2, width: '200px' }}
          >
             Xong
          </Button>

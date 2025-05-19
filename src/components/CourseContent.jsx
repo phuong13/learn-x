@@ -4,35 +4,32 @@ import SubmissionHeader from '../components/SubmissionHeader';
 import QuizzHeader from '../components/QuizzHeader';
 import CourseService from '@/services/courses/course.service.js';
 import Loader from './Loader';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Lecture from './LectureComponent';
 import Resource from './ResourceComponent';
 import ModuleService from '@/services/modules/module.service.js';
 import CourseSidebar from './CourseSidebar.jsx';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth.js';
+import { parseJavaLocalDateTime } from '@/utils/date.js';
 
 const CourseContent = () => {
     const [expandedSections, setExpandedSections] = useState([]);
-    const { courseId } = useParams();
     const [modules, setModules] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [moduleData, setModuleData] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
     const moduleRefs = useRef({});
+    const { courseId } = useParams();
     const navigate = useNavigate();
     const { authUser } = useAuth();
 
     useEffect(() => {
-        setIsLoading(true);
         const fetchModules = async () => {
+            setIsLoading(true);
             try {
                 const response = await CourseService.getModulesByCourseId(courseId);
                 setModules(response);
-                // if (response.length > 0) {
-                //   setExpandedSections([modules[0].id]);
-                // }
             } catch (err) {
-                console.log(err);
+                console.error('Failed to fetch modules:', err);
             } finally {
                 setIsLoading(false);
             }
@@ -41,59 +38,49 @@ const CourseContent = () => {
         fetchModules();
     }, [courseId]);
 
+    const fetchModuleContents = async (moduleId) => {
+        try {
+            const [lectures, resources, assignments, quizzes] = await Promise.all([
+                ModuleService.getLecturesByModuleId(moduleId),
+                ModuleService.getResourcesByModuleId(moduleId),
+                ModuleService.getAssignmentsByModuleId(moduleId),
+                ModuleService.getQuizzesByModuleId(moduleId),
+            ]);
+
+            const allContents = [
+                ...(lectures || []).map((item) => ({ ...item, type: 'lecture' })),
+                ...(resources || []).map((item) => ({ ...item, type: 'resource' })),
+                ...(assignments || []).map((item) => ({ ...item, type: 'assignment' })),
+                ...(quizzes || []).map((item) => ({ ...item, type: 'quiz' })),
+            ];
+
+            const sortedContents = allContents.sort((a, b) => {
+                const dateA = parseJavaLocalDateTime(a.createdAt);
+                const dateB = parseJavaLocalDateTime(b.createdAt);
+                return dateA - dateB;
+            });
+
+            return sortedContents;
+        } catch (error) {
+            console.error(`Failed to fetch module contents: ${error}`);
+            return [];
+        }
+    };
+
     const toggleSection = async (module) => {
         if (expandedSections.includes(module.id)) {
-            setExpandedSections((prev) => prev.filter((s) => s !== module.id));
+            setExpandedSections((prev) => prev.filter((id) => id !== module.id));
         } else {
             setExpandedSections((prev) => [...prev, module.id]);
+
             if (!moduleData[module.id]) {
-                try {
-                    const [lectures, resources, assignments, quizzes] = await Promise.all([
-                        fetchLectures(module.id),
-                        fetchResources(module.id),
-                        fetchAssignments(module.id),
-                        fetchQuizzes(module.id),
-                    ]);
-                    setModuleData((prev) => ({
-                        ...prev,
-                        [module.id]: { lectures, resources, assignments,quizzes },
-                    }));
-                } catch (err) {
-                    console.log(err);
-                }
+                const contents = await fetchModuleContents(module.id);
+                setModuleData((prev) => ({
+                    ...prev,
+                    [module.id]: contents,
+                }));
             }
-        }
-    };
 
-    const fetchLectures = async (moduleId) => {
-        try {
-            return await ModuleService.getLecturesByModuleId(moduleId);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
-    const fetchQuizzes = async (moduleId) => {
-        try {
-            return await ModuleService.getQuizzesByModuleId(moduleId);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
-    const fetchResources = async (moduleId) => {
-        try {
-            return await ModuleService.getResourcesByModuleId(moduleId);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
-    const fetchAssignments = async (moduleId) => {
-        try {
-            return await ModuleService.getAssignmentsByModuleId(moduleId);
-        } catch (err) {
-            console.log(err);
         }
     };
 
@@ -101,28 +88,19 @@ const CourseContent = () => {
         const element = moduleRefs.current[moduleId];
         if (element) {
             const offset = -120;
-            const bodyRect = document.body.getBoundingClientRect().top;
-            const elementRect = element.getBoundingClientRect().top;
-            const elementPosition = elementRect - bodyRect;
-            const offsetPosition = elementPosition + offset;
+            const bodyTop = document.body.getBoundingClientRect().top;
+            const elemTop = element.getBoundingClientRect().top;
+            const position = elemTop - bodyTop + offset;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth',
-            });
+            window.scrollTo({ top: position, behavior: 'smooth' });
         }
     };
 
-    const expandAll = () => {
-        setExpandedSections(modules.map((module) => module.id));
-    };
-
-    const collapseAll = () => {
-        setExpandedSections([]);
-    };
+    const expandAll = () => setExpandedSections(modules.map((m) => m.id));
+    const collapseAll = () => setExpandedSections([]);
 
     return (
-        <div className="flex ">
+        <div className="flex">
             <CourseSidebar
                 modules={modules}
                 expandedSections={expandedSections}
@@ -131,89 +109,91 @@ const CourseContent = () => {
                 expandAll={expandAll}
                 collapseAll={collapseAll}
             />
-            <div className="flex-1 px-4 flex flex-col gap-2 ">
+
+            <div className="flex-1 px-4 flex flex-col gap-2">
                 {authUser?.role === 'TEACHER' && (
-                 <div className="flex justify-end">
-                 <button
-                   onClick={() => navigate(`/course-detail/${courseId}/edit`)}
-                   className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                 
-                   Chỉnh sửa
-                 </button>
-               </div>
-               
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => navigate(`/course-detail/${courseId}/edit`)}
+                            className="py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors">
+                            Chỉnh sửa
+                        </button>
+                    </div>
                 )}
+
                 <Loader isLoading={isLoading} />
+
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                    {modules.map((module, index) => (
+                    {modules.map((module) => (
                         <div
                             key={module.id}
-                            className={`border-b last:border-b-0 ${index % 2 === 0 ? '' : ''}`}
-                            ref={(el) => (moduleRefs.current[module.id] = el)}>
+                            ref={(el) => (moduleRefs.current[module.id] = el)}
+                            className="border-b last:border-b-0">
                             <button
                                 onClick={() => toggleSection(module)}
                                 className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none">
-                                <span className="text-base  bold font-semibold text-slate-600">{`${module.name}`}</span>
-                                <div className="flex items-center">
-                                    {expandedSections.includes(module.id) ? (
-                                        <ChevronDown className="h-5 w-5 text-slate-400" />
-                                    ) : (
-                                        <ChevronRight className="h-5 w-5 text-slate-400" />
-                                    )}
-                                </div>
+                                <span className="text-base font-semibold text-slate-600">
+                                    {module.name}
+                                </span>
+                                {expandedSections.includes(module.id) ? (
+                                    <ChevronDown className="h-5 w-5 text-slate-400" />
+                                ) : (
+                                    <ChevronRight className="h-5 w-5 text-slate-400" />
+                                )}
                             </button>
+
                             {expandedSections.includes(module.id) && (
                                 <div className="px-4 pb-2">
-                                    {module.description && <span>{module.description}</span>}
-                                    {moduleData[module.id] && (
-                                        <>
-                                            {moduleData[module.id].lectures.map((lecture) => (
-                                                <Lecture
-                                                    key={lecture.id}
-                                                    name={lecture.title}
-                                                    content={lecture.content}
-                                                />
-                                            ))}
-                                            {moduleData[module.id].resources.map((resource) => {
-                                                const resourceType = resource.urlDocument.endsWith('.pdf')
-                                                    ? 'pdf'
-                                                    : resource.urlDocument.endsWith('.ppt')
-                                                    ? 'ppt'
-                                                    : resource.urlDocument.endsWith('.xlsx')
-                                                    ? 'excel'
-                                                    : 'word';
+                                    {module.description && <p>{module.description}</p>}
+                                    {moduleData[module.id]?.map((item) => {
+                                        switch (item.type) {
+                                            case 'lecture':
                                                 return (
-                                                    <Resource
-                                                        key={resource.id}
-                                                        type={resourceType}
-                                                        title={resource.title}
-                                                        link={resource.urlDocument}
+                                                    <Lecture
+                                                        key={item.id}
+                                                        name={item.title}
+                                                        content={item.content}
                                                     />
                                                 );
-                                            })}
-                                            {moduleData[module.id].assignments.map((assignment) => (
-                                                <SubmissionHeader
-                                                    courseID={courseId}
-                                                    key={assignment.id}
-                                                    id={assignment.id}
-                                                    title={assignment.title}
-                                                    startDate={assignment.startDate}
-                                                    endDate={assignment.endDate}
-                                                />
-                                            ))}
+                                            case 'resource': {
+                                                const ext = item.urlDocument?.split('.').pop();
+                                                const type = ['pdf', 'ppt', 'xlsx'].includes(ext) ? ext : 'word';
+                                                return (
+                                                    <Resource
+                                                        key={item.id}
+                                                        type={type}
+                                                        title={item.title}
+                                                        link={item.urlDocument}
+                                                    />
+                                                );
+                                            }
+                                            case 'assignment':
+                                                return (
+                                                    <SubmissionHeader
+                                                        key={item.id}
+                                                        courseID={courseId}
+                                                        id={item.id}
+                                                        title={item.title}
+                                                        startDate={item.startDate}
+                                                        endDate={item.endDate}
+                                                    />
+                                                );
+                                            case 'quiz':
+                                                return (
+                                                    <QuizzHeader
+                                                        key={item.id}
+                                                        courseID={courseId}
+                                                        id={item.id}
+                                                        title={item.title}
+                                                        startDate={item.startDate}
+                                                        endDate={item.endDate}
+                                                    />
+                                                );
+                                            default:
+                                                return null;
+                                        }
+                                    })}
 
-                                             {moduleData[module.id].quizzes.map((quiz) => (
-                                                <QuizzHeader
-                                                    courseID={courseId}
-                                                    key={quiz.id}
-                                                    id={quiz.id}
-                                                    title={quiz.title}
-                                                    startDate={quiz.startDate}
-                                                    endDate={quiz.endDate}
-                                                />
-                                            ))}
-                                        </>
-                                    )}
                                 </div>
                             )}
                         </div>
