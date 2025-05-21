@@ -7,6 +7,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { id } from 'date-fns/locale';
 
 export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = false, onSubmit }) {
   const [title, setTitle] = useState('');
@@ -34,11 +35,12 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
     setDescription(data.description || '');
     setStartTime(data.startDate || '');
     setEndTime(data.endDate || '');
-    setRetakeLimit(data.attemptLimit || 0);
+    setRetakeLimit(data.attemptAllowed || 0);
     setDuration(data.timeLimit || 0);
     setShuffleQuestions(data.shuffled || false);
     setQuestions(
       (data.questions || []).map((q) => ({
+        id: q.id,
         text: q.content,
         type: q.type,
         answers: q.options.map((opt, idx) => ({
@@ -95,12 +97,13 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       description,
       startDate: startTime,
       endDate: endTime,
-      attemptLimit: Number(retakeLimit),
+      attemptAllowed: Number(retakeLimit),
       timeLimit: Number(duration),
       shuffled: shuffleQuestions,
     };
 
     const formattedQuestions = questions.map((q) => ({
+      id: q.id || `temp-${Date.now().toString()}`,
       content: q.text,
       type: q.type,
       quizId: quizData.id,
@@ -274,7 +277,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
             <TextField fullWidth type="datetime-local" label="Ngày kết thúc" InputLabelProps={{ shrink: true }} value={endTime} onChange={(e) => setEndTime(e.target.value)} error={!!errors.endTime} helperText={errors.endTime} />
           </Grid>
           <Grid item xs={6}>
-            <TextField fullWidth type="number" label="Số lần làm lại" inputProps={{ min: 0 }} value={retakeLimit} onChange={(e) => setRetakeLimit(e.target.value)} error={!!errors.retakeLimit} helperText={errors.retakeLimit} />
+            <TextField fullWidth type="number" label="Số lần cho phép" inputProps={{ min: 0 }} value={retakeLimit} onChange={(e) => setRetakeLimit(e.target.value)} error={!!errors.retakeLimit} helperText={errors.retakeLimit} />
           </Grid>
           <Grid item xs={6}>
             <TextField fullWidth type="number" label="Thời gian làm bài (phút)" inputProps={{ min: 0 }} value={duration} onChange={(e) => setDuration(e.target.value)} error={!!errors.duration} helperText={errors.duration} />

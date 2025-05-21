@@ -64,8 +64,8 @@ export default function InteractiveStepProgress() {
       </Stepper>
 
       <Box sx={{ mt: 2 }}>
-        {currentStep === 1 && <CreateCourseForm onSubmitSuccess={handleNext} />}
-        {currentStep === 0 &&
+        {currentStep ===0 && <CreateCourseForm onSubmitSuccess={handleNext} />}
+        {currentStep === 1 &&
           <CreateCurriculumForm
             onSubmitSuccess={() => {
               handleNext();

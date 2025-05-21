@@ -44,7 +44,6 @@ function transformModulesFromApi(modules) {
       if (content.type === 'quiz' && content.questions) {
         return {
           ...content,
-          attemptLimit: content.attemptAllowed ?? 0,
           questions: content.questions.map(transformQuestionFromApi),
         };
       }
@@ -90,7 +89,6 @@ const EditModule = () => {
       initialModules={modules}
       onSubmitSuccess={
         () =>{ toast.success('Cập nhật module thành công!')
-            window.location.href = `/course-detail/${courseId}`;
         }
 
       }

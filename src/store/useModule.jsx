@@ -6,24 +6,12 @@ const typeToEndpoint = {
   assignment: "assignments",
   resource: "resources",
 };
-function sortContentsByType(modules) {
-  const typeOrder = ['lecture', 'resource', 'assignment', 'quiz'];
 
-  return modules.map(module => ({
-    ...module,
-    contents: [...module.contents].sort((a, b) => {
-      const indexA = typeOrder.indexOf(a.type);
-      const indexB = typeOrder.indexOf(b.type);
-      return indexA - indexB;
-    }),
-  }));
-}
 
 export const useSubmitModules = () => {
   const axiosPrivate = useAxiosPrivate();
 
   const submitModules = async (modules, courseId) => {
-  
     try {
       const res = await getModules(courseId);
       if (!res.success) {
@@ -50,7 +38,8 @@ export const useSubmitModules = () => {
           moduleId = res.data.data.id;
         } else {
           const old = oldModuleMap.get(moduleId);
-          if (old && old.name !== module.title) {
+          console.log("🚀 ~ submitModules ~ old:", old)
+          if (old && old.title !== module.title) {
             await axiosPrivate.patch(`/modules/${moduleId}`, {
               name: module.title,
             });
@@ -80,7 +69,9 @@ export const useSubmitModules = () => {
                 const res = await axiosPrivate.post("/lectures", payload);
                 contentId = res.data.data.id;
               } else {
-                const old = oldModule?.lectures?.find((l) => l.id === contentId);
+                const old = oldModule?.contents?.find(
+                  (c) => c.id === contentId && c.type === 'lecture'
+                );
                 if (!old || old.title !== item.title || old.content !== item.content) {
                   await axiosPrivate.patch(`/lectures/${contentId}`, payload);
                 }
@@ -109,13 +100,16 @@ export const useSubmitModules = () => {
 
               if (isNewQuiz) {
                 const res = await axiosPrivate.post("/quizzes", {
-                  ...postPayload, attemptLimit: item.attemptAllowed || 0, moduleId,
+                  ...postPayload, attemptAllowed: item.attemptAllowed || 0, moduleId,
 
                 });
                 quizId = res.data.data.id;
                 item.id = quizId;
               } else {
-                const old = oldModule?.quizzes?.find((q) => q.id === quizId);
+                const old = oldModule?.contents?.find(
+                  (q) => q.id === quizId && q.type === 'quiz'
+                );
+
                 const hasChanges =
                   !old ||
                   old.title !== item.title ||
@@ -133,12 +127,14 @@ export const useSubmitModules = () => {
 
 
 
-              const oldQuestions = oldModule?.quizzes?.find((q) => q.id === quizId)?.questions || [];
+              const oldQuestions = oldModule?.contents
+                ?.find((item) => item.id === quizId && item.type === 'quiz')
+                ?.questions || [];
               const oldQuestionIds = oldQuestions.map((q) => q.id);
               const currentQuestionIds = [];
 
               for (const q of item.questions) {
-                const isNew = !q.id || String(q.id).startsWith("temp-");
+                const isNewquestion = !q.id || String(q.id).startsWith("temp-");
                 const endpoint = q.type === "single" ? "scq" : "mcq";
                 const url = `/question-quizzes/${endpoint}`;
                 const questionPayload = {
@@ -148,7 +144,7 @@ export const useSubmitModules = () => {
                   ...(q.type === "single" ? { answer: q.answer } : { answers: q.answer }),
                 };
 
-                if (isNew) {
+                if (isNewquestion) {
                   const res = await axiosPrivate.post(url, questionPayload);
                   currentQuestionIds.push(res.data.data.id);
                 } else {
@@ -169,7 +165,10 @@ export const useSubmitModules = () => {
             else if (item.type === "assignment") {
               const payload = {
                 title: item.title,
-                description: item.description || "",
+                content: item.content || "",
+                state: item.state || "OPEN",
+                startDate: convertUTCToLocal(item.startDate),
+                endDate: convertUTCToLocal(item.endDate),
                 moduleId,
               };
 
@@ -177,7 +176,10 @@ export const useSubmitModules = () => {
                 const res = await axiosPrivate.post("/assignments", payload);
                 contentId = res.data.data.id;
               } else {
-                const old = oldModule?.assignments.find((a) => a.id === contentId);
+                const old = oldModule?.contents?.find(
+                  (a) => a.id === contentId && a.type === 'assignment'
+                );
+
                 if (!old || old.title !== item.title || old.description !== item.description) {
                   await axiosPrivate.patch(`/assignments/${contentId}`, payload);
                 }
@@ -185,7 +187,6 @@ export const useSubmitModules = () => {
             }
 
             else if (item.type === "resource") {
-              console.log("🚀 ~ submitModules ~ item:", item);
 
               const formData = item.resourceData;
 
@@ -295,69 +296,67 @@ export const useSubmitModules = () => {
     }
   };
 
- const getModules = async (courseId) => {
-  try {
-    const response = await axiosPrivate.get(`/courses/${courseId}/modules`);
-    const modulesData = response.data.data;
+  const getModules = async (courseId) => {
+    try {
+      const response = await axiosPrivate.get(`/courses/${courseId}/modules`);
+      const modulesData = response.data.data;
 
-    const formattedModules = await Promise.all(
-      modulesData.map(async (module) => {
-        const [lecturesRes, resourcesRes, assignmentsRes, quizzesRes] = await Promise.all([
-          axiosPrivate.get(`/modules/${module.id}/lectures`),
-          axiosPrivate.get(`/modules/${module.id}/resources`),
-          axiosPrivate.get(`/modules/${module.id}/assignments`),
-          axiosPrivate.get(`/modules/${module.id}/quizzes`),
-        ]);
+      const formattedModules = await Promise.all(
+        modulesData.map(async (module) => {
+          const [lecturesRes, resourcesRes, assignmentsRes, quizzesRes] = await Promise.all([
+            axiosPrivate.get(`/modules/${module.id}/lectures`),
+            axiosPrivate.get(`/modules/${module.id}/resources`),
+            axiosPrivate.get(`/modules/${module.id}/assignments`),
+            axiosPrivate.get(`/modules/${module.id}/quizzes`),
+          ]);
 
-        const lectures = lecturesRes.data.data.map((lecture) => ({
-          ...lecture,
-          type: 'lecture',
-        }));
+          const lectures = lecturesRes.data.data.map((lecture) => ({
+            ...lecture,
+            type: 'lecture',
+          }));
 
-        const resources = resourcesRes.data.data.map((res) => ({
-          ...res,
-          type: 'resource',
-        }));
+          const resources = resourcesRes.data.data.map((res) => ({
+            ...res,
+            type: 'resource',
+          }));
 
-        const assignments = assignmentsRes.data.data.map((asmt) => ({
-          ...asmt,
-          type: 'assignment',
-        }));
+          const assignments = assignmentsRes.data.data.map((asmt) => ({
+            ...asmt,
+            type: 'assignment',
+          }));
 
-        const quizzes = await Promise.all(
-          quizzesRes.data.data.map(async (quiz) => {
-            const questionsRes = await axiosPrivate.get(`/quizzes/${quiz.id}/questions`);
-            return {
-              ...quiz,
-              type: 'quiz',
-              questions: questionsRes.data.data,
-            };
-          })
-        );
+          const quizzes = await Promise.all(
+            quizzesRes.data.data.map(async (quiz) => {
+              const questionsRes = await axiosPrivate.get(`/quizzes/${quiz.id}/questions`);
+              return {
+                ...quiz,
+                type: 'quiz',
+                questions: questionsRes.data.data,
+              };
+            })
+          );
 
-        // Gộp và sắp xếp theo thời gian
-        const combinedContents = [...lectures, ...resources, ...assignments, ...quizzes];
-        combinedContents.sort((a, b) => {
-          const dateA = parseJavaLocalDateTime(a.createdAt);
-          const dateB = parseJavaLocalDateTime(b.createdAt)
-          return dateA - dateB;
-        });
+          const combinedContents = [...lectures, ...resources, ...assignments, ...quizzes];
+          combinedContents.sort((a, b) => {
+            const dateA = parseJavaLocalDateTime(a.createdAt);
+            const dateB = parseJavaLocalDateTime(b.createdAt)
+            return dateA - dateB;
+          });
 
-        return {
-          id: module.id,
-          title: module.name,
-          contents: combinedContents,
-        };
-        
-      })
-    );
-    console.log("🚀 ~ getModules ~ formattedModules:", formattedModules);
-    return { success: true, modules: formattedModules };
-  } catch (error) {
-    console.error(error);
-    return { success: false, modules: [] };
-  }
-};
+          return {
+            id: module.id,
+            title: module.name,
+            contents: combinedContents,
+          };
+
+        })
+      );
+      return { success: true, modules: formattedModules };
+    } catch (error) {
+      console.error(error);
+      return { success: false, modules: [] };
+    }
+  };
 
   return { submitModules, getModules };
 };
