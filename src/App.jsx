@@ -10,6 +10,8 @@ import ProtectedRoute from './utils/ProtectedRoute';
 import { AuthProvider } from './contexts/auth/AuthContext';
 import AuthService from './services/auth/auth.service';
 import AppLayout from './layout/AppLayout';
+import Quiz from './pages/Quiz';
+import QuizSubmission from './pages/QuizSubmission';
 
 // Lazy-loaded pages
 const MyCourse = lazy(() => import('./pages/MyCourse'));
@@ -26,7 +28,6 @@ const AddCourse = lazy(() => import('./pages/AddCourse'));
 const EditCourseContent = lazy(() => import('./components/EditCourseContent'));
 const Grading = lazy(() => import('./pages/Grade'));
 const Forum = lazy(() => import('./pages/Forum'));
-const AddQuiz = lazy(() => import('./pages/AddQuiz'));
 
 function App() {
   const navigate = useNavigate();
@@ -77,10 +78,13 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/forum" element={<Forum />} />
             <Route path="/forum/:forumId" element={<Forum />} />
-            <Route path="/add-quiz" element={<AddQuiz />} />
             <Route path="/course-detail/:courseId" element={<DetailCourse />} />
             <Route path="/course-detail/:courseId/edit" element={<EditCourseContent />} />
             <Route path="/submission/:courseId/:assignmentId" element={<Submission />} />
+            <Route path="/quiz/:courseId/:quizId" element={<Quiz />} />
+            <Route path="/quiz-submission/:courseId/:quizId" element={<QuizSubmission />} />
+
+
             <Route path="/add-course" element={<AddCourse />} />
             <Route path="/grading/:courseId/:assignmentId" element={<Grading />} />
             <Route path="/logout" element={<Logout />} />

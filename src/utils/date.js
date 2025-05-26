@@ -10,3 +10,13 @@ export const parseJavaLocalDateTime = (arr) => {
     return new Date(year, month - 1, day, hour, minute, second, milliseconds); // month - 1 vì JS bắt đầu từ 0
 }
 
+export const formatDateTimeLocal = (timestamp) => {
+    const date = new Date(timestamp);
+    const pad = (n) => n.toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}

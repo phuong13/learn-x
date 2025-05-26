@@ -2,85 +2,44 @@ import { useEffect, useState, useRef } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import SubmissionHeader from '../components/SubmissionHeader';
 import QuizzHeader from '../components/QuizzHeader';
-import CourseService from '@/services/courses/course.service.js';
-import Loader from './Loader';
-import { useParams, useNavigate } from 'react-router-dom';
-import Lecture from './LectureComponent';
-import Resource from './ResourceComponent';
-import ModuleService from '@/services/modules/module.service.js';
 import CourseSidebar from './CourseSidebar.jsx';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth.js';
 import { parseJavaLocalDateTime } from '@/utils/date.js';
+import { useSubmitModules } from '../store/useModule';
+import Loader from './Loader';
+import Lecture from './LectureComponent';
+import Resource from './ResourceComponent';
 
 const CourseContent = () => {
     const [expandedSections, setExpandedSections] = useState([]);
     const [modules, setModules] = useState([]);
-    const [moduleData, setModuleData] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+
     const moduleRefs = useRef({});
     const { courseId } = useParams();
     const navigate = useNavigate();
     const { authUser } = useAuth();
+    const { getModules } = useSubmitModules();
 
     useEffect(() => {
-        const fetchModules = async () => {
+        const fetchData = async () => {
             setIsLoading(true);
-            try {
-                const response = await CourseService.getModulesByCourseId(courseId);
-                setModules(response);
-            } catch (err) {
-                console.error('Failed to fetch modules:', err);
-            } finally {
-                setIsLoading(false);
+            const { success, modules: fetchedModules } = await getModules(courseId);
+            if (success) {
+                setModules(fetchedModules);
             }
+            setIsLoading(false);
         };
 
-        fetchModules();
+        fetchData();
     }, [courseId]);
 
-    const fetchModuleContents = async (moduleId) => {
-        try {
-            const [lectures, resources, assignments, quizzes] = await Promise.all([
-                ModuleService.getLecturesByModuleId(moduleId),
-                ModuleService.getResourcesByModuleId(moduleId),
-                ModuleService.getAssignmentsByModuleId(moduleId),
-                ModuleService.getQuizzesByModuleId(moduleId),
-            ]);
-
-            const allContents = [
-                ...(lectures || []).map((item) => ({ ...item, type: 'lecture' })),
-                ...(resources || []).map((item) => ({ ...item, type: 'resource' })),
-                ...(assignments || []).map((item) => ({ ...item, type: 'assignment' })),
-                ...(quizzes || []).map((item) => ({ ...item, type: 'quiz' })),
-            ];
-
-            const sortedContents = allContents.sort((a, b) => {
-                const dateA = parseJavaLocalDateTime(a.createdAt);
-                const dateB = parseJavaLocalDateTime(b.createdAt);
-                return dateA - dateB;
-            });
-
-            return sortedContents;
-        } catch (error) {
-            console.error(`Failed to fetch module contents: ${error}`);
-            return [];
-        }
-    };
-
-    const toggleSection = async (module) => {
+    const toggleSection = (module) => {
         if (expandedSections.includes(module.id)) {
             setExpandedSections((prev) => prev.filter((id) => id !== module.id));
         } else {
             setExpandedSections((prev) => [...prev, module.id]);
-
-            if (!moduleData[module.id]) {
-                const contents = await fetchModuleContents(module.id);
-                setModuleData((prev) => ({
-                    ...prev,
-                    [module.id]: contents,
-                }));
-            }
-
         }
     };
 
@@ -128,12 +87,14 @@ const CourseContent = () => {
                         <div
                             key={module.id}
                             ref={(el) => (moduleRefs.current[module.id] = el)}
-                            className="border-b last:border-b-0">
+                            className="border-b last:border-b-0"
+                        >
                             <button
                                 onClick={() => toggleSection(module)}
-                                className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none">
+                                className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
+                            >
                                 <span className="text-base font-semibold text-slate-600">
-                                    {module.name}
+                                    {module.title}
                                 </span>
                                 {expandedSections.includes(module.id) ? (
                                     <ChevronDown className="h-5 w-5 text-slate-400" />
@@ -144,8 +105,7 @@ const CourseContent = () => {
 
                             {expandedSections.includes(module.id) && (
                                 <div className="px-4 pb-2">
-                                    {module.description && <p>{module.description}</p>}
-                                    {moduleData[module.id]?.map((item) => {
+                                    {module.contents.map((item) => {
                                         switch (item.type) {
                                             case 'lecture':
                                                 return (
@@ -193,7 +153,6 @@ const CourseContent = () => {
                                                 return null;
                                         }
                                     })}
-
                                 </div>
                             )}
                         </div>

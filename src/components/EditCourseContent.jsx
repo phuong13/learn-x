@@ -7,20 +7,31 @@ import { toast } from 'react-toastify';
 
 // Hàm chuyển đổi dữ liệu câu hỏi từ API về format form
 function transformQuestionFromApi(raw) {
-  const type = raw.questionType === 'SINGLE_CHOICE' ? 'single' : 'multiple';
+  let type;
+  if (raw.questionType === 'SINGLE_CHOICE') {
+    type = 'single';
+  } else if (raw.questionType === 'MULTIPLE_CHOICE') {
+    type = 'multiple';
+  } else if (raw.questionType === 'TRUE_FALSE') {
+    type = 'truefalse';
+  } else {
+    type = 'fitb';
+  }
 
   const sortedOptions = [...raw.options].sort((a, b) => a.seq - b.seq);
   const options = sortedOptions.map(opt => opt.content);
 
   let answer;
 
-  if (type === 'single') {
+  if (type === 'single' || type === 'truefalse') {
     const selectedAnswerId = raw.answers?.[0]?.answerId;
     const selectedOptionIndex = sortedOptions.findIndex(
       opt => opt.id.optionId === selectedAnswerId
     );
     answer = selectedOptionIndex;
-  } else {
+  }
+
+  else {
     const selectedAnswerIds = raw.answers?.map(a => a.answerId) || [];
     answer = sortedOptions
       .map((opt, index) => selectedAnswerIds.includes(opt.id.optionId) ? index : -1)
@@ -31,6 +42,7 @@ function transformQuestionFromApi(raw) {
     id: raw.id,
     type,
     content: raw.content,
+    answerContent: raw.answers?.map(a => a.answerContent).join(', '),
     options,
     answer,
   };
@@ -44,7 +56,6 @@ function transformModulesFromApi(modules) {
       if (content.type === 'quiz' && content.questions) {
         return {
           ...content,
-          attemptLimit: content.attemptAllowed ?? 0,
           questions: content.questions.map(transformQuestionFromApi),
         };
       }
@@ -67,8 +78,9 @@ const EditModule = () => {
     const fetchModules = async () => {
       setLoading(true);
       const res = await getModules(courseId);
+      console.log("🚀 ~ fetchModules ~ res:", res)
       if (res.success) {
-        setModules(transformModulesFromApi(res.modules)); 
+        setModules(transformModulesFromApi(res.modules));
       }
       setLoading(false);
     };
@@ -85,15 +97,17 @@ const EditModule = () => {
   }
 
   return (
+  
     <Curriculum
       isEdit={true}
       initialModules={modules}
       onSubmitSuccess={
-        () =>{ toast.success('Cập nhật module thành công!')
-            window.location.href = `/course-detail/${courseId}`;
+        () => {
+          toast.success('Cập nhật module thành công!')
         }
 
       }
+      
     />
   );
 };

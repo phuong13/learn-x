@@ -19,7 +19,6 @@ export default function FormAssignment({
     const [content, setContent] = useState('');
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [file, setFile] = useState(null);
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -29,13 +28,11 @@ export default function FormAssignment({
                 setContent(defaultData.content || '');
                 setStartDate(defaultData.startDate ? dayjs(defaultData.startDate) : null);
                 setEndDate(defaultData.endDate ? dayjs(defaultData.endDate) : null);
-                setFile(null);
             } else {
                 setTitle('');
                 setContent('');
                 setStartDate(null);
                 setEndDate(null);
-                setFile(null);
             }
             setErrors({});
         }
@@ -66,17 +63,7 @@ export default function FormAssignment({
             moduleId,
         };
 
-        const formData = new FormData();
-        formData.append(
-            'assignment',
-            JSON.stringify(assignmentData)
-        );
-
-        if (file) {
-            formData.append('document', file);
-        }
-
-        onSubmit?.(formData);
+        onSubmit?.(assignmentData);
         onClose?.();
     };
 
@@ -142,27 +129,6 @@ export default function FormAssignment({
                     ampms={false}
                 />
 
-                <Button
-                    variant="contained"
-                    component="label"
-                    sx={{ my: 2 }}
-                >
-                    {file ? 'Đổi tài liệu' : 'Chọn tài liệu'}
-                    <input
-                        hidden
-                        type="file"
-                        onChange={(e) => {
-                            const selected = e.target.files?.[0];
-                            if (selected) setFile(selected);
-                        }}
-                    />
-                </Button>
-
-                {file && (
-                    <Typography variant="body2" color="text.secondary">
-                        Tệp đính kèm: <strong>{file.name}</strong>
-                    </Typography>
-                )}
             </DialogContent>
 
             <DialogActions>

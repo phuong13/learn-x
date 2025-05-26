@@ -7,8 +7,10 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-
+import { formatDateTimeLocal } from '../utils/date.js';
+import { mt } from 'date-fns/locale';
 export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = false, onSubmit }) {
+  console.log("🚀 ~ FormQuiz ~ defaultData:", defaultData)
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -32,21 +34,30 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
   const initFormData = (data) => {
     setTitle(data.title || '');
     setDescription(data.description || '');
-    setStartTime(data.startDate || '');
-    setEndTime(data.endDate || '');
-    setRetakeLimit(data.attemptLimit || 0);
+    setStartTime(formatDateTimeLocal(data?.startDate) || '');
+    setEndTime(formatDateTimeLocal(data.endDate) || '');
+    setRetakeLimit(data.attemptAllowed || 0);
     setDuration(data.timeLimit || 0);
     setShuffleQuestions(data.shuffled || false);
     setQuestions(
       (data.questions || []).map((q) => ({
+        id: q.id,
         text: q.content,
         type: q.type,
-        answers: q.options.map((opt, idx) => ({
-          text: opt,
-          isCorrect: Array.isArray(q.answer)
-            ? q.answer.includes(idx)
-            : q.answer === idx,
-        })),
+        ...(q.type === 'fitb'
+          ? {
+            content: q.content || '',
+            answerContent: q.answerContent || '',
+          }
+          : {
+            answers: q.options.map((opt, idx) => ({
+              text: opt,
+              isCorrect: Array.isArray(q.answer)
+                ? q.answer.includes(idx)
+                : q.answer === idx,
+            })),
+          }),
+
       }))
     );
     setErrors({});
@@ -69,17 +80,27 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       newErrors.questions = 'Phải có ít nhất một câu hỏi';
     } else {
       questions.forEach((q, qIndex) => {
-        if (!q.text.trim()) {
+        if (!q.text?.trim() ) {
           newErrors[`q-${qIndex}-text`] = 'Câu hỏi không được để trống';
         }
-        if (q.answers.length < 2) {
-          newErrors[`q-${qIndex}-answers`] = 'Phải có ít nhất 2 đáp án';
-        }
-        const hasCorrect = q.answers.some((a) => a.isCorrect);
-        if (!hasCorrect) {
-          newErrors[`q-${qIndex}-correct`] = 'Phải chọn ít nhất một đáp án đúng';
+
+        if (q.type === 'fitb') {
+          if (!q.answerContent?.trim()) {
+            newErrors[`q-${qIndex}-answerContent`] = 'Đáp án không được để trống';
+          }
+        } else {
+          if (!q.answers || q.answers.length < 2) {
+            newErrors[`q-${qIndex}-answers`] = 'Phải có ít nhất 2 đáp án';
+          }
+
+          const hasCorrect = q.answers?.some((a) => a.isCorrect);
+          if (!hasCorrect) {
+            newErrors[`q-${qIndex}-correct`] = 'Phải chọn ít nhất một đáp án đúng';
+          }
         }
       });
+
+
     }
 
     setErrors(newErrors);
@@ -95,20 +116,36 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       description,
       startDate: startTime,
       endDate: endTime,
-      attemptLimit: Number(retakeLimit),
+      attemptAllowed: Number(retakeLimit),
       timeLimit: Number(duration),
       shuffled: shuffleQuestions,
     };
 
-    const formattedQuestions = questions.map((q) => ({
-      content: q.text,
-      type: q.type,
-      quizId: quizData.id,
-      answer: q.type === 'single'
-        ? q.answers?.findIndex((a) => a.isCorrect)
-        : q.answers.reduce((arr, a, idx) => a.isCorrect ? [...arr, idx] : arr, []),
-      options: q.answers?.map((a) => a.text),
-    }));
+    const formattedQuestions = questions.map((q) =>
+    (q.type === 'fitb'
+      ? {
+        id: q.id || `temp-${Date.now().toString()}`,
+        type: 'fitb',
+        quizId: quizData.id,
+        content: q.text,
+        answerContent: q.answerContent,
+      }
+      : {
+        id: q.id || `temp-${Date.now().toString()}`,
+        content: q.text,
+        type: q.type,
+        quizId: quizData.id,
+        answer:
+          q.type === 'single' || q.type === 'truefalse'
+            ? q.answers?.findIndex((a) => a.isCorrect)
+            : q.answers.reduce(
+              (arr, a, idx) => (a.isCorrect ? [...arr, idx] : arr),
+              []
+            ),
+        options: q.answers?.map((a) => a.text),
+      }
+    ));
+    console.log("🚀 ~ handleSubmit ~ formattedQuestions:", formattedQuestions)
 
     onSubmit?.(quizData, formattedQuestions);
     onClose?.();
@@ -124,7 +161,9 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
           { text: '', isCorrect: false },
           { text: '', isCorrect: false },
         ],
-      },
+      }
+
+
     ]);
   };
 
@@ -135,6 +174,30 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
   const handleQuestionChange = (index, key, value) => {
     const updated = [...questions];
     updated[index][key] = value;
+
+    if (key === 'type') {
+      if (value === 'truefalse') {
+        updated[index].answers = [
+          { text: 'True', isCorrect: false },
+          { text: 'False', isCorrect: false },
+        ];
+        delete updated[index].content;
+        delete updated[index].answerContent;
+      } else if (value === 'fitb') {
+        updated[index].content = '';
+        updated[index].answerContent = '';
+        delete updated[index].answers;
+      } else {
+        updated[index].answers = [
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+        ];
+        delete updated[index].content;
+        delete updated[index].answerContent;
+      }
+    }
+
+
     setQuestions(updated);
   };
 
@@ -202,6 +265,9 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
         >
           <MenuItem value="single">Single Choice</MenuItem>
           <MenuItem value="multiple">Multiple Choice</MenuItem>
+          <MenuItem value="truefalse">True False</MenuItem>
+          <MenuItem value="fitb">Fill in the Blank (---)</MenuItem>
+
         </Select>
       </FormControl>
 
@@ -217,38 +283,73 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       </Grid>
 
       <Grid item xs={12}>
-        <Typography fontWeight="bold" my={1}>Đáp án</Typography>
-        {q.answers?.map((a, aIndex) => (
-          <Grid container spacing={1} alignItems="center" key={aIndex} mb={1}>
-            <Grid item xs={11}>
-              <TextField
-                fullWidth
-                label={`Đáp án ${aIndex + 1}`}
-                value={a.text}
-                onChange={(e) => handleAnswerChange(qIndex, aIndex, e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={0.5}>
-              {q.type === 'single' ? (
-                <Radio checked={a.isCorrect} onChange={() => handleCorrectChange(qIndex, aIndex)} />
-              ) : (
-                <Checkbox checked={a.isCorrect} onChange={() => handleCorrectChange(qIndex, aIndex)} />
-              )}
-            </Grid>
-            <Grid item xs={0.5}>
-              <IconButton onClick={() => handleDeleteAnswer(qIndex, aIndex)}><CloseIcon /></IconButton>
-            </Grid>
-          </Grid>
-        ))}
-        {errors[`q-${qIndex}-answers`] && (
-          <Typography color="error" variant="body2">{errors[`q-${qIndex}-answers`]}</Typography>
+        {q.type === 'fitb' ? (
+          <div className='mt-2'>
+            <TextField
+              fullWidth
+              label="Đáp án đúng"
+              value={q.answerContent}
+              onChange={(e) => handleQuestionChange(qIndex, 'answerContent', e.target.value)}
+            />
+            {errors[`q-${qIndex}-answerContent`] && (
+              <Typography color="error" variant="body2">{errors[`q-${qIndex}-answerContent`]}</Typography>
+            )}
+          </div>
+        ) : (
+          <>
+            <Typography fontWeight="bold" my={1}>Đáp án</Typography>
+            {q.answers?.map((a, aIndex) => (
+              <Grid container spacing={1} alignItems="center" key={aIndex} mb={1}>
+                <Grid item xs={11}>
+                  <TextField
+                    fullWidth
+                    label={`Đáp án ${aIndex + 1}`}
+                    value={a.text}
+                    onChange={(e) => handleAnswerChange(qIndex, aIndex, e.target.value)}
+                    disabled={q.type === 'truefalse'}
+                  />
+                </Grid>
+                <Grid item xs={0.5}>
+                  {q.type === 'single' && (
+                    <Radio
+                      checked={a.isCorrect}
+                      onChange={() => handleCorrectChange(qIndex, aIndex)}
+                    />
+                  )}
+                  {q.type === 'multiple' && (
+                    <Checkbox
+                      checked={a.isCorrect}
+                      onChange={() => handleCorrectChange(qIndex, aIndex)}
+                    />
+                  )}
+                  {q.type === 'truefalse' && (
+                    <Radio
+                      checked={a.isCorrect}
+                      onChange={() => handleCorrectChange(qIndex, aIndex)}
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={0.5}>
+                  {q.type !== 'truefalse' && (
+                    <IconButton onClick={() => handleDeleteAnswer(qIndex, aIndex)}><CloseIcon /></IconButton>
+                  )}
+                </Grid>
+              </Grid>
+            ))}
+            {errors[`q-${qIndex}-answers`] && (
+              <Typography color="error" variant="body2">{errors[`q-${qIndex}-answers`]}</Typography>
+            )}
+            {errors[`q-${qIndex}-correct`] && (
+              <Typography color="error" variant="body2">{errors[`q-${qIndex}-correct`]}</Typography>
+            )}
+            {q.type !== 'truefalse' && (
+              <Button onClick={() => handleAddAnswer(qIndex)} variant="text" size="small">
+                + Thêm đáp án
+              </Button>
+            )}
+          </>
         )}
-        {errors[`q-${qIndex}-correct`] && (
-          <Typography color="error" variant="body2">{errors[`q-${qIndex}-correct`]}</Typography>
-        )}
-        <Button onClick={() => handleAddAnswer(qIndex)} variant="text" size="small">
-          + Thêm đáp án
-        </Button>
+
       </Grid>
     </Grid>
   );
@@ -274,7 +375,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
             <TextField fullWidth type="datetime-local" label="Ngày kết thúc" InputLabelProps={{ shrink: true }} value={endTime} onChange={(e) => setEndTime(e.target.value)} error={!!errors.endTime} helperText={errors.endTime} />
           </Grid>
           <Grid item xs={6}>
-            <TextField fullWidth type="number" label="Số lần làm lại" inputProps={{ min: 0 }} value={retakeLimit} onChange={(e) => setRetakeLimit(e.target.value)} error={!!errors.retakeLimit} helperText={errors.retakeLimit} />
+            <TextField fullWidth type="number" label="Số lần cho phép" inputProps={{ min: 0 }} value={retakeLimit} onChange={(e) => setRetakeLimit(e.target.value)} error={!!errors.retakeLimit} helperText={errors.retakeLimit} />
           </Grid>
           <Grid item xs={6}>
             <TextField fullWidth type="number" label="Thời gian làm bài (phút)" inputProps={{ min: 0 }} value={duration} onChange={(e) => setDuration(e.target.value)} error={!!errors.duration} helperText={errors.duration} />

@@ -34,3 +34,33 @@ export const useCourses = () => {
 
   return { courses, loading, error };
 };
+
+
+export const useCourseById = (courseId) => {
+  const axiosPrivate = useAxiosPrivate();
+  const [course, setCourse] = useState(null);
+  const [courseName, setCourseName] = useState(null); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!courseId) return;
+
+    const fetchCourse = async () => {
+      try {
+        const response = await axiosPrivate.get(`/courses/${courseId}`);
+        setCourse(response.data.data);
+        setCourseName(response.data.data.name); 
+      } catch (err) {
+        console.error('Lỗi khi lấy thông tin khóa học:', err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourse();
+  }, [courseId]);
+
+  return { courseName ,course, loading, error };
+}

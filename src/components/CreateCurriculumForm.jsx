@@ -196,47 +196,30 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
    };
 
 
-   const handleAddAssignment = (moduleId, assignmentData) => {
-      let parsedAssignment = {};
-
-      if (assignmentData instanceof FormData) {
-         const assignmentJson = assignmentData.get('assignment');
-         try {
-            parsedAssignment = JSON.parse(assignmentJson);
-         } catch (err) {
-            console.error('Không thể parse assignment data:', err);
-            return;
-         }
-      } else {
-         parsedAssignment = assignmentData;
-      }
-
-      const updatedAssignment = {
-         ...parsedAssignment,
-         assignmentData,
-         type: 'assignment',
-         id: parsedAssignment.id || `temp-${Date.now()}`
-      };
-
+  const handleAddAssignment = (moduleId, assignmenrData) => {
       setModules(prev =>
-         prev.map(mod => {
-            if (mod.id !== moduleId) return mod;
-
-            const exists = mod.contents.some(c => c.id === updatedAssignment.id);
-
-            const updatedContents = exists
-               ? mod.contents.map(c =>
-                  c.id === updatedAssignment.id ? updatedAssignment : c
-               )
-               : [...mod.contents, updatedAssignment];
-
-            return {
-               ...mod,
-               contents: updatedContents,
-            };
-         })
+         prev.map(mod =>
+            mod.id === moduleId
+               ? {
+                  ...mod,
+                  contents: mod.contents.some(c => c.id === assignmenrData.id)
+                     ? mod.contents.map(c =>
+                        c.id === assignmenrData.id
+                           ? { ...assignmenrData, type: 'assignment' }
+                           : c
+                     )
+                     : [
+                        ...mod.contents,
+                        {
+                           ...assignmenrData,
+                           id: `temp-${Date.now()}`,
+                           type: 'assignment',
+                        },
+                     ],
+               }
+               : mod
+         )
       );
-
       setAssignmentDialog({ open: false, moduleId: null, editData: null });
    };
 
@@ -382,7 +365,11 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
             open={quizDialog.open}
             onClose={() => setQuizDialog({ open: false, moduleId: null, editData: null })}
             onSubmit={(quizData, questionData) =>
-               handleAddQuiz(quizDialog.moduleId, quizData, questionData)
+               handleAddQuiz(quizDialog.moduleId, quizDialog.editData
+                  ? { ...quizDialog.editData, ...quizData }
+                  : quizData,
+                  questionData
+               )
             }
             isEdit={!!quizDialog.editData}
             defaultData={quizDialog.editData}
