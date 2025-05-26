@@ -53,9 +53,10 @@ const QuizQuestionList = ({
                     backgroundColor: isAnswered ? 'green.50' : 'grey.100',
                     color: isAnswered ? 'green.800' : 'grey.500',
                     '&.Mui-selected': {
-                      border: '1px solid',
-                      borderColor: 'success.main',
+                      border: '2px solid',
+                      borderColor: '#14919B',
                       backgroundColor: 'green.100',
+                      borderRadius: 2,
                     },
                   }}
                 >

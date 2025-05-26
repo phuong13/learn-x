@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 export default function SubmissionHeader({ courseID, id, title, startDate, endDate }) {
     const formattedStartDate = format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
@@ -16,7 +17,7 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
             {/* Content */}
             <div className="flex-1">
                 <h2 className="text-blue-600 text-sm font-bold hover:text-blue-700 cursor-pointer ">
-                    <a href={`/submission/${courseID}/${id}`}>{title}</a>
+                    <Link to={`/submission/${courseID}/${id}`}>{title}</Link>
                 </h2>
                 <div className="text-sm text-gray-600">
                     <div className="flex gap-1">

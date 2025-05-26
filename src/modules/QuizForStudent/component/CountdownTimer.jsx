@@ -32,7 +32,7 @@ const CountdownTimer = ({ timeLimit, onTimeout }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg text-center w-full h-52 flex flex-col items-center justify-center shadow-md">
+    <div className="bg-white rounded-lg text-center w-full h-48 flex flex-col items-center justify-center shadow-md">
       <div style={{ width: 120, height: 120 }}>
         <CircularProgressbar
           value={percentage}

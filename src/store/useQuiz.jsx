@@ -60,3 +60,50 @@ export const useQuestionByQuizId = (quizId) => {
 
   return { questions, loading, error };
 }
+
+export const getSession =(quizId) => {
+    const axiosPrivate = useAxiosPrivate();
+    const [session, setSession] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    useEffect(() => {
+        if (!quizId) return;
+
+        const fetchSession = async () => {
+            try {
+                const response = await axiosPrivate.get(`/quizzes/${quizId}/session`);
+                setSession(response.data.data);
+            } catch (err) {
+                console.error('Lỗi khi lấy thông tin phiên làm bài:', err);
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSession();
+    }, [quizId]);
+    return { session, loading, error };
+}
+
+export const useSubmissionQuiz = () => {
+  const axiosPrivate = useAxiosPrivate();
+
+  const submit = async (quizId, totalTimeTakenInSeconds, answers) => {
+    try {
+      const payload = {
+        quizId,
+        totalTimeTakenInSeconds,
+        answers,
+      };
+
+      const response = await axiosPrivate.post("/quiz-submissions", payload);
+      return response.data;
+    } catch (error) {
+      console.error(" Lỗi khi nộp bài:", error);
+      throw error;
+    }
+  };
+
+  return submit;
+};

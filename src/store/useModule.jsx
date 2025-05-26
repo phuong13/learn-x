@@ -38,7 +38,6 @@ export const useSubmitModules = () => {
           moduleId = res.data.data.id;
         } else {
           const old = oldModuleMap.get(moduleId);
-          console.log("🚀 ~ submitModules ~ old:", old)
           if (old && old.title !== module.title) {
             await axiosPrivate.patch(`/modules/${moduleId}`, {
               name: module.title,
@@ -135,13 +134,21 @@ export const useSubmitModules = () => {
 
               for (const q of item.questions) {
                 const isNewquestion = !q.id || String(q.id).startsWith("temp-");
-                const endpoint = q.type === "single" ? "scq" : "mcq";
+                const endpoint =
+                  q.type === "single"
+                    ? "scq"
+                    : q.type === "multiple"
+                      ? "mcq"
+                      : q.type === "truefalse"
+                        ? "tfq"
+                        : "fitb";
                 const url = `/question-quizzes/${endpoint}`;
                 const questionPayload = {
                   content: q.content || "",
                   quizId,
                   options: q.options,
-                  ...(q.type === "single" ? { answer: q.answer } : { answers: q.answer }),
+                  ...(q.type === "fitb" ? { answerContent: q.answerContent } : {}),
+                  ...(q.type === "multiple" ? { answers: q.answer } : { answer: q.answer }),
                 };
 
                 if (isNewquestion) {
@@ -180,10 +187,11 @@ export const useSubmitModules = () => {
                   (a) => a.id === contentId && a.type === 'assignment'
                 );
 
-                if (!old || old.title !== item.title || old.description !== item.description) {
+                if (!old || old.title !== item.title || old.content !== item.content) {
                   await axiosPrivate.patch(`/assignments/${contentId}`, payload);
                 }
               }
+              currentContentIds.push(contentId);
             }
 
             else if (item.type === "resource") {

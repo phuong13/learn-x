@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import GradingSummary from '../components/GradingSummary';
 import { useAuth } from '@hooks/useAuth.js';
 import { useCourseById } from '../store/useCourses';
-import { useQuizById } from '../store/useQuiz.jsx';
+import { useQuizById ,getSession} from '../store/useQuiz.jsx';
 
 export default function QuizLayout({ title, content, startDate, endDate }) {
     const [isFolderVisible, setIsFolderVisible] = useState(false);
@@ -175,7 +175,8 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
 
                         {authUser.role === 'TEACHER' ? (
                             <button
-                                className="py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                className="py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                                onClick={getSession(quizId)}>
                                 <Link to={`/quiz-submission/${courseId}/${quizId}`} className="text-white">
                                     Xem điểm các sinh viên
                                 </Link>
