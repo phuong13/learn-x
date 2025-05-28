@@ -11,12 +11,14 @@ import { toast } from 'react-toastify';
 import GradingSummary from '../components/GradingSummary';
 import { useAuth } from '@hooks/useAuth.js';
 import { useCourseById } from '../store/useCourses';
-import { useQuizById, getSession } from '../store/useQuiz.jsx';
+import { useQuizById, getQuizSubmissionByQuizId } from '../store/useQuiz.jsx';
 
 export default function QuizLayout({ title, content, startDate, endDate }) {
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
     const { quizId } = useParams();
     const { quiz, quizTitle, loading } = useQuizById(quizId);
+    const { submission } = getQuizSubmissionByQuizId(quizId);
+    console.log("🚀 ~ QuizLayout ~ submission:", submission)
     const { courseId } = useParams();
     const { courseName } = useCourseById(courseId);
     const { authUser } = useAuth();
@@ -149,6 +151,10 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                 if (now > end) {
                                     return <p className="text-center text-rose-500 font-semibold">Đã hết thời gian làm bài.</p>;
                                 }
+
+                                if (submission?.length >= (quiz?.attemptAllowed || 1)) { 
+                                    return <p className="text-center text-rose-500 font-semibold">Bạn đã làm đủ số lần cho phép.</p>;
+                                }
                                 return (
                                     <button
                                         className="mx-auto py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors">
@@ -186,15 +192,25 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                         <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-slate-700">Số lần đã thực hiện</td>
                                             <td className="py-3 text-slate-600">
-                                                Chưa có
+                                                {submission?.length}
                                             </td>
                                         </tr>
 
 
                                         <tr className="border-b border-slate-300">
-                                            <td className="py-3 font-medium text-slate-700">Điểm lần thứ </td>
+                                            <td className="py-3 font-medium text-slate-700">Điểm từng lần</td>
                                             <td className="py-3 text-slate-600">
-                                                Điểm từng lần
+                                                {submission && submission.length > 0 ? (
+                                                    <div className="flex flex-col gap-1">
+                                                        {submission.map((s, idx) => (
+                                                            <div key={s.id || idx}>
+                                                                Lần thứ {idx + 1}: {typeof s.score === 'number' ? s.score/10 : ''} đ
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <>Bạn chưa làm</>
+                                                )}
                                             </td>
                                         </tr>
                                         <tr className="border-b border-slate-300">

@@ -16,6 +16,7 @@ const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 export default function MUICalendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState([]);
+    const [events2, setEvents2] = useState([]);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -23,8 +24,9 @@ export default function MUICalendar() {
                 const params = new URLSearchParams();
                 params.append('month', (currentDate.getMonth() + 1).toString());
                 params.append('year', currentDate.getFullYear().toString());
-                const res = await axiosPrivate.get(`/assignments/get-by-month-year?${params.toString()}`);
-                setEvents(res.data.data);
+                const res = await axiosPrivate.get(`/dashboard/get-by-month-year?${params.toString()}`);
+                setEvents(res.data.data.assignments);
+                setEvents2(res.data.data.quizzes);
             } catch (error) {
                 toast(error.response?.data?.message || 'Lỗi khi tải sự kiện');
             }
@@ -67,6 +69,19 @@ export default function MUICalendar() {
         });
     };
 
+    const getEventsForDate2 = (day2) => {
+        return events2.filter(event => {
+            const eventDate = new Date(event.endDate);
+            return (
+                eventDate.getDate() === day2 &&
+                eventDate.getMonth() === currentDate.getMonth() &&
+                eventDate.getFullYear() === currentDate.getFullYear()
+            );
+        });
+    };
+
+
+
     const navigateMonth = (direction) => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + direction));
     };
@@ -90,7 +105,7 @@ export default function MUICalendar() {
                         </IconButton>
                     </Box>
                 </Box>
-             
+
 
                 <Grid container spacing={1} mb={1}>
                     {weekDays.map(day => (
@@ -149,6 +164,26 @@ export default function MUICalendar() {
                                                     noWrap
                                                 >
                                                     <Link to={`/submission/${event.courseId}/${event.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                        • {event.courseName} - {event.title}
+                                                    </Link>
+                                                </Typography>
+                                            ))}
+
+                                        {day &&
+                                            getEventsForDate2(day).map(event => (
+                                                <Typography
+                                                    key={event.id}
+                                                    variant="caption"
+                                                    sx={{
+                                                        display: 'block',
+                                                        color: 'primary.main',
+                                                        fontSize: '0.75rem',
+                                                        mt: 0.3,
+                                                        lineHeight: 1.2,
+                                                    }}
+                                                    noWrap
+                                                >
+                                                    <Link to={`/quiz/${event.courseId}/${event.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                                         • {event.courseName} - {event.title}
                                                     </Link>
                                                 </Typography>
