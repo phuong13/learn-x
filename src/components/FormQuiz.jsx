@@ -8,13 +8,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { formatDateTimeLocal } from '../utils/date.js';
-import { mt } from 'date-fns/locale';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from 'dayjs';
+
+
 export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = false, onSubmit }) {
-  console.log("🚀 ~ FormQuiz ~ defaultData:", defaultData)
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const [retakeLimit, setRetakeLimit] = useState(0);
   const [duration, setDuration] = useState(0);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
@@ -34,8 +36,8 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
   const initFormData = (data) => {
     setTitle(data.title || '');
     setDescription(data.description || '');
-    setStartTime(formatDateTimeLocal(data?.startDate) || '');
-    setEndTime(formatDateTimeLocal(data.endDate) || '');
+    setStartTime(data?.startDate ? dayjs(data.startDate) : null);
+    setEndTime(data?.endDate ? dayjs(data.endDate) : null);
     setRetakeLimit(data.attemptAllowed || 0);
     setDuration(data.timeLimit || 0);
     setShuffleQuestions(data.shuffled || false);
@@ -80,7 +82,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       newErrors.questions = 'Phải có ít nhất một câu hỏi';
     } else {
       questions.forEach((q, qIndex) => {
-        if (!q.text?.trim() ) {
+        if (!q.text?.trim()) {
           newErrors[`q-${qIndex}-text`] = 'Câu hỏi không được để trống';
         }
 
@@ -114,8 +116,8 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       id: defaultData?.id || Date.now().toString(),
       title,
       description,
-      startDate: startTime,
-      endDate: endTime,
+      startDate: startTime ? startTime.toISOString() : null,
+      endDate: endTime ? endTime.toISOString() : null,
       attemptAllowed: Number(retakeLimit),
       timeLimit: Number(duration),
       shuffled: shuffleQuestions,
@@ -145,7 +147,6 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
         options: q.answers?.map((a) => a.text),
       }
     ));
-    console.log("🚀 ~ handleSubmit ~ formattedQuestions:", formattedQuestions)
 
     onSubmit?.(quizData, formattedQuestions);
     onClose?.();
@@ -369,11 +370,38 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
             <TextField fullWidth label="Description" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} error={!!errors.description} helperText={errors.description} />
           </Grid>
           <Grid item xs={6}>
-            <TextField fullWidth type="datetime-local" label="Ngày bắt đầu" InputLabelProps={{ shrink: true }} value={startTime} onChange={(e) => setStartTime(e.target.value)} error={!!errors.startTime} helperText={errors.startTime} />
+            <DateTimePicker
+              label="Ngày bắt đầu"
+              value={startTime}
+              onChange={(value) => setStartTime(value)}
+              format="DD/MM/YYYY HH:mm"
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  margin: 'normal',
+                  error: !!errors.startTime,
+                  helperText: errors.startTime,
+                }
+              }}
+              ampms={false}
+            />
           </Grid>
           <Grid item xs={6}>
-            <TextField fullWidth type="datetime-local" label="Ngày kết thúc" InputLabelProps={{ shrink: true }} value={endTime} onChange={(e) => setEndTime(e.target.value)} error={!!errors.endTime} helperText={errors.endTime} />
-          </Grid>
+            <DateTimePicker
+              label="Ngày kết thúc"
+              value={endTime}
+              onChange={(value) => setEndTime(value)}
+              format="DD/MM/YYYY HH:mm"
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  margin: 'normal',
+                  error: !!errors.endTime,
+                  helperText: errors.endTime,
+                }
+              }}
+              ampms={false}
+            />          </Grid>
           <Grid item xs={6}>
             <TextField fullWidth type="number" label="Số lần cho phép" inputProps={{ min: 0 }} value={retakeLimit} onChange={(e) => setRetakeLimit(e.target.value)} error={!!errors.retakeLimit} helperText={errors.retakeLimit} />
           </Grid>

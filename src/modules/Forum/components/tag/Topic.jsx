@@ -31,10 +31,10 @@ const Topic = ({ user, content, createAt, topicId }) => {
   };
 
   return (
-    <div className="w-full p-4 bg-white rounded-lg shadow-lg">
+    <div className="w-full p-4 bg-white rounded-lg shadow-lg border border-slate-200">
       {/* User info and post header */}
-      <div className="px-4 flex items-start gap-3">
-        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-700">
+      <div className=" flex items-center gap-2">
+        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-300">
           <img
             src={user.avatarUrl || profileUser}
             alt=""
@@ -44,24 +44,24 @@ const Topic = ({ user, content, createAt, topicId }) => {
 
         <div className="flex-1">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-sm text-gray-800">{user.username}</h3>
-            <span className="text-sm text-gray-500">{formatDateTime(createAt)}</span>
+            <h3 className="font-semibold text-sm text-slate-700 truncate">{user.username}</h3>
+            <span className="text-sm text-slate-500">{formatDateTime(createAt)}</span>
           </div>
         </div>
       </div>
 
       {/* Nội dung topic */}
       <div className="flex my-2 mx-4">
-        <p className="text-gray-800 text-base">{content}</p>
+        <p className="text-slate-700 text-sm "><span className="text-slate-700 text-base font-semibold"></span> {content}</p>
       </div>
 
       {/* Comment section */}
-      <div className="px-4 border-t border-slate-400 mx-2">
+      <div className="px-4 border-t border-slate-300 mx-2">
         <div
-          className="flex items-center gap-2 text-gray-600 cursor-pointer"
+          className="flex items-center gap-2 text-slate-600 cursor-pointer mt-2"
           onClick={() => setShowComments(!showComments)}
         >
-          <span className="text-sm text-slate-500 hover:underline hover:text-blue-600 transition">
+          <span className="text-sm text-slate-500 hover:underline hover:text-slate-600 transition">
             {t('topic.comments_count', { count: comment.length })}
           </span>
         </div>
@@ -73,17 +73,17 @@ const Topic = ({ user, content, createAt, topicId }) => {
             ) : (
               comment.map((item) => (
                 <div key={item.id} className="flex items-start gap-2">
-                  <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-700">
+                  <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-300">
                     <img
                       src={profileUser}
                       alt=""
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="flex-1 bg-slate-100 p-2 rounded-md">
+                  <div className="flex-1 bg-slate-50 p-2 rounded-md">
                     <div className="flex justify-between">
-                      <div className="font-semibold text-sm">{item.account.email}</div>
-                      <div className="text-sm">{formatDateTime(item.createdAt)}</div>
+                      <div className="font-semibold text-sm text-slate-700">{item.account.email}</div>
+                      <div className="text-sm text-slate-500">{formatDateTime(item.createdAt)}</div>
                     </div>
                     <p className="text-slate-700 text-sm">{item.content}</p>
                   </div>
@@ -96,7 +96,7 @@ const Topic = ({ user, content, createAt, topicId }) => {
 
       {/* Comment input */}
       <div className="px-4 flex items-center gap-3 mt-2">
-        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-700">
+        <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-300">
           <img
             src={me.avatar || profileUser}
             alt=""
@@ -109,7 +109,7 @@ const Topic = ({ user, content, createAt, topicId }) => {
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
             placeholder={t('topic.comment_input_placeholder')}
-            className="w-full py-2 px-3 border-b border-gray-300 focus:outline-none focus:border-blue-500"
+            className="w-full py-2 px-3 border-b border-slate-300 focus:outline-none text-slate-600 "
           />
           <button
             className="absolute right-2 top-1/2 -translate-y-1/2 contrast-50 hover:contrast-200 transition"

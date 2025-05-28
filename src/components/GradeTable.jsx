@@ -64,17 +64,17 @@ export default function GradeTable() {
         <div className="max-w-full overflow-x-auto">
         <div className="min-w-[800px]">
             {/* Header */}
-            <div className="flex bg-slate-100  font-semibold text-slate-600 rounded-lg mb-2">
-                <div className="flex-1 p-4 text-left">Mục điểm</div>
-                <div className="w-40 p-4 text-center">Điểm</div>
+            <div className="flex bg-slate-100  font-semibold text-slate-600 rounded-lg mb-3 px-4 ">
+                <div className="flex-1 p-2 text-left">Mục điểm</div>
+                <div className="w-40 p-2 text-center">Điểm</div>
             </div>
     
             {modules.map((module) => (
-                <div key={module.id} className="">
+                <div key={module.id} className="shadow-md mb-4 bg-white rounded-lg">
                     {/* Module title row */}
                     <button
                         onClick={() => toggleModuleExpansion(module.id)}
-                        className="flex items-center w-full p-3 hover:bg-slate-50 text-left border-b bg-blue-50">
+                        className="flex items-center w-full p-2  text-left border-slate-400 bg-blue-50 rounded-lg">
                         <ChevronDown
                             className={`w-5 h-5 mr-2 transition-transform ${
                                 expandedModules[module.id]
@@ -88,14 +88,14 @@ export default function GradeTable() {
                     {/* Assignment rows */}
                     {expandedModules[module.id] &&
                         assignmentsWithSubmissions[module.id]?.map(({ assignment, submission }) => (
-                            <div key={assignment.id} className="flex items-start border-b hover:bg-gray-50">
+                            <div key={assignment.id} className="flex items-start border-t border-slate-400  px-6">
                                 <div className="flex-1 p-2">
                                     <div className="flex items-center gap-2">
-                                        {/* <div className="text-xs text-gray-500">BÀI TẬP</div> */}
+                                        {/* <div className="text-xs text-slate-500">BÀI TẬP</div> */}
                                         <FileText className="w-4 h-4 text-slate-600" />
                                         <a
                                             href={submission?.fileSubmissionUrl || '#'}
-                                            className="text-blue-600 text-sm font-semibold hover:underline"
+                                            className="text-blue-500 text-sm font-bold hover:text-blue-700 cursor-pointer"
                                             target="_blank"
                                             rel="noopener noreferrer">
                                             {assignment.title}
