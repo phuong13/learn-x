@@ -37,6 +37,7 @@ const QuizSubmissionLayout = () => {
   }
   const handleSubmit = async () => {
     await submissionQuiz(quizId, totalTimeTakenInSeconds, answers);
+    toast.success('Nộp bài thành công');
     navigate(`/quiz/${courseId}/${quizId}`);
   };
 
