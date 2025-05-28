@@ -84,16 +84,16 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
    >
       <div className="px-4 sm:px-6 lg:px-8">
         <Loader isLoading={isLoading} />
-        <div className="mx-4 border border-slate-300 rounded-lg ">
+        <div className="mx-4 border border-slate-300 rounded-lg">
           <form
             onSubmit={handleOnSubmit}
             className="bg-white shadow-xl rounded-lg overflow-hidden"
           >
             <div className="px-6 py-8">
-              <h2 className="text-2xl font-bold text-center text-slate-8 00 mb-8">
+              <h2 className="text-2xl font-bold text-center text-slate-700 mb-8">
                 Tạo khóa học mới
               </h2>
-              <div className="space-y-6">
+              <div className="space-y-3">
                 <div>
                   <label
                     htmlFor="category"

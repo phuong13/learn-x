@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 export default function Resource({ type, title, link }) {
   // Map loại tài liệu với biểu tượng Font Awesome
@@ -19,9 +20,9 @@ export default function Resource({ type, title, link }) {
 
       {/* Content */}
       <h3 className="text-blue-600 text-sm hover:text-blue-700 hover:underline cursor-pointer mb-1 pt-2">
-        <a href={link} target="_blank" rel="noopener noreferrer">
+        <Link to={link} target="_blank" rel="noopener noreferrer">
           {title}
-        </a>
+        </Link>
       </h3>
     </div>
   );

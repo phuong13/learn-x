@@ -257,7 +257,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                 <div className="bg-white shadow-lg overflow-hidden rounded-lg">
                     {/* Assignment Details */}
                     <div className="p-4 border-b border-gray-200">
-                        <h2 className="text-lg font-semibold mb-2 text-gray-800">Thời gian</h2>
+                        <h2 className="text-lg font-semibold mb-2 text-slate-700">Thời gian</h2>
                         <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-600">
                             <p className="mb-2 sm:mb-0">
                                 <Calendar className="inline mr-2" size={16} /> Opened: {formattedStartDate}

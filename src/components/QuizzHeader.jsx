@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 export default function QuizzHeader({ courseID, id, title, startDate, endDate }) {
     const formattedStartDate = format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
@@ -10,13 +11,13 @@ export default function QuizzHeader({ courseID, id, title, startDate, endDate })
         <div className="flex items-start gap-4 border-t py-1 border-slate-400">
             {/* Icon */}
             <div className="text-primary mt-1 text-xl">
-                <i class="fa-solid fa-feather" ></i>
+                <i className="fa-solid fa-feather" ></i>
                 </div>
 
             {/* Content */}
             <div className="flex-1">
                 <h2 className="text-blue-600 text-sm font-bold hover:text-blue-700 cursor-pointer ">
-                    <a href={`/quiz/${courseID}/${id}`}>{title}</a>
+                    <Link to={`/quiz/${courseID}/${id}`}>{title}</Link>
                 </h2>
                 <div className="text-sm text-gray-600">
                     <div className="flex gap-1">

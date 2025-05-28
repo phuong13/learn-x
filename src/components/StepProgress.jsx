@@ -64,8 +64,8 @@ export default function InteractiveStepProgress() {
       </Stepper>
 
       <Box sx={{ mt: 2 }}>
-        {currentStep === 1 && <CreateCourseForm onSubmitSuccess={handleNext} />}
-        {currentStep === 0 &&
+        {currentStep ===2 && <CreateCourseForm onSubmitSuccess={handleNext} />}
+        {currentStep === 1 &&
           <CreateCurriculumForm
             onSubmitSuccess={() => {
               handleNext();
@@ -73,10 +73,10 @@ export default function InteractiveStepProgress() {
             }}
             initialModules={[]}
           />}
-        {currentStep === 2 && (
+        {currentStep === 0 && (
           <div className='flex flex-col items-center justify-center h-64'>
-            <div className="text-xl font-bold mb-2">Xác nhận</div>
-            <p className="text-lg text-gray-700 mb-4">
+            <div className="text-xl font-bold mb- text-slate-700 mb-4">Xác nhận</div>
+            <p className="text-lg text-slate-700 mb-4">
               Lưu ý, hãy ấn vào nút ✔ sau khi đã điền thông tin khóa học.
             </p>
             <Button

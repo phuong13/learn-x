@@ -4,6 +4,7 @@ import { ExpandMore, ExpandLess, School, Menu, ChevronLeft } from '@mui/icons-ma
 import PropTypes from 'prop-types';
 
 const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModule, expandAll, collapseAll }) => {
+    console.log("🚀 ~ CourseSidebar ~ modules:", modules)
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -20,14 +21,14 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
                 {isOpen ? <ChevronLeft /> : <Menu />}
             </IconButton>
             {isOpen && (
-                <div className={`${isOpen ? '' : 'hidden'} bg-slate-100 rounded-lg`}>
+                <div className={`${isOpen ? '' : 'hidden'} bg-blue-50 rounded-lg`}>
                     <div className="flex justify-evenly">
                         <button
                             className="p-2 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors mr-2"
                             onClick={expandAll}>
                             Mở rộng
                         </button>
-                        <button 
+                        <button
                             className="p-2 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
                             onClick={collapseAll}>
                             Thu nhỏ
@@ -46,18 +47,22 @@ const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModul
                                     <ListItemIcon>
                                         <School />
                                     </ListItemIcon>
-                                    <ListItemText primary={module.name} />
+                                    <ListItemText primary={module.title} />
                                     {expandedSections.includes(module.id) ? <ExpandLess /> : <ExpandMore />}
                                 </ListItem>
-                                <Collapse in={expandedSections.includes(module.id)} timeout="auto" unmountOnExit>
+                                {/* <Collapse in={expandedSections.includes(module.id)} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
-                                        {module.lectures && module.lectures.map((lecture) => (
-                                            <ListItem button key={lecture.id} className="pl-8">
-                                                <ListItemText primary={lecture.name} />
-                                            </ListItem>
-                                        ))}
+                                        {module.contents &&
+                                            module.contents
+                                                .filter((item) => item.type === 'lecture')
+                                                .map((lecture) => (
+                                                    <ListItem button key={lecture.id} className="pl-8">
+                                                        <ListItemText primary={lecture.title} />
+                                                    </ListItem>
+                                                ))}
+
                                     </List>
-                                </Collapse>
+                                </Collapse> */}
                             </React.Fragment>
                         ))}
                     </List>

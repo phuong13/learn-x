@@ -4,28 +4,29 @@ import { axiosPrivate } from '@/axios/axios.js';
 import { toast } from 'react-toastify';
 import SubmissionHeader from '@components/SubmissionHeader.jsx';
 import { t } from 'i18next';
+import QuizzHeader from './QuizzHeader';
 export default function AssignmentControlPanel() {
   let [timeFilter, setTimeFilter] = useState('7')
   let [sortBy, setSortBy] = useState('Sắp xếp theo ngày')
   let [searchQuery, setSearchQuery] = useState('')
 
   const [assignments, setAssignments] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
 
   useEffect(() => {
     const fetchAssignments = async () => {
       const urlParams = new URLSearchParams();
       const date = new Date();
-      urlParams.append('day', timeFilter);
+      // urlParams.append('day', timeFilter);
       urlParams.append('month', (date.getMonth() + 1).toString());
       urlParams.append('year', date.getFullYear().toString());
-      const url = `/assignments/get-by-next-x-day?${urlParams.toString()}`;
+      const url = `/dashboard/get-by-month-year?${urlParams.toString()}`;
       await axiosPrivate.get(`${url}`)
         .then((res) => {
-          setAssignments(res.data.data);
-          console.log(res.data.data);
+          setAssignments(res.data.data.assignments);
+          setQuizzes(res.data.data.quizzes);
         })
         .catch((err) => {
-          console.log(err);
           toast(err.response.data.message, { type: 'error' });
         });
     }
@@ -65,6 +66,10 @@ export default function AssignmentControlPanel() {
 
       {assignments.map((assignment) => (
         <SubmissionHeader courseID={assignment.courseId} key={assignment.id} id={assignment.id} title={`${assignment.courseName} - ${assignment.title}`} startDate={assignment.startDate} endDate={assignment.endDate} />
+      ))}
+
+      {quizzes.map((quiz) => (
+        <QuizzHeader courseID={quiz.courseId} key={quiz.id} id={quiz.id} title={`${quiz.courseName} - ${quiz.title}`} startDate={quiz.startDate} endDate={quiz.endDate} />
       ))}
 
     </div>

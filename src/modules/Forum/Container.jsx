@@ -46,7 +46,7 @@ const Container = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 h-full focus:outline-none" tabIndex={-1}>
       {forumId ? (
         <button
           className="py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
@@ -55,15 +55,15 @@ const Container = () => {
           {t("forum.create_topic")}
         </button>
       ) : (
-        <p className="text-lg text-center text-slate-600 font-semibold p-1">
+        <div className="text-lg text-center text-slate-600 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
           {t("forum.please_select_forum")}
-        </p>
+        </div>
       )}
 
       {loading ? (
         <div className="text-center text-slate-500 mt-4">{t("loading")}...</div>
       ) : topics.length > 0 && forumId ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6 overflow-y-auto">
           {topics.map((topic) => (
             <Topic
               key={topic.id}
@@ -84,14 +84,17 @@ const Container = () => {
 
       {/* Popup Create Topic */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-30">
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-30"
+        >
           <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] max-w-xl h-[405px]">
-            <h2 className="text-lg font-semibold mb-2">{t("forum.new_topic_title")}</h2>
+            <h2 className="text-lg text-slate-600 font-semibold mb-2">{t("forum.new_topic_title")}</h2>
             <textarea
-              className="w-full h-[300px] border p-2 rounded-md"
+              className="w-full h-[300px] border border-slate-300 focus:border-slate-400 outline-none p-2 rounded-md text-slate-600"
               placeholder={t("forum.new_topic_placeholder")}
               value={newTopic}
               onChange={(e) => setNewTopic(e.target.value)}
+              autoFocus
             />
             <div className="flex justify-end gap-2">
               <button

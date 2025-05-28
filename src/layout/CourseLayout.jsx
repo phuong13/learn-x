@@ -39,7 +39,7 @@ export default function CoursePageLayout() {
         t('tabs.scores')
     ];
     const inputClassName =
-        'mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm';
+        'mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm';
     const [newCategory, setNewCategory] = useState('');
     const handleCategoryChange = (e) => {
         setCategory(e.target.value);
@@ -122,21 +122,21 @@ export default function CoursePageLayout() {
             case 0:
                 return (
                     <div className="p-4">
-                        <div className="text-xl font-bold mb-2">{t('course_content')}</div>
+                        <div className="text-xl font-bold mb-2 text-slate-700">{t('course_content')}</div>
                         <CourseContent />
                     </div>
                 );
             case 1:
                 return (
                     <div className="p-4">
-                        <div className="text-xl font-bold mb-2">{t('student_list')}</div>
+                        <div className="text-xl font-bold mb-2 text-slate-700">{t('student_list')}</div>
                         <StudentRegisteredLayout />
                     </div>
                 );
             case 2:
                 return (
                     <div className="p-4">
-                        <div className="text-xl font-bold mb-2">{t('grades')}</div>
+                        <div className="text-xl font-bold mb-2 text-slate-700">{t('grades')}</div>
                         {authUser.role === 'TEACHER' && <CourseGradeChart courseId={courseId} />}
                         {authUser.role === 'STUDENT' && <GradeTable courseId={courseId} />}
                     </div>
@@ -185,7 +185,7 @@ export default function CoursePageLayout() {
     };
 
     return (
-        <div className="bg-gray-100 min-h-[calc(100vh-193px)]">
+        <div className="bg-slate-100 min-h-[calc(100vh-193px)] flex flex-col">
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
                     src={course?.thumbnail}
@@ -202,7 +202,7 @@ export default function CoursePageLayout() {
                                     </a>
                                 </li>
                                 <li>
-                                    <span className="mx-2 text-gray-300">/</span>
+                                    <span className="mx-2 text-slate-300">/</span>
                                 </li>
                                 <li>
                                     <a href="/my-course" className="text-white hover:underline">
@@ -210,9 +210,9 @@ export default function CoursePageLayout() {
                                     </a>
                                 </li>
                                 <li>
-                                    <span className="mx-2 text-gray-300">/</span>
+                                    <span className="mx-2 text-slate-300">/</span>
                                 </li>
-                                <li className="text-gray-200">{course?.name || 'Đang tải...'}</li>
+                                <li className="text-slate-200">{course?.name || 'Đang tải...'}</li>
                             </ol>
                         </nav>
                     </div>
@@ -247,7 +247,7 @@ export default function CoursePageLayout() {
                         <li key={index} >
                             <button
                                 onClick={() => setSelectedTab(index)}
-                                className={`block px-4 py-2 text-sm font-semibold ${selectedTab === index ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'
+                                className={`block px-4 py-2 text-sm font-semibold ${selectedTab === index ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600'
                                     }`}>
                                 {item}
                             </button>
@@ -256,7 +256,7 @@ export default function CoursePageLayout() {
                 </ul>
             </nav>
 
-            <div className="my-4 px-4 mx-4 bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="my-4 px-4 mx-4 bg-white rounded-lg shadow-lg overflow-hidden flex-1">
                 {renderContentForTab()}
             </div>
 
@@ -290,12 +290,12 @@ export default function CoursePageLayout() {
                         onSubmit={handleSaveCourseInfo}
                         className="bg-white shadow-xl rounded-lg w-full mx-96 max-h-[80vh] overflow-y-auto">
                         <div className="px-6 py-8">
-                            <div className="text-2xl font-bold text-center text-gray-800 mb-8">
+                            <div className="text-2xl font-bold text-center text-slate-800 mb-8">
                                 Chỉnh sửa thông tin khóa học
                             </div>
                             <div className="space-y-6">
                                 <div>
-                                    <label htmlFor="category" className="block text-sm font-bold text-gray-700 mb-1">
+                                    <label htmlFor="category" className="block text-sm font-bold text-slate-700 mb-1">
                                         Danh mục
                                     </label>
                                     <select
@@ -318,7 +318,7 @@ export default function CoursePageLayout() {
                                     <div>
                                         <label
                                             htmlFor="newCategory"
-                                            className="block text-sm font-bold text-gray-700 mb-1">
+                                            className="block text-sm font-bold text-slate-700 mb-1">
                                             Tên danh mục mới
                                         </label>
                                         <input
@@ -335,7 +335,7 @@ export default function CoursePageLayout() {
                                 <div>
                                     <label
                                         htmlFor="courseName"
-                                        className="block text-sm font-bold text-gray-700 mb-1">
+                                        className="block text-sm font-bold text-slate-700 mb-1">
                                         Tên khóa học
                                     </label>
                                     <input
@@ -353,7 +353,7 @@ export default function CoursePageLayout() {
                                 <div>
                                     <label
                                         htmlFor="description"
-                                        className="block text-sm font-bold text-gray-700 mb-1">
+                                        className="block text-sm font-bold text-slate-700 mb-1">
                                         Mô tả
                                     </label>
                                     <textarea
@@ -368,11 +368,11 @@ export default function CoursePageLayout() {
                                 </div>
 
                                 <div>
-                                    <label htmlFor="startDate" className="block text-sm font-bold text-gray-700 mb-1">
+                                    <label htmlFor="startDate" className="block text-sm font-bold text-slate-700 mb-1">
                                         Ngày bắt đầu
                                     </label>
                                     <div
-                                        className="mt-1 relative w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        className="mt-1 relative w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                         onClick={() => datePickerRef.current.setOpen(true)}>
                                         <DatePicker
                                             id="startDate"
@@ -384,13 +384,13 @@ export default function CoursePageLayout() {
                                             ref={datePickerRef}
                                         />
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                            <CalendarIcon className="h-5 w-5 text-slate-400" />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label htmlFor="state" className="block text-sm font-bold text-gray-700 mb-1">
+                                    <label htmlFor="state" className="block text-sm font-bold text-slate-700 mb-1">
                                         Trạng thái
                                     </label>
                                     <select id="state" name="state" defaultValue="OPEN" className={inputClassName}>
@@ -400,7 +400,7 @@ export default function CoursePageLayout() {
                                 </div>
 
                                 <div>
-                                    <label htmlFor="thumbnail" className="block text-sm font-bold text-gray-700 mb-1">
+                                    <label htmlFor="thumbnail" className="block text-sm font-bold text-slate-700 mb-1">
                                         Ảnh nền
                                     </label>
                                     <input
