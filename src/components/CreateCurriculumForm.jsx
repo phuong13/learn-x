@@ -1,689 +1,435 @@
-import { useState, useRef, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import { List, FileText, Edit2, Edit3, Trash2, Plus, Check, X, Upload, Calendar } from 'lucide-react';
-import RichTextEditor from './RichTextEditor';
-import { axiosPrivate } from '@/axios/axios.js';
-import { toast } from 'react-toastify';
-import PropTypes from 'prop-types';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import EditQuizModal from './EditQuizModal';
-
-export default function Curriculum({ onSubmitSuccess }) {
-    const [sections, setSections] = useState([]);
-    const inputRef = useRef(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [quizEditing, setQuizEditing] = useState({ sectionId: null, itemId: null });
-
-    const handlePostModule = async (sectionId) => {
-        setIsConfirmDialogOpen(true);
-        setConfirmingSectionId(sectionId);
-    };
-
-    const handleQuizSubmit = (quizData, questions) => {
-        setSections(prev =>
-            prev.map(section =>
-                section.id === quizEditing.sectionId
-                    ? {
-                        ...section,
-                        items: section.items.map(item =>
-                            item.id === quizEditing.itemId
-                                ? {
-                                    ...item,
-                                    // gán tất cả fields backend cần
-                                    title: quizData.title,
-                                    description: quizData.description,
-                                    startDate: convertUTCToLocal(quizData.startDate).toISOString(),
-                                    endDate: convertUTCToLocal(quizData.endDate).toISOString(),
-                                    attemptLimit: quizData.attemptLimit,
-                                    timeLimit: quizData.timeLimit,
-                                    shuffled: quizData.shuffled,
-                                    questions,      // mảng câu hỏi UI (chứa type, answers,…)
-                                }
-                                : item
-                        ),
-                    }
-                    : section
-            )
-        );
-        setIsModalOpen(false);
-    };
+import React, { useState, useEffect } from 'react';
+import {
+   Box, Button, Typography, Grid, Card, CardActionArea,
+   CardContent, TextField, IconButton
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import QuizIcon from '@mui/icons-material/Quiz';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FormQuiz from './FormQuiz';
+import FormLecture from './FormLecture';
+import FormAssignment from './FormAssignment';
+import FormResource from './FormResource';
+import Tag from './Tag';
+import { useSubmitModules } from '../store/useModule';
+import { useParams } from 'react-router-dom';
+import { Quiz } from '@mui/icons-material';
 
 
-    let moduleId;
+export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [] }) {
+   const [modules, setModules] = useState([]);
+   const [quizDialog, setQuizDialog] = useState({ open: false, moduleId: null, editData: null });
+   const [lectureDialog, setLectureDialog] = useState({ open: false, moduleId: null, editData: null });
+   const [assignmentDialog, setAssignmentDialog] = useState({ open: false, moduleId: null, editData: null });
+   const [resourceDialog, setResourceDialog] = useState({ open: false, moduleId: null, editData: null });
+   const { submitModules } = useSubmitModules();
+   const [errors, setErrors] = useState({});
 
-    const confirmAndPostModule = async () => {
-        setIsConfirmDialogOpen(false);
-        const sectionId = confirmingSectionId;
-        const section = sections.find((section) => section.id === sectionId);
+   const { courseId: courseIdParam } = useParams();
 
-        const courseInfo = localStorage.getItem('courseInfo');
-        const { id: courseId } = JSON.parse(courseInfo);
+   const validateForm = () => {
+      const newErrors = {};
+      modules.forEach((mod, index) => {
+         if (!mod.title.trim()) {
+            newErrors[mod.id] = 'Tên chương không được bỏ trống';
+         }
+      }); setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+   };
+   useEffect(() => {
+      setModules(initialModules);
+   }, [initialModules]);
 
-        const moduleData = {
-            courseId: courseId,
-            name: section.title,
-        };
-        const response = await axiosPrivate.post(`/modules`, moduleData);
-        if (response.status === 200) {
-            toast(response.data.message, {});
-            moduleId = response.data.data.id;
-            console.log(response);
-            await Promise.all(
-                section.items.map(async (item) => {
-                    switch (item.type) {
-                        case 'lecture': {
-                            let lectureData = {
-                                moduleId,
-                                title: item.title,
-                                content: item.content,
-                            };
-                            console.log(lectureData);
-                            await axiosPrivate
-                                .post(`/lectures`, lectureData)
-                                .then((r) => {
-                                    console.log(r);
-                                    // toast(r.data.message);
-                                })
-                                .catch((e) => {
-                                    console.error(e.response.message);
-                                    toast(e.response.data.message);
-                                });
-                            break;
-                        }
-                        case 'quiz': {
-                            try {
-                                // Tạo quiz trước, lấy quizId
-                                const quizPayload = {
-                                    title: item.title,
-                                    description: item.description || '',
-                                    startDate: convertUTCToLocal(item.startDate).toISOString(),
-                                    endDate: convertUTCToLocal(item.endDate).toISOString(),
-                                    attemptLimit: Number(item.attemptLimit || 1),
-                                    timeLimit: Number(item.timeLimit || 0),
-                                    shuffled: item.shuffled || false,
-                                    moduleId: moduleId,
-                                };
+   const handleAddChapter = () => {
+      const newModule = {
+         id: `temp-${Date.now()}`,
+         title: '',
+         contents: [],
+      };
+      setModules([...modules, newModule]);
+   };
 
-                                const quizRes = await axiosPrivate.post('/quizzes', quizPayload);
-                                const quizId = quizRes.data.data.id;
+   const handleTitleChange = (id, newTitle) => {
+      setModules(prev =>
+         prev.map(mod =>
+            mod.id === id ? { ...mod, title: newTitle } : mod
+         )
+      );
+   };
 
-                                // Duyệt câu hỏi trong quiz
-                                await Promise.all(item.questions.map(async (q) => {
+   const handleRemoveModule = (id) => {
+      setModules(prev => prev.filter(mod => mod.id !== id));
+   };
 
-                                    if (q.type === 'single') {
-                                        const questionSCQPayload = {
-                                            content: q.content || '',
-                                            quizId: quizId,
-                                            options: q.options,
-                                            answer: q.answer
-                                        };
-                                        await axiosPrivate.post('/question-quizzes/scq', questionSCQPayload);
-                                    } else if (q.type === 'multiple') {
-                                        const questionMCQPayload = {
-                                            content: q.content || '',
-                                            quizId: quizId,
-                                            options: q.options,
-                                            answers: q.answer
-                                        };
-                                        await axiosPrivate.post('/question-quizzes/mcq', questionMCQPayload);
-                                    }
-                                }));
+   const handleOptionSelect = (moduleId, type) => {
+      if (type === 'quiz') {
+         setQuizDialog({ open: true, moduleId, editData: null });
+      } else if (type === 'lecture') {
+         setLectureDialog({ open: true, moduleId, editData: null });
+      } else if (type === 'assignment') {
+         setAssignmentDialog({ open: true, moduleId, editData: null });
+      }
+      else if (type === 'resource') {
+         setResourceDialog({ open: true, moduleId, editData: null });
+      }
 
-                                toast('Tạo quiz thành công');
-                            } catch (e) {
-                                console.error(e.response?.data?.message || e.message);
-                                toast(e.response?.data?.message || 'Lỗi tạo quiz');
-                            }
-                            break;
-                        }
+   };
 
-                        case 'assignment': {
-                            let utcStartDate = convertUTCToLocal(item.startDate);
-                            let utcEndDate = convertUTCToLocal(item.endDate);
-                            let assignmentData = {
-                                title: item.title,
-                                content: itemContents[item.id] || item.content,
-                                startDate: utcStartDate.toISOString(),
-                                endDate: utcEndDate.toISOString(),
-                                state: 'OPEN',
-                                moduleId: moduleId,
-                            };
-                            let formData = new FormData();
-                            formData.append(
-                                'assignment',
-                                new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }),
-                            );
-                            if (files[`${sectionId}-${item.id}`]) {
-                                formData.append('document', files[`${sectionId}-${item.id}`]);
-                            }
-                            console.log(formData);
-                            await axiosPrivate
-                                .post(`/assignments`, formData, {
-                                    headers: { 'Content-Type': 'multipart/form-data' },
-                                })
-                                .then((r) => {
-                                    console.log(r);
-                                    // toast(r.data.message);
-                                })
-                                .catch((e) => {
-                                    console.error(e.response.message);
-                                    toast(e.response.data.message);
-                                });
 
-                            break;
-                        }
-                        case 'resource': {
-                            let resources = {
-                                title: item.title,
-                                moduleId: moduleId,
-                            };
-                            let formData = new FormData();
-                            formData.append(
-                                'resources',
-                                new Blob([JSON.stringify(resources)], { type: 'application/json' }),
-                            );
-                            if (files[`${sectionId}-${item.id}`]) {
-                                formData.append('document', files[`${sectionId}-${item.id}`]);
-                            }
-                            console.log(formData);
-                            await axiosPrivate
-                                .post(`/resources`, formData, {
-                                    headers: { 'Content-Type': 'multipart/form-data' },
-                                })
-                                .then((r) => {
-                                    console.log(r);
-                                    // toast(r.data.message);
-                                })
-                                .catch((e) => {
-                                    console.error(e.response.data.message);
-                                    toast(e.response.data.message);
-                                });
+   const handleRemoveContent = (moduleId, contentId) => {
+      setModules(prev =>
+         prev.map(mod =>
+            mod.id === moduleId
+               ? { ...mod, contents: mod.contents.filter(c => c.id !== contentId) }
+               : mod
+         )
+      );
+   };
 
-                            break;
-                        }
-                    }
-                }),
-            );
-            // Mark this section as saved
-            setSavedSections((prev) => ({ ...prev, [sectionId]: true }));
-        }
-    };
+   const handleEditContent = (moduleId, item) => {
+      if (item.type === 'quiz') {
+         setQuizDialog({ open: true, moduleId, editData: item });
+      } else if (item.type === 'lecture') {
+         setLectureDialog({ open: true, moduleId, editData: item });
+      }
+      else if (item.type === 'resource') {
+         setResourceDialog({ open: true, moduleId, editData: item });
+      }
+      else if (item.type === 'assignment') {
+         setAssignmentDialog({ open: true, moduleId, editData: item });
+      }
+   };
 
-    const [editingSectionId, setEditingSectionId] = useState(null);
-    const [editingItemId, setEditingItemId] = useState(null);
-    const [tempTitle, setTempTitle] = useState('');
 
-    const [itemContents, setItemContents] = useState({});
-    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-    const [confirmingSectionId, setConfirmingSectionId] = useState(null);
-    const [savedSections, setSavedSections] = useState({});
+   const handleAddQuiz = (moduleId, quizData, questionData) => {
+      setModules(prev =>
+         prev.map(mod =>
+            mod.id === moduleId
+               ? {
+                  ...mod,
+                  contents: mod.contents.some(c => c.id === quizData.id)
+                     ? mod.contents.map(c =>
+                        c.id === quizData.id
+                           ? { ...quizData, type: 'quiz', questions: questionData }
+                           : c
+                     )
+                     : [
+                        ...mod.contents,
+                        {
+                           ...quizData,
+                           type: 'quiz',
+                           id: `temp-${Date.now()}`,
+                           questions: questionData,
+                        },
+                     ],
+               }
+               : mod
+         )
+      );
+      setQuizDialog({ open: false, moduleId: null, editData: null });
+   };
 
-    useEffect(() => {
-        localStorage.setItem('sections', JSON.stringify(sections));
-    }, [sections]);
 
-    const handleDateChange = (sectionId, itemId, field, date) => {
-        const now = new Date();
-        const section = sections.find((section) => section.id === sectionId);
-        const item = section.items.find((item) => item.id === itemId);
+   const handleAddLecture = (moduleId, lectureData) => {
+      setModules(prev =>
+         prev.map(mod =>
+            mod.id === moduleId
+               ? {
+                  ...mod,
+                  contents: mod.contents.some(c => c.id === lectureData.id)
+                     ? mod.contents.map(c =>
+                        c.id === lectureData.id
+                           ? { ...lectureData, type: 'lecture' }
+                           : c
+                     )
+                     : [
+                        ...mod.contents,
+                        {
+                           ...lectureData,
+                           id: `temp-${Date.now()}`,
+                           type: 'lecture',
+                        },
+                     ],
+               }
+               : mod
+         )
+      );
+      setLectureDialog({ open: false, moduleId: null, editData: null });
+   };
 
-        // Kiểm tra điều kiện validate
-        if (field === 'startDate') {
-            if (date <= now) {
-                toast('Ngày giờ bắt đầu phải sau giờ hiện tại!', { type: 'error' });
-                return false;
+   const handleAddResource = (moduleId, resourceData) => {
+      let parsedResource = {};
+
+      if (resourceData instanceof FormData) {
+         const resourceJson = resourceData.get('resources');
+         try {
+            parsedResource = JSON.parse(resourceJson);
+         } catch (err) {
+            console.error('Không thể parse resource data:', err);
+         }
+      } else {
+         parsedResource = resourceData;
+      }
+
+      const newResource = {
+         ...parsedResource,
+         resourceData,
+         id: `temp-${Date.now()}`,
+         type: 'resource',
+      };
+
+      setModules(prev =>
+         prev.map(mod =>
+            mod.id === moduleId
+               ? {
+                  ...mod,
+                  contents: [...mod.contents, newResource],
+               }
+               : mod
+         )
+      );
+
+      setResourceDialog({ open: false, moduleId: null, editData: null });
+   };
+
+
+   const handleAddAssignment = (moduleId, assignmentData) => {
+      let parsedAssignment = {};
+
+      if (assignmentData instanceof FormData) {
+         const assignmentJson = assignmentData.get('assignment');
+         try {
+            parsedAssignment = JSON.parse(assignmentJson);
+         } catch (err) {
+            console.error('Không thể parse assignment data:', err);
+            return;
+         }
+      } else {
+         parsedAssignment = assignmentData;
+      }
+
+      const updatedAssignment = {
+         ...parsedAssignment,
+         assignmentData,
+         type: 'assignment',
+         id: parsedAssignment.id || `temp-${Date.now()}`
+      };
+
+      setModules(prev =>
+         prev.map(mod => {
+            if (mod.id !== moduleId) return mod;
+
+            const exists = mod.contents.some(c => c.id === updatedAssignment.id);
+
+            const updatedContents = exists
+               ? mod.contents.map(c =>
+                  c.id === updatedAssignment.id ? updatedAssignment : c
+               )
+               : [...mod.contents, updatedAssignment];
+
+            return {
+               ...mod,
+               contents: updatedContents,
+            };
+         })
+      );
+
+      setAssignmentDialog({ open: false, moduleId: null, editData: null });
+   };
+
+
+
+
+
+   const handleDone = async () => {
+      const isValid = validateForm();
+      if (!isValid) return;
+      const courseInfo = JSON.parse(localStorage.getItem('courseInfo') || '{}');
+      const courseId = courseInfo.id ?? courseIdParam;
+
+      if (!courseId) {
+         console.error('Course ID is missing');
+         return;
+      }
+
+      const result = await submitModules(modules, courseId);
+      if (result.success && onSubmitSuccess) {
+         onSubmitSuccess();
+      }
+   };
+
+
+   return (
+      <Box display="flex" flexDirection="column" gap={2} sx={{ mx: 'auto', width: '100%' }}>
+         <div className='ml-4 flex flex-col gap-2'>
+            {isEdit
+               ? <Typography variant="h6" fontWeight="bold">Chỉnh sửa nội dung khoá học</Typography>
+               : <Typography variant="h6" fontWeight="bold">Tạo nội dung khoá học</Typography>
             }
-        }
+            {/* <Typography color="text.secondary">Tạo nội dung cho khoá học của bạn</Typography> */}
 
-        if (field === 'endDate') {
-            if (!item.startDate) {
-                toast('Vui lòng chọn ngày bắt đầu trước!', { type: 'error' });
-                return false;
-            }
+            <Button startIcon={<AddIcon />} variant="outlined" onClick={handleAddChapter} sx={{ width: 'fit-content' }}>
+               Thêm chương
+            </Button>
+         </div>
 
-            if (date <= new Date(item.startDate)) {
-                toast('Ngày giờ kết thúc phải sau ngày bắt đầu!', { type: 'error' });
-                return false;
-            }
-        }
 
-        // Cập nhật state nếu các điều kiện hợp lệ
-        const utcDate = new Date(date.getTime());
-        setSections(
-            sections.map((section) =>
-                section.id === sectionId
-                    ? {
-                        ...section,
-                        items: section.items.map((item) =>
-                            item.id === itemId ? { ...item, [field]: utcDate.toISOString() } : item,
-                        ),
-                    }
-                    : section,
-            ),
-        );
-    };
+         {modules.map((module) => (
+            <Box
+               key={module.id}
+               sx={{
+                  border: '1px solid #ccc',
+                  borderRadius: 2,
+                  p: 2,
+                  mx: '64px',
+                  maxWidth: '100%',
+                  bgcolor: '#f9f9f9',
+                  position: 'relative',
+               }}
+            >
+               <Box display="flex" alignItems="center" gap={2} mb={2}>
+                  <TextField
+                     fullWidth
+                     label="Tên chương"
+                     value={module.title}
+                     onChange={(e) => handleTitleChange(module.id, e.target.value)}
+                     error={!!errors[module.id]}
+                     helperText={errors[module.id]}
+                  />
 
-    const handleKeyDown = (event, saveFunction) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            saveFunction();
-        }
-    };
+                  <IconButton color="error" onClick={() => handleRemoveModule(module.id)}>
+                     <DeleteIcon />
+                  </IconButton>
+               </Box>
 
-    useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-            inputRef.current.select();
-        }
-    }, [editingItemId, editingSectionId]);
+               {module.contents.length > 0 && (
+                  <Box mt={2}>
+                     <Typography fontWeight="bold">Nội dung đã thêm:</Typography>
+                     <Box display="flex" flexWrap="wrap" gap={1}>
+                        {module.contents.map((item) => (
+                           <Tag
+                              key={item.id}
+                              icon={item.type === 'quiz' ? QuizIcon : item.type === 'lecture' ? MenuBookIcon : item.type === 'assignment' ? AssignmentIcon : InsertDriveFileIcon}
+                              label={
+                                 item.type === 'quiz'
+                                    ? `Quiz: ${item.title || 'Không có tiêu đề'}`
+                                    : item.type === 'lecture'
+                                       ? `Lecture: ${item.title || 'Không có tiêu đề'}`
+                                       : item.type === 'assignment'
+                                          ? `Assignment: ${item.title || 'Không có tiêu đề'}`
+                                          : item.type === 'resource'
+                                             ? `Resource: ${item.title || 'Không có tiêu đề'}`
+                                             : ''
 
-    const convertUTCToLocal = (dateString) => {
-        const date = new Date(dateString);
-        return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-    };
-
-    const addSection = () => {
-        const newSection = {
-            id: Date.now().toString(),
-            title: 'New Section',
-            items: [],
-        };
-        setSections([...sections, newSection]);
-    };
-
-    const addItem = (sectionId, type) => {
-        const newItem = {
-            id: Date.now().toString(),
-            type,
-            title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-        };
-        setSections(
-            sections.map((section) =>
-                section.id === sectionId ? { ...section, items: [...section.items, newItem] } : section,
-            ),
-        );
-    };
-
-    const deleteItem = (sectionId, itemId) => {
-        setSections(
-            sections.map((section) =>
-                section.id === sectionId
-                    ? { ...section, items: section.items.filter((item) => item.id !== itemId) }
-                    : section,
-            ),
-        );
-    };
-
-    const deleteSection = (sectionId) => {
-        setSections(sections.filter((section) => section.id !== sectionId));
-    };
-
-    const startEditingSection = (sectionId, currentTitle) => {
-        setEditingSectionId(sectionId);
-        setTempTitle(currentTitle);
-    };
-
-    const startEditingItem = (itemId, currentTitle, currentContent) => {
-        setEditingItemId(itemId);
-        setTempTitle(currentTitle);
-        setItemContents((prevContents) => ({
-            ...prevContents,
-            [itemId]: currentContent || '',
-        }));
-    };
-
-    const saveSection = () => {
-        setSections(
-            sections.map((section) => (section.id === editingSectionId ? { ...section, title: tempTitle } : section)),
-        );
-        setEditingSectionId(null);
-        setTempTitle('');
-    };
-
-    const saveItem = (sectionId) => {
-        setSections((prevSections) => {
-            const updatedSections = prevSections.map((section) =>
-                section.id === sectionId
-                    ? {
-                        ...section,
-                        items: section.items.map((item) =>
-                            item.id === editingItemId
-                                ? { ...item, title: tempTitle, content: itemContents[editingItemId] }
-                                : item,
-                        ),
-                    }
-                    : section,
-            );
-            localStorage.setItem('sections', JSON.stringify(updatedSections));
-            return updatedSections;
-        });
-        setEditingItemId(null);
-        setTempTitle('');
-    };
-
-    const [files, setFiles] = useState({});
-    const handleFileUpload = (sectionId, itemId, event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const fileName = file.name;
-            setSections(
-                sections.map((section) =>
-                    section.id === sectionId
-                        ? {
-                            ...section,
-                            items: section.items.map((item) =>
-                                item.id === itemId ? { ...item, title: fileName } : item,
-                            ),
-                        }
-                        : section,
-                ),
-            );
-            setFiles((prevFiles) => ({
-                ...prevFiles,
-                [`${sectionId}-${itemId}`]: file,
-            }));
-        }
-    };
-
-    return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <div className="mr-8 border rounded-lg p-6 bg-white shadow-md">
-                <div className="flex justify-between items-center mb-6">
-                    <div className="text-xl font-bold flex items-center ">
-                        <List className="mr-2" />
-                        Thêm nội dung khóa học
-                    </div>
-                    <button
-                        onClick={addSection}
-                        className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                        Thêm chương mới
-                    </button>
-                </div>
-
-                {sections.map((section) => (
-                    <div key={section.id}
-                        className="mb-4 border border-slate-400 p-4 rounded-lg bg-slate-50">
-                        <div className="flex justify-between items-center mb-2">
-                            {editingSectionId === section.id ? (
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="text"
-                                        value={tempTitle || ''}
-                                        onChange={(e) => setTempTitle(e.target.value)}
-                                        className="border border-slate-300 p-1 rounded-md"
-                                        onKeyDown={(e) => handleKeyDown(e, saveSection)}
-                                        ref={inputRef}
-                                    />
-                                    <button onClick={saveSection}
-                                    >
-                                        <Check size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => setEditingSectionId(null)}
-                                    >
-                                        <X size={18} />
-                                    </button>
-                                </div>
-                            ) : (
-                                <h2 className="text-lg font-semibold flex items-center">
-                                    <List className="mr-2" /> {section.title}
-                                </h2>
-                            )}
-
-                            {!savedSections[section.id] && (
-                                <div>
-                                    <button
-                                        onClick={() => startEditingSection(section.id, section.title)}
-                                        className="p-1 text-green-500 hover:text-green-700 rounded-full mr-2"
-                                    >
-                                        <Edit3 size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => deleteSection(section.id)}
-                                        className="p-1  text-green-500 hover:text-green-700 rounded-full mr-2"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {section.items.map((item) => (
-                            <div key={item.id}
-                                className="bg-slate-200 p-3 mb-2 rounded flex flex-col group relative">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        {item.type === 'lecture' && (
-                                            <FileText className="mr-2 text-blue-500" size={18} />
-                                        )}
-                                        {item.type === 'quiz' && <List className="mr-2 text-[#25764a]" size={18} />}
-                                        {item.type === 'assignment' && (
-                                            <FileText className="mr-2 text-[#CD4F2E]" size={18} />
-                                        )}
-                                        {item.type === 'resource' ? (
-                                            <div className="flex items-center">
-                                                <Upload className="mr-2 text-[#CD4F2E]" size={18} />
-                                                {editingItemId === item.id ? (
-                                                    <input
-                                                        type="text"
-                                                        value={tempTitle}
-                                                        onChange={(e) => setTempTitle(e.target.value)}
-                                                        className="ml-0 border border-gray-300 p-1 rounded"
-                                                        ref={inputRef}
-                                                    />
-                                                ) : (
-                                                    <span className={'p-0 ml-0'}>{item.title}</span>
-                                                )}
-                                                <input
-                                                    type="file"
-                                                    onChange={(e) => handleFileUpload(section.id, item.id, e)}
-                                                    className="hidden"
-                                                    id={`upload-${item.id}`}
-                                                />
-                                                {!savedSections[section.id] && (
-                                                    <button
-                                                        onClick={() =>
-                                                            document.getElementById(`upload-${item.id}`).click()
-                                                        }
-                                                        className="text-blue-500 hover:text-blue-700 hidden group-hover:flex items-center">
-                                                        <Plus size={20} className="absolute right-8 " />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ) : editingItemId === item.id ? (
-                                            <input
-                                                type="text"
-                                                value={tempTitle}
-                                                onChange={(e) => setTempTitle(e.target.value)}
-                                                className="border border-gray-300 p-1 rounded"
-                                                onKeyDown={(e) => handleKeyDown(e, () => saveItem(section.id))}
-                                                ref={inputRef}
-                                            />
-                                        ) : (
-                                            <span className="ml-0">{item.title}</span>
-                                        )}
-                                    </div>
-                                    {!savedSections[section.id] && (
-                                        <div className="hidden group-hover:flex space-x-2">
-                                            {item.type !== 'resource' && (
-                                                <button
-                                                    onClick={() => startEditingItem(item.id, item.title)}
-                                                    className="text-gray-500 hover:text-gray-700">
-                                                    <Edit2 size={16} />
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => deleteItem(section.id, item.id)}
-                                                className="text-gray-500 hover:text-gray-700">
-                                                <Trash2 size={16} />
-                                            </button>
-
-                                            {editingItemId === item.id && (
-                                                <button
-                                                    onClick={() => saveItem(section.id)}
-                                                    className="text-green-500 hover:text-green-700">
-                                                    <Check size={18} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {item.type === 'lecture' && editingItemId === item.id && (
-                                    <div className="mt-4">
-                                        <RichTextEditor
-                                            initialContent={itemContents[item.id] || item.content || ''}
-                                            onContentChange={(content) =>
-                                                setItemContents((prevContents) => ({
-                                                    ...prevContents,
-                                                    [item.id]: content,
-                                                }))
-                                            }
-                                        />
-                                    </div>
-                                )}
-
-                                {item.type === 'assignment' && editingItemId === item.id && (
-                                    <div className="mt-4">
-                                        <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày và giờ bắt đầu</p>
-                                            <DateTimePicker
-                                                className="w-full rounded-xl bg-white"
-                                                value={item.startDate ? new Date(item.startDate) : null}
-                                                onChange={(date) => handleDateChange(section.id, item.id, 'startDate', date)}
-                                                ampm={false}
-                                            />
-
-                                        </div>
-
-                                        <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Ngày và giờ kết thúc</p>
-                                            <DateTimePicker
-                                                className="w-full rounded-xl bg-white"
-                                                value={item.endDate ? new Date(item.endDate) : null}
-                                                onChange={(date) => handleDateChange(section.id, item.id, 'endDate', date)}
-                                                ampm={false}
-                                            />
-                                        </div>
-
-                                        <div className="block text-sm font-medium text-gray-700 mb-1">
-                                            <p>Nội dung</p>
-                                        </div>
-                                        <RichTextEditor
-                                            initialContent={itemContents[item.id] || item.content || ''}
-                                            onContentChange={(content) =>
-                                                setItemContents((prevContents) => ({
-                                                    ...prevContents,
-                                                    [item.id]: content,
-                                                }))
-                                            }
-                                        />
-                                    </div>
-                                )}
-                            </div>
+                              }
+                              onRemove={() => handleRemoveContent(module.id, item.id)}
+                              onEdit={() => handleEditContent(module.id, item)}
+                           />
                         ))}
+                     </Box>
+                  </Box>
+               )}
 
-                        {!savedSections[section.id] && (
-                            <div className="bg-primaryDark rounded-lg grid grid-cols-5 divide-x-2 gap-4 mt-2 mx-64">
-                                <button
-                                    onClick={() => addItem(section.id, 'lecture')}
-                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
-                                >
-                                    Lecture <Plus size={18} className="ml-1" />
-                                </button>
+               <Grid container spacing={2} mt={1}>
+                  <Grid item xs={6} md={3}>
+                     <Card onClick={() => handleOptionSelect(module.id, 'lecture')}>
+                        <CardActionArea>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
+                              <MenuBookIcon fontSize="large" color="primary" />
+                              <Typography variant="subtitle2">Lecture</Typography>
+                           </CardContent>
+                        </CardActionArea>
+                     </Card>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                     <Card onClick={() => handleOptionSelect(module.id, 'quiz')}>
+                        <CardActionArea>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
+                              <QuizIcon fontSize="large" color="primary" />
+                              <Typography variant="subtitle2">Quiz</Typography>
+                           </CardContent>
+                        </CardActionArea>
+                     </Card>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                     <Card onClick={() => handleOptionSelect(module.id, 'assignment')}>
+                        <CardActionArea>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
+                              <AssignmentIcon fontSize="large" color="primary" />
+                              <Typography variant="subtitle2">Assignment</Typography>
+                           </CardContent>
+                        </CardActionArea>
+                     </Card>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                     <Card onClick={() => handleOptionSelect(module.id, 'resource')}>
+                        <CardActionArea>
+                           <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
+                              <InsertDriveFileIcon fontSize="large" color="primary" />
+                              <Typography variant="subtitle2">Resource</Typography>
+                           </CardContent>
+                        </CardActionArea>
+                     </Card>
+                  </Grid>
+               </Grid>
+            </Box>
+         ))}
 
-                                <button
-                                    onClick={() => {
-                                        const newItemId = Date.now().toString(); // hoặc chính item.id bạn mới tạo
-                                        setQuizEditing({ sectionId: section.id, itemId: newItemId });
-                                        addItem(section.id, 'quiz');
-                                        setIsModalOpen(true);
-                                    }}
-                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
-                                >
-                                    Quiz <Plus size={18} className="ml-1" />
-                                </button>
+         <FormQuiz
+            open={quizDialog.open}
+            onClose={() => setQuizDialog({ open: false, moduleId: null, editData: null })}
+            onSubmit={(quizData, questionData) =>
+               handleAddQuiz(quizDialog.moduleId, quizData, questionData)
+            }
+            isEdit={!!quizDialog.editData}
+            defaultData={quizDialog.editData}
+         />
+         <FormLecture
+            open={lectureDialog.open}
+            onClose={() => setLectureDialog({ open: false, moduleId: null, editData: null })}
+            onSubmit={(lectureData) =>
+               handleAddLecture(lectureDialog.moduleId, lectureDialog.editData
+                  ? { ...lectureDialog.editData, ...lectureData }
+                  : lectureData)
+            }
+            isEdit={!!lectureDialog.editData}
+            defaultData={lectureDialog.editData}
+         />
 
-                                <button
-                                    onClick={() => addItem(section.id, 'assignment')}
-                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
-                                >
-                                    Assignment <Plus size={18} className="ml-1" />
-                                </button>
+         <FormResource
+            open={resourceDialog.open}
+            onClose={() => setResourceDialog({ open: false, moduleId: null, editData: null })}
+            onSubmit={(resourceData) => {
+               handleAddResource(resourceDialog.moduleId, resourceDialog.editData
+                  ? { ...resourceDialog.editData, ...resourceData }
+                  : resourceData)
+            }}
+            isEdit={!!resourceDialog.editData}
+            defaultData={resourceDialog.editData}
+         />
 
-                                <button
-                                    onClick={() => addItem(section.id, 'resource')}
-                                    className="text-white flex items-center justify-center  rounded-md py-2 hover:bg-opacity-80 transition"
-                                >
-                                    Resource <Plus size={18} className="ml-1" />
-                                </button>
-
-                                <button
-                                    data-tooltip-id="my-tooltip"
-                                    data-tooltip-content="Kiểm tra kĩ thông tin trước khi lưu!"
-                                    onClick={() => handlePostModule(section.id)}
-                                    className="text-white hover:text-green-700 rounded-full flex items-center justify-center transition"
-                                >
-                                    <Check size={20} />
-                                </button>
-
-                            </div>
-                        )}
-
-                    </div>
-
-                ))}
-                <div className="flex justify-end">
-                    <button
-                        className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
-                        onClick={onSubmitSuccess}
-                    >
-                        Xong
-                    </button>
-                </div>
-
-
-            </div>
-            {isConfirmDialogOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded-lg">
-                        <h2 className="text-xl font-bold mb-4">Xác nhận lưu chương</h2>
-                        <p className="mb-4">
-                            Bạn có muốn lưu chương này? (Nội dung chương có thể thay đổi sau hành động này)
-                        </p>
-                        <div className="flex justify-end space-x-2">
-                            <button
-                                className="btn btn--secondary text-btn hover:bg-emerald-400"
-                                onClick={() => setIsConfirmDialogOpen(false)}>
-                                Không
-                            </button>
-                            <button className="btn btn--primary hover:bg-emerald-400" onClick={confirmAndPostModule}>
-                                Có
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {isModalOpen && (
-                <EditQuizModal
-                    open={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    initialData={
-                       {}
-                    }
-                    onSubmit={handleQuizSubmit}
-
-                />
-            )}
+         <FormAssignment
+            open={assignmentDialog.open}
+            onClose={() => setAssignmentDialog({ open: false, moduleId: null, editData: null })}
+            onSubmit={(assignmentData) =>
+               handleAddAssignment(assignmentDialog.moduleId, assignmentData)
+            }
+            isEdit={!!assignmentDialog.editData}
+            defaultData={assignmentDialog.editData}
+         />
 
 
-        </LocalizationProvider>
-    );
+         <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDone}
+            sx={{ alignSelf: 'flex-center', mx: 'auto', mb: 2, width: '200px' }}
+         >
+            Xong
+         </Button>
+      </Box>
+   );
 }
-
-Curriculum.propTypes = {
-    onPostAllModules: PropTypes.func.isRequired,
-};
