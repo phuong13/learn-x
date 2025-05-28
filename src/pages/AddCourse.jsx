@@ -8,7 +8,7 @@ const AddCourse = () => {
         <>
                 <DocumentTitle title="Thêm khóa học" />
                 <div className="min-h-[calc(100vh-193px)] bg-white shadow-sm m-4 rounded-lg">
-                    <h2 className="text-lg font-bold text-slate-900 pl-6 pt-6">Thêm khóa học</h2>
+                    <h2 className="text-lg font-bold text-slate-700 pl-6 pt-6">Thêm khóa học</h2>
                     <InteractiveStepProgress />
                 </div>
                

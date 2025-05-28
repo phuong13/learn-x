@@ -146,9 +146,9 @@ export const useSubmitModules = () => {
                 const questionPayload = {
                   content: q.content || "",
                   quizId,
-                  options: q.options,
+                  ...(q.type !== "fitb" ? { options: q.options } : {}),
                   ...(q.type === "fitb" ? { answerContent: q.answerContent } : {}),
-                  ...(q.type === "multiple" ? { answers: q.answer } : { answer: q.answer }),
+                  ...(q.type === "multiple" ? { answers: q.answer } : (q.type !== "fitb" ? { answer: q.answer } : {})),
                 };
 
                 if (isNewquestion) {
