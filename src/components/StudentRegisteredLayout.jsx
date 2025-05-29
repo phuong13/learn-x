@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { X } from 'lucide-react';
 import readXlsxFile from 'read-excel-file';
 import { toast } from 'react-toastify';
+import AddIcon from '@mui/icons-material/Add';
+
 
 const StudentRegisteredLayout = () => {
     const [students, setStudents] = useState([]);
@@ -32,7 +34,7 @@ const StudentRegisteredLayout = () => {
         try {
             const pageable = {
                 page: page,
-                size: 5,
+                size: 10,
             };
             const response = await axiosPrivate.get(
                 `course-registrations/course/${courseId}?page=${pageable.page}&size=${pageable.size}`,
@@ -134,12 +136,13 @@ const StudentRegisteredLayout = () => {
     };
 
     return (
-        <div className="w-full">
-            <div className="flex justify-end items-center mb-4">
+        <div className="w-full h-full">
+            <div className="flex justify-end items-center mb-2">
             {authUser.role === 'TEACHER' && (
                 <button 
-                className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                className="py-2 px-3 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors flex items-center"
                  onClick={handleOpen}>
+                    <AddIcon/>
                     Thêm sinh viên
                 </button>
             )}

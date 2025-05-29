@@ -2,6 +2,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 export default function SubmissionHeader({ courseID, id, title, startDate, endDate }) {
     const formattedStartDate = format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
@@ -10,9 +11,8 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
     return (
         <div className="flex items-start gap-4 border-t py-1 border-slate-400">
             {/* Icon */}
-            <div className="text-pink-500 mt-1 text-xl">
-                <i className="fa-solid fa-file-arrow-up text-2xl"></i>
-            </div>
+            <AssignmentIcon className="text-pink-500" fontSize="medium" />
+
 
             {/* Content */}
             <div className="flex-1">

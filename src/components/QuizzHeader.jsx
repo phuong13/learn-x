@@ -2,6 +2,8 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import QuizIcon from '@mui/icons-material/Quiz';
+
 
 export default function QuizzHeader({ courseID, id, title, startDate, endDate }) {
     const formattedStartDate = format(new Date(startDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
@@ -10,9 +12,8 @@ export default function QuizzHeader({ courseID, id, title, startDate, endDate })
     return (
         <div className="flex items-start gap-4 border-t py-1 border-slate-400">
             {/* Icon */}
-            <div className="text-primary mt-1 text-xl">
-                <i className="fa-solid fa-feather" ></i>
-                </div>
+            <QuizIcon className="text-primary" fontSize="medium" />
+
 
             {/* Content */}
             <div className="flex-1">

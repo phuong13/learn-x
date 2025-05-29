@@ -196,7 +196,7 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
    };
 
 
-  const handleAddAssignment = (moduleId, assignmenrData) => {
+   const handleAddAssignment = (moduleId, assignmenrData) => {
       setModules(prev =>
          prev.map(mod =>
             mod.id === moduleId
@@ -247,16 +247,19 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
 
    return (
       <Box display="flex" flexDirection="column" gap={2} sx={{ mx: 'auto', width: '100%' }}>
-         <div className='ml-4 flex flex-col gap-2'>
+         <div className='mx-6 mt-6 flex flex-col gap-2'>
             {isEdit
-               ? <Typography variant="h6" fontWeight="bold">Chỉnh sửa nội dung khoá học</Typography>
-               : <Typography variant="h6" fontWeight="bold">Tạo nội dung khoá học</Typography>
-            }
-            {/* <Typography color="text.secondary">Tạo nội dung cho khoá học của bạn</Typography> */}
+               ? <div className='text-slate-700 font-bold text-lg'>Chỉnh sửa nội dung khoá học</div>
+               : <div className='text-slate-700 font-bold text-lg'>Tạo nội dung khoá học</div>}
 
-            <Button startIcon={<AddIcon />} variant="outlined" onClick={handleAddChapter} sx={{ width: 'fit-content' }}>
+            <button
+               type="button"
+               onClick={handleAddChapter}
+               className="flex ml-6 gap-2 py-2 px-2 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors w-fit"
+            >
+               <AddIcon />
                Thêm chương
-            </Button>
+            </button>
          </div>
 
 
@@ -281,8 +284,20 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
                      onChange={(e) => handleTitleChange(module.id, e.target.value)}
                      error={!!errors[module.id]}
                      helperText={errors[module.id]}
+                     InputProps={{
+                        sx: {
+                           fontWeight: 'bold',
+                           color: '#334155', // slate-700
+                        },
+                     }}
+                     InputLabelProps={{
+                        sx: {
+                           color: '#334155', // slate-700
+                           fontWeight: 'bold',
+                        },
+                     }}
+                     sx={{ width: '100%' }}
                   />
-
                   <IconButton color="error" onClick={() => handleRemoveModule(module.id)}>
                      <DeleteIcon />
                   </IconButton>
@@ -296,6 +311,7 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
                            <Tag
                               key={item.id}
                               icon={item.type === 'quiz' ? QuizIcon : item.type === 'lecture' ? MenuBookIcon : item.type === 'assignment' ? AssignmentIcon : InsertDriveFileIcon}
+                              color={item.type === 'quiz' ? 'primary' : item.type === 'lecture' ? 'secondary' : item.type === 'assignment' ? 'pink-500' : 'rose-600'}
                               label={
                                  item.type === 'quiz'
                                     ? `Quiz: ${item.title || 'Không có tiêu đề'}`
@@ -331,7 +347,7 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
                      <Card onClick={() => handleOptionSelect(module.id, 'quiz')}>
                         <CardActionArea>
                            <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
-                              <QuizIcon fontSize="large" color="primary" />
+                              <QuizIcon fontSize="large" className='text-primary' />
                               <Typography variant="subtitle2">Quiz</Typography>
                            </CardContent>
                         </CardActionArea>
@@ -341,7 +357,7 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
                      <Card onClick={() => handleOptionSelect(module.id, 'assignment')}>
                         <CardActionArea>
                            <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
-                              <AssignmentIcon fontSize="large" color="primary" />
+                              <AssignmentIcon fontSize="large" className='text-pink-500' />
                               <Typography variant="subtitle2">Assignment</Typography>
                            </CardContent>
                         </CardActionArea>
@@ -351,7 +367,7 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
                      <Card onClick={() => handleOptionSelect(module.id, 'resource')}>
                         <CardActionArea>
                            <CardContent sx={{ textAlign: 'center', padding: '2px' }}>
-                              <InsertDriveFileIcon fontSize="large" color="primary" />
+                              <InsertDriveFileIcon fontSize="large" className='text-rose-600' />
                               <Typography variant="subtitle2">Resource</Typography>
                            </CardContent>
                         </CardActionArea>
@@ -409,14 +425,14 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
          />
 
 
-         <Button
-            variant="contained"
-            color="primary"
+
+         <button
+            type="button"
             onClick={handleDone}
-            sx={{ alignSelf: 'flex-center', mx: 'auto', mb: 2, width: '200px' }}
+            className="flex w-40 justify-center mx-auto gap-2 py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors font-semibold hover:shadow-lg"
          >
             Xong
-         </Button>
+         </button>
       </Box>
    );
 }

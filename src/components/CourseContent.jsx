@@ -1,12 +1,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import SubmissionHeader from '../components/SubmissionHeader';
+import { School } from '@mui/icons-material';
 import QuizzHeader from '../components/QuizzHeader';
 import CourseSidebar from './CourseSidebar.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth.js';
 import { parseJavaLocalDateTime } from '@/utils/date.js';
 import { useSubmitModules } from '../store/useModule';
+import EditIcon from '@mui/icons-material/Edit';
+
 import Loader from './Loader';
 import Lecture from './LectureComponent';
 import Resource from './ResourceComponent';
@@ -74,7 +77,8 @@ const CourseContent = () => {
                     <div className="flex justify-end">
                         <button
                             onClick={() => navigate(`/course-detail/${courseId}/edit`)}
-                            className="py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors">
+                            className="py-2 px-3 bg-primaryDark text-white rounded-lg hover:bg-secondary hover:shadow-lg transition-colors flex items-center">
+                            <EditIcon fontSize='small' />
                             Chỉnh sửa
                         </button>
                     </div>
@@ -93,8 +97,8 @@ const CourseContent = () => {
                                 onClick={() => toggleSection(module)}
                                 className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
                             >
-                                <span className="text-base font-semibold text-slate-600">
-                                    {module.title}
+                                <span className="flex  gap-2 text-base font-semibold text-slate-600 items-center">
+                                    <School /> {module.title}
                                 </span>
                                 {expandedSections.includes(module.id) ? (
                                     <ChevronDown className="h-5 w-5 text-slate-400" />

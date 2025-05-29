@@ -18,7 +18,6 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
     const { quizId } = useParams();
     const { quiz, quizTitle, loading } = useQuizById(quizId);
     const { submission } = getQuizSubmissionByQuizId(quizId);
-    console.log("🚀 ~ QuizLayout ~ submission:", submission)
     const { courseId } = useParams();
     const { courseName } = useCourseById(courseId);
     const { authUser } = useAuth();
