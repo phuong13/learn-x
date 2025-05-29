@@ -31,6 +31,7 @@ export default function AssignmentControlPanel() {
       urlParams.append('year', year.toString());
       const url = `/dashboard/get-by-month-year?${urlParams.toString()}`;
       await axiosPrivate.get(url)
+
         .then((res) => {
           setAssignments(res.data.data.assignments);
           setQuizzes(res.data.data.quizzes);
@@ -105,6 +106,7 @@ export default function AssignmentControlPanel() {
           endDate={quiz.endDate}
         />
       ))}
+
     </div>
   )
 }
