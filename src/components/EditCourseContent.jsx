@@ -104,8 +104,8 @@ const EditModule = () => {
       onSubmitSuccess={
         () => {
           toast.success('Cập nhật module thành công!')
+          window.history.back();
         }
-
       }
       
     />

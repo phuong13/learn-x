@@ -1,11 +1,11 @@
 import { X, Pencil } from 'lucide-react';
 
-const Tag = ({ label, icon: Icon, onEdit, onRemove }) => {
+const Tag = ({ label, icon: Icon, onEdit, onRemove ,color }) => {
   return (
-    <div className="w-full flex flex-row justify-between items-center bg-slate-200 text-blue-600 text-sm px-3 rounded-lg py-3 group">
+    <div className="w-full flex flex-row justify-between items-center bg-slate-100 text-blue-600 text-sm px-3 rounded-lg py-3 group">
       {/* Hiển thị icon nếu có */}
       <div className="flex flex-row items-center gap-3"> 
-        {Icon && <Icon className="" size={16} />}
+        {Icon && <Icon className={`text-${color}`} size={16} />}
         <span className='font-semibold text-slate-700'>{label}</span>
         </div>
 

@@ -40,7 +40,7 @@
         "submit": "Tạo",
         "search_course_placeholder": "Tìm kiếm theo tên khoá học",
         "no_courses_found": "Không tìm thấy khoá học",
-        "no_topics": "Không tìm thấy topic"
+        "no_topics": "Hiện chưa có topic nào trong forum này."
     },
     "topic": {
         "comments_count": "{{count}} bình luận về topic",

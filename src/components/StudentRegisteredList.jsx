@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useAuth } from '@hooks/useAuth.js';
+import { Pagination } from '@mui/material';
 
 const StudentRegisteredList = ({
   totalStudents,
@@ -68,10 +69,10 @@ const StudentRegisteredList = ({
   };
 
   return (
-    <div className="w-full mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="w-full mx-auto bg-white shadow-md rounded-lg h-full">
       {isTeacher && (
         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-          <p>Tổng số {localStudents.length} thành viên</p>
+          <p>Tổng số: {localStudents.length} thành viên</p>
         </div>
       )}
 
@@ -79,7 +80,7 @@ const StudentRegisteredList = ({
         {localStudents.map((student) => (
           <li
             key={student.id}
-            className="px-6 py-4 hover:bg-slate-50 flex items-center"
+            className="px-6 py-2 flex items-center"
           >
             {isTeacher && (
               <div className="flex items-center mr-4">
@@ -115,36 +116,23 @@ const StudentRegisteredList = ({
       </ul>
 
       {isTeacher && selectedStudents.length > 0 && (
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div className="px-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
           <button
             onClick={handleDeleteSelected}
-            className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            className="p-2 bg-rose-100 text-red-600 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           >
             Xóa tất cả đã chọn
           </button>
         </div>
       )}
 
-      <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 0}
-          className="px-3 py-1 bg-white text-slate-700 border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <ChevronLeftIcon className="h-4 w-4 mr-2 inline-block" />
-          Trang trước
-        </button>
-        <span className="text-sm text-slate-700">
-          Trang {currentPage + 1}/{paginationInfo.totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === paginationInfo.totalPages - 1}
-          className="px-3 py-1 bg-white text-slate-700 border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Trang kế
-          <ChevronRightIcon className="h-4 w-4 ml-2 inline-block" />
-        </button>
+      <div className="px-6 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-center">
+        <Pagination
+          count={paginationInfo.totalPages}
+          page={currentPage + 1}
+          onChange={(_, value) => handlePageChange(value - 1)}
+          color="primaryDark"
+        />
       </div>
 
       {isDeleteConfirmOpen && (

@@ -6,7 +6,7 @@ import TagCourse from './components/tag/TagCourse';
 import { useCourses } from '../../store/useCourses';
 import { useForum } from '../../store/useForum';
 
-import { TextField, InputAdornment } from '@mui/material';
+import { TextField, InputAdornment, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 export const Sidebar = () => {
@@ -33,7 +33,10 @@ export const Sidebar = () => {
 
   return (
     <div className="h-full flex flex-col gap-4">
-      <div className="p-2">
+      <div className="flex flex-col gap-2 p-2">
+        <p className="text-slate-600 font-semibold text-lg ">
+          {t('Chọn hoặc tìm kiếm Forum')}
+        </p>
         <TextField
           fullWidth
           placeholder={t('forum.search_course_placeholder')}
@@ -62,7 +65,7 @@ export const Sidebar = () => {
             />
           ))
         ) : (
-          <p className="text-center text-gray-400 py-4">
+          <p className="text-center text-slate-700 py-4">
             {t('forum.no_courses_found')}
           </p>
         )}
