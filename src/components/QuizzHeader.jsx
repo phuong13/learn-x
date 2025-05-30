@@ -13,8 +13,6 @@ export default function QuizzHeader({ courseID, id, title, startDate, endDate })
         <div className="flex items-start gap-4 border-t py-1 border-slate-400">
             {/* Icon */}
             <QuizIcon className="text-primary" fontSize="medium" />
-
-
             {/* Content */}
             <div className="flex-1">
                 <h2 className="text-blue-600 text-sm font-bold hover:text-blue-700 cursor-pointer ">

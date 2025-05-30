@@ -139,6 +139,7 @@ export default function GradeTable() {
                                                     ? submission.score
                                                     : 'Chưa chấm điểm'
                                             : '-'}
+
                                     </div>
                                 </div>
                             ))}

@@ -99,6 +99,7 @@ const CourseContent = () => {
                             >
                                 <span className="flex  gap-2 text-base font-semibold text-slate-600 items-center">
                                     <School /> {module.title}
+
                                 </span>
                                 {expandedSections.includes(module.id) ? (
                                     <ChevronDown className="h-5 w-5 text-slate-400" />

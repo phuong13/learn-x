@@ -4,6 +4,7 @@ import { ExpandMore, ExpandLess, School, Menu, ChevronLeft } from '@mui/icons-ma
 import PropTypes from 'prop-types';
 
 const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModule, expandAll, collapseAll }) => {
+    console.log("🚀 ~ CourseSidebar ~ modules:", modules)
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleSidebar = () => {

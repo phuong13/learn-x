@@ -78,6 +78,7 @@ const EditModule = () => {
     const fetchModules = async () => {
       setLoading(true);
       const res = await getModules(courseId);
+      console.log("🚀 ~ fetchModules ~ res:", res)
       if (res.success) {
         setModules(transformModulesFromApi(res.modules));
       }
@@ -105,7 +106,6 @@ const EditModule = () => {
           toast.success('Cập nhật module thành công!')
           window.history.back();
         }
-
       }
       
     />
