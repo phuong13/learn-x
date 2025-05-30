@@ -71,8 +71,8 @@ const StudentRegisteredList = ({
   return (
     <div className="w-full mx-auto bg-white shadow-md rounded-lg h-full">
       {isTeacher && (
-        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-          <p>Tổng số: {localStudents.length} thành viên</p>
+        <div className=" text-xs px-6 py-2 bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold flex items-center sm:text-sm md:text-base">
+          <p>Tổng số: {localStudents.length} sinh viên</p>
         </div>
       )}
 
@@ -100,9 +100,9 @@ const StudentRegisteredList = ({
                 {student.email}
               </p>
             </div>
-            <div className="inline-flex items-center text-xs font-semibold text-slate-500 bg-slate-100 rounded-full px-2 py-1 mr-2">
+            {/* <div className="inline-flex items-center text-xs font-semibold text-slate-500 bg-slate-100 rounded-full px-2 py-1 mr-2">
               {student.role}
-            </div>
+            </div> */}
             {isTeacher && (
               <button
                 onClick={() => handleDeleteStudent(student.email)}
@@ -119,14 +119,16 @@ const StudentRegisteredList = ({
         <div className="px-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
           <button
             onClick={handleDeleteSelected}
-            className="p-2 bg-rose-100 text-red-600 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            className="px-2 py-1 my-1 bg-rose-500 text-xs sm:text-sm md:text-base text-white rounded-lg 
+             hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50
+             transition duration-200"
           >
-            Xóa tất cả đã chọn
+            Xóa đã chọn
           </button>
         </div>
       )}
 
-      <div className="px-6 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-center">
+      <div className="px-6 py-1 bg-slate-50 border-t border-slate-200 flex items-center justify-center">
         <Pagination
           count={paginationInfo.totalPages}
           page={currentPage + 1}

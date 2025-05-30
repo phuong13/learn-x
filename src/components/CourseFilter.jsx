@@ -15,8 +15,8 @@ export default function CourseFilter() {
                 <Link to="/add-course">
                     <button
                         onClick={() => handleAddCourse()}
-                        className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors flex items-center">
-                        <AddIcon />
+                        className=" text-xs sm:text-sm md:text-base  py-2 px-3 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors flex items-center">
+                        <AddIcon className="w-3 h-3 sm:w-5 sm:h-5" />
                         Thêm khóa học
                     </button>
                 </Link>

@@ -193,11 +193,11 @@ export default function CoursePageLayout() {
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                    <div className="bg-primaryDark text-white px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+                    <div className="bg-primaryDark text-white px-4 py-2 rounded-lg text-sm font-semibold mb-2 ">
                         <nav aria-label="breadcrumb">
                             <ol className="flex items-center space-x-2 text-sm">
                                 <li>
-                                    <a href="/" className="text-white hover:underline">
+                                    <a href="/" className="text-white hover:underline tru">
                                         {t('home_page')}
                                     </a>
                                 </li>
