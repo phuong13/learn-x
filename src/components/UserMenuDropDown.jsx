@@ -35,8 +35,8 @@ export default function UserMenuDropdown() {
     }, []);
 
     const menuItems = [
-        { label: t('my_profile') , href: '/LEARNX/profile' },
-        { label: t('logout'), href: '/LEARNX/logout' },
+        { label: t('my_profile') , href: '/profile' },
+        { label: t('logout'), href: '/logout' },
     ];
 
     return (
