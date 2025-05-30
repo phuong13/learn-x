@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export default function UserMenuDropdown() {
     const [isOpen, setIsOpen] = useState(false);
@@ -75,13 +76,13 @@ export default function UserMenuDropdown() {
                     {menuItems.map(
                         (item, index) => (
                             (
-                                <a
+                                <Link
                                     key={index}
-                                    href={item.href}
+                                    to={item.href}
                                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">
                                     {item.label}
-                                </a>
+                                </Link>
                             )
                         ),
                     )}
