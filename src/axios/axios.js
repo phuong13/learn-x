@@ -2,7 +2,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 
-const baseURL = 'https://learnx-spring-app-86563bbf71fb.herokuapp.com';
+const baseURL = 'https://learnx-spring-app-86563bbf71fb.herokuapp.com/api/v1';
 
 export default axios.create({
     baseURL: baseURL,
