@@ -9,7 +9,7 @@ export default function Component() {
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <img
-                    src="/LEARNX/src/assets/backround.jpg"
+                    src="/assets/backround.jpg"
                     alt=""
                     className="w-full h-full object-cover transform scale-100"
                 />

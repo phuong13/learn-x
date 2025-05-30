@@ -209,7 +209,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
-                    src="/src/assets/backround.jpg"
+                    src="/assets/backround.jpg"
                     alt="Online learning illustration"
                     className="w-full h-fit object-cover"
                 />
