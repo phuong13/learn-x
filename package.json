@@ -28,6 +28,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.5.4",
+    "gh-pages": "^6.3.0",
     "http-proxy-middleware": "^3.0.3",
     "i18next": "^25.0.1",
     "js-cookie": "^3.0.5",
