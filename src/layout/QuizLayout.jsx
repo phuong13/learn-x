@@ -1,24 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Calendar, ChevronDown, ChevronUp, Clock, Upload } from 'lucide-react';
-import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, format } from 'date-fns';
+import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import PropTypes from 'prop-types';
-import { axiosPrivate } from '@/axios/axios.js';
 import { Link, useParams } from 'react-router-dom';
-
 import Loader from '@components/Loader.jsx';
-import { toast } from 'react-toastify';
-import GradingSummary from '../components/GradingSummary';
 import { useAuth } from '@hooks/useAuth.js';
 import { useCourseById } from '../store/useCourses';
-import { useQuizById, getQuizSubmissionByQuizId } from '../store/useQuiz.jsx';
+import { t } from 'i18next';
+import { useQuizById, getQuizSubmissionByQuizId, getStudentSubmissionsByQuizId } from '../store/useQuiz.jsx';
 
 export default function QuizLayout({ title, content, startDate, endDate }) {
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
     const { quizId } = useParams();
     const { quiz, quizTitle, loading } = useQuizById(quizId);
     const { submission } = getQuizSubmissionByQuizId(quizId);
-
+    const { studentsubmit } = getStudentSubmissionsByQuizId(quizId);
     const { courseId } = useParams();
     const { courseName } = useCourseById(courseId);
     const { authUser } = useAuth();
@@ -68,9 +64,9 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
-                    src="/src/assets/backround.jpg"
+                    src="/LEARNX/src/assets/backround.jpg"
                     alt="Online learning illustration"
-                    className="w-full h-full object-cover"
+                    className="w-full h-fit object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30" />
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
@@ -80,17 +76,17 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                 <ol className="flex items-center space-x-2">
                                     <i className="fa-solid fa-file-arrow-up text-white text-xl mr-2"></i>
                                     <li>
-                                        <a href="/" className="text-white hover:underline">
-                                            Trang chủ
-                                        </a>
+                                        <Link to="/" className="text-white hover:underline">
+                                            {t('home_page')}
+                                        </Link>
                                     </li>
                                     <li>
                                         <span className="mx-2 text-slate-300">/</span>
                                     </li>
                                     <li>
-                                        <a href="/my-course" className="text-white hover:underline">
-                                            Khóa học
-                                        </a>
+                                        <Link to="/my-course" className="text-white hover:underline">
+                                            {t('my_courses')}
+                                        </Link>
                                     </li>
 
                                     <li>
@@ -112,17 +108,17 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
             </div>
 
             {/* Main Content */}
-            <div className="pt-4 relative">
+            <div className="my-4 relative">
                 <div className="bg-white shadow-lg overflow-hidden rounded-lg">
                     {/* Quiz Details */}
                     <div className="p-4 border-b border-slate-200">
                         <h2 className="text-lg font-semibold mb-2 text-slate-700">Thời gian</h2>
                         <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-slate-600">
                             <p className="mb-2 sm:mb-0">
-                                <Calendar className="inline mr-2" size={16} /> Opened: {formattedStartDate}
-                            </p>
+                                <Calendar className="inline mr-1" size={16} /> {t('opened')}: {formattedStartDate}
+                            </p> 
                             <p>
-                                <Calendar className="inline mr-2" size={16} /> Due: {formattedEndDate}
+                                <Calendar className="inline mr-1" size={16} /> {t('due')}: {formattedEndDate}
                             </p>
                         </div>
                     </div>
@@ -152,7 +148,7 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                     return <p className="text-center text-rose-500 font-semibold">Đã hết thời gian làm bài.</p>;
                                 }
 
-                                if (submission?.length >= (quiz?.attemptAllowed || 1)) { 
+                                if (submission?.length >= (quiz?.attemptAllowed || 1)) {
                                     return <p className="text-center text-rose-500 font-semibold">Bạn đã làm đủ số lần cho phép.</p>;
                                 }
                                 return (
@@ -204,7 +200,7 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                                     <div className="flex flex-col gap-1">
                                                         {submission.map((s, idx) => (
                                                             <div key={s.id || idx}>
-                                                                Lần thứ {idx + 1}: {typeof s.score === 'number' ? s.score/10 : ''} đ
+                                                                Lần thứ {idx + 1}: {typeof s.score === 'number' ? s.score / 10 : ''} đ
                                                             </div>
                                                         ))}
                                                     </div>
@@ -227,11 +223,48 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                         </div>
                     )}
 
-                    <div className="">
-                        {authUser.role === 'TEACHER' && (
-                            <GradingSummary timeRemaining={calculateRemainingTime(endDate)} />
-                        )}
-                    </div>
+                    {/* Grading Summary for Teacher */}
+                    {authUser.role === 'TEACHER' && (
+                        <div className="p-6">
+                            <div
+                                className="flex justify-between items-center mb-2 cursor-pointer"
+                                onClick={toggleStatusDropdown}>
+                                <h3 className="text-lg font-semibold text-slate-700">Trạng thái Quiz</h3>
+                                {isStatusDropdownOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </div>
+
+                            {isStatusDropdownOpen && (
+                                <table className="w-full">
+                                    <tbody>
+                                        <tr className="border-b border-slate-300">
+                                            <td className="py-3 font-medium text-slate-700">Số lần làm cho phép</td>
+                                            <td className="py-3 text-slate-600">
+                                                {quiz && quiz.attemptAllowed ? quiz.attemptAllowed : '1'}
+                                            </td>
+                                        </tr>
+
+                                        <tr className="border-b border-slate-300">
+                                            <td className="py-3 font-medium text-slate-700">Số học sinh đã thực hiện</td>
+                                            <td className="py-3 text-slate-600">
+                                                {studentsubmit?.length}
+                                            </td>
+                                        </tr>
+
+
+                                        <tr className="border-b border-slate-300">
+                                            <td className="py-3 font-medium text-slate-700">Thời gian còn lại</td>
+                                            <td className="py-3 text-slate-600 flex items-center">
+                                                <Clock className="mr-2" size={16} />
+                                                {calculateRemainingTime(endDate)}
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    )}
+
                 </div>
             </div>
         </div>

@@ -93,6 +93,19 @@ class ModuleService {
                 console.log(err);
             });
     }
+
+    static async getQuizSubmissions(quizId) {
+        return await axiosPrivate
+            .get(`/quizzes/${quizId}/submissions`, {
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then((res) => {
+                return res.data.data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
 }
 
 export default ModuleService;

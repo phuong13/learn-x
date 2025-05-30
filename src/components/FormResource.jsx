@@ -42,7 +42,14 @@ export default function FormResource({ open, onClose, defaultData = {}, isEdit =
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog
+      open={open}
+      onClose={(event, reason) => {
+        if (reason === 'backdropClick' || reason === 'escapeKeyDown') return;
+        onClose?.();
+      }}
+      fullWidth maxWidth="sm"
+    >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {isEdit ? 'Chỉnh sửa tài nguyên' : 'Tạo tài nguyên'}
         <IconButton onClick={onClose}><CloseIcon /></IconButton>

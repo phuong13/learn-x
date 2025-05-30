@@ -35,7 +35,7 @@ export const Sidebar = () => {
     <div className="h-full flex flex-col gap-4">
       <div className="flex flex-col gap-2 p-2">
         <p className="text-slate-600 font-semibold text-lg ">
-          {t('Chọn hoặc tìm kiếm Forum')}
+          {t('Forum')}
         </p>
         <TextField
           fullWidth

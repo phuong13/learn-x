@@ -9,9 +9,9 @@ export default function Component() {
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <img
-                    src="/src/assets/backround.jpg"
+                    src="/LEARNX/src/assets/backround.jpg"
                     alt=""
-                    className="w-full h-full object-cover transform"
+                    className="w-full h-full object-cover transform scale-100"
                 />
                 <div className="absolute inset-0 bg-white/80 mix-blend-overlay" />
             </div>

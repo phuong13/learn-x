@@ -8,6 +8,7 @@ export const ChangePasswordModal = ({ visible, onClose, getResponse }) => {
     if (!visible) return null;
 
     const handleOutsideClick = (e) => {
+
         if (e.target === e.currentTarget) {
             onClose();
         }

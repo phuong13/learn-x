@@ -134,3 +134,31 @@ export const getQuizSubmissionByQuizId = (quizId) => {
 
   return { submission, loading, error };
 }
+
+
+export const getStudentSubmissionsByQuizId = (quizId) => {
+  const axiosPrivate = useAxiosPrivate();
+  const [studentsubmit, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!quizId) return;
+
+    const fetchSubmissions = async () => {
+      try {
+        const response = await axiosPrivate.get(`/quizzes/${quizId}/submissions`);
+        setSubmissions(response.data.data);
+      } catch (err) {
+        console.error('Lỗi khi lấy thông tin nộp bài:', err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubmissions();
+  }, [quizId]);
+
+  return { studentsubmit, loading, error };
+}

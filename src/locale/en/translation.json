@@ -16,35 +16,46 @@
     "time": "Time",
     "sort_by_day": "Sort by Day",
     "calendar": "Calendar",
+    "month": "Month",
+    "this_month": "This Month",
+    "next_month": "Next Month",
     "course_content": "Course Content",
     "student_list": "Student List",
     "grades": "Grades",
     "teacher": "Teacher",
+    "opened": "From",
+    "due": "To",
     "tabs": {
-      "courses": "Courses",
-      "members": "Members",
-      "scores": "Scores"
+        "courses": "Courses",
+        "members": "Members",
+        "scores": "Scores"
     },
     "landing": {
-      "title_top": "ONLINE LEARNING",
-      "title_bottom": "LEARN X",
-      "description": "Bridging distances, saving time, high efficiency, support anytime, anywhere, ...",
-      "button_text": "View Courses"
+        "title_top": "ONLINE TEACHING",
+        "title_bottom": "LEARN X",
+        "description": "Bridging gaps, saving time, high efficiency, support anytime, anywhere, ...",
+        "button_text": "Explore Courses"
     },
     "forum": {
-      "create_topic": "Create Topic",
-      "please_select_forum": "Please select a forum",
-      "new_topic_title": "Create New Topic",
-      "new_topic_placeholder": "Enter topic content...",
-      "cancel": "Cancel",
-      "submit": "Create",
-      "search_course_placeholder": "Search by course name",
-      "no_courses_found": "No courses found"
+        "create_topic": "Create Topic",
+        "please_select_forum": "Please select a forum",
+        "new_topic_title": "Create New Topic",
+        "new_topic_placeholder": "Enter topic content...",
+        "cancel": "Cancel",
+        "submit": "Create",
+        "search_course_placeholder": "Search by course name",
+        "no_courses_found": "No courses found",
+        "no_topics": "There are currently no topics in this forum."
     },
     "topic": {
-      "comments_count": "{{count}} comments about topic",
-      "no_comments": "No comments yet.",
-      "comment_input_placeholder": "Comment to topic..."
+        "comments_count": "{{count}} comments on this topic",
+        "no_comments": "No comments yet.",
+        "comment_input_placeholder": "Enter a comment on this topic..."
+    },
+    "placeholder": {
+        "search_courses": "Search courses",
+        "search_forum": "Search forum",
+        "search_topic": "Search topic",
+        "search_by_name": "Search by activity type or assignment name"
     }
-  }
-  
+}

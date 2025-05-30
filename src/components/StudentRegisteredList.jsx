@@ -11,6 +11,7 @@ const StudentRegisteredList = ({
   onPageChange,
   onDeleteStudents,
 }) => {
+  console.log("🚀 ~ paginationInfo:", )
   // **Local copy** của students để xóa + re-render
   const [localStudents, setLocalStudents] = useState(students);
   const [currentPage, setCurrentPage] = useState(paginationInfo.pageNumber);
@@ -128,7 +129,8 @@ const StudentRegisteredList = ({
         </div>
       )}
 
-      <div className="px-6 py-1 bg-slate-50 border-t border-slate-200 flex items-center justify-center">
+      {localStudents.length >= paginationInfo.pageSize && (
+         <div className="px-6 py-1 bg-slate-50 border-t border-slate-200 flex items-center justify-center">
         <Pagination
           count={paginationInfo.totalPages}
           page={currentPage + 1}
@@ -136,6 +138,7 @@ const StudentRegisteredList = ({
           color="primaryDark"
         />
       </div>
+      )}
 
       {isDeleteConfirmOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

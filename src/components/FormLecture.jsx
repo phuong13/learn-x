@@ -37,7 +37,14 @@ export default function FormLecture({ open, onClose, defaultData = {}, isEdit = 
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+    <Dialog
+      open={open}
+      onClose={(event, reason) => {
+        if (reason === 'backdropClick' || reason === 'escapeKeyDown') return;
+        onClose?.();
+      }}
+      fullWidth maxWidth="md"
+    >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {isEdit ? 'Chỉnh sửa bài giảng' : 'Tạo bài giảng'}
         <IconButton onClick={onClose}><CloseIcon /></IconButton>

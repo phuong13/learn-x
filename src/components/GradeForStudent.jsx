@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { axiosPrivate } from '@/axios/axios.js';
 import { Calendar, ChevronLeft, ChevronRight, Clock, HelpCircle, User } from 'lucide-react';
 import { toast } from 'react-toastify';
 import DocumentTitle from '../components/DocumentTitle';
-
+import { IconButton, Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
+import { parseISO, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, format } from 'date-fns';
 
 export default function GradingInterface({ title, startDate, endDate }) {
     const [summaryData, setSummaryData] = useState([]);
@@ -16,27 +16,37 @@ export default function GradingInterface({ title, startDate, endDate }) {
     const [currentStudentIndex, setCurrentStudentIndex] = useState(0);
     const [document, setDocument] = useState(null);
 
+
     const { assignmentId } = useParams();
     const [isLoading, setIsLoading] = useState(false);
     const { courseId } = useParams();
 
     const calculateSubmissionTime = (submissionTime) => {
-        const date = new Date(endDate);
-        const submissionDate = new Date(submissionTime);
-        const diffInDays = differenceInDays(date, submissionDate);
-        const diffInHours = differenceInHours(date, submissionDate) % 24;
-        const diffInMinutes = differenceInMinutes(date, submissionDate) % 60;
-        const diffInSeconds = differenceInSeconds(date, submissionDate) % 60;
+        const deadline = new Date(endDate); // endDate là hạn chót
+        const submissionDate = parseISO(submissionTime); // parse chuỗi ISO
 
-        if (submissionDate < date) {
-            return <div className="py-3 text-blue-500">Nộp
-                sớm {diffInDays > 0 ? `${diffInDays} ngày ` : ''} {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</div>;
+        const diffInMs = deadline - submissionDate;
+        const absDiff = Math.abs(diffInMs);
+
+        const days = Math.floor(absDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((absDiff % (1000 * 60)) / 1000);
+
+        if (submissionDate < deadline) {
+            return (
+                <div className="py-1 text-blue-500">
+                    Nộp sớm {days > 0 ? `${days} ngày ` : ''}{hours} giờ {minutes} phút {seconds} giây
+                </div>
+            );
         } else {
-            return <div className="py-3 text-rose-600">Nộp
-                trễ {diffInHours} giờ {diffInMinutes} phút {diffInSeconds} giây</div>;
+            return (
+                <div className="py-1 text-rose-600">
+                    Nộp trễ {days > 0 ? `${days} ngày ` : ''}{hours} giờ {minutes} phút {seconds} giây
+                </div>
+            );
         }
     };
-
     const formattedStartDate = format(new Date(startDate), 'EEEE, dd \'tháng\' MM yyyy, hh:mm a', { locale: vi });
     const formattedEndDate = format(new Date(endDate), 'EEEE, dd \'tháng\' MM yyyy, hh:mm a', { locale: vi });
 
@@ -93,28 +103,6 @@ export default function GradingInterface({ title, startDate, endDate }) {
         setCurrentStudent(summaryData[currentStudentIndex]);
     }, [currentStudentIndex]);
 
-    useEffect(() => {
-        const fetchAssignment = async () => {
-            await axiosPrivate.get(`/assignment-submissions/${assignmentId}/logged-in`)
-                .then((res) => {
-                    setAssignmentSubmission(res.data.data);
-                })
-                .catch((err) => {
-                    setAssignmentSubmission(null);
-                    console.log(err);
-                });
-        };
-        try {
-            setIsLoading(true);
-            fetchAssignment();
-        } finally {
-            setIsLoading(false);
-        }
-
-        if (assignmentSubmission) {
-            console.log(assignmentSubmission);
-        }
-    }, [assignmentId]);
 
     const calculateRemainingTime = (endDate) => {
         const now = new Date();
@@ -172,59 +160,92 @@ export default function GradingInterface({ title, startDate, endDate }) {
                         </div>
                     </div>
 
-                    <div className='text-lg font-semibold text-slate-700'>
+                    <div className='text-xl font-bold text-slate-700 pl-24'>
                         Chấm điểm
                     </div>
+
+
                     <div className="flex flex-wrap items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <button className="p-1" onClick={handlePreviousStudent}><ChevronLeft className="w-4 h-4" />
-                            </button>
-                            <select className="border rounded px-2 py-1 text-sm" value={currentStudent.studentEmail}
-                                onChange={(e) => setCurrentStudentIndex(summaryData.findIndex(student => student.studentEmail === e.target.value))}>
-                                {summaryData.map((student, index) => (
-                                    <option key={index} value={student.studentEmail}>{student.studentEmail}</option>
-                                ))}
-                            </select>
-                            <button className="p-1" onClick={handleNextStudent}><ChevronRight className="w-4 h-4" />
-                            </button>
+                            <IconButton size="small" onClick={handlePreviousStudent}>
+                                <ChevronLeft className="w-4 h-4" />
+                            </IconButton>
+                            <FormControl size="small" variant="outlined">
+                                <InputLabel id="student-select-label">Email</InputLabel>
+                                <Select
+                                    labelId="student-select-label"
+                                    label="Email"
+                                    value={currentStudent.studentEmail}
+                                    onChange={(e) =>
+                                        setCurrentStudentIndex(
+                                            summaryData.findIndex(student => student.studentEmail === e.target.value)
+                                        )
+                                    }
+                                    sx={{ minWidth: 180 }}
+                                >
+                                    {summaryData.map((student, index) => (
+                                        <MenuItem key={index} value={student.studentEmail}>
+                                            {student.studentEmail}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <IconButton size="small" onClick={handleNextStudent}>
+                                <ChevronRight className="w-4 h-4" />
+                            </IconButton>
                         </div>
-                        <div className="text-sm text-gray-600">{currentStudentIndex + 1} of {summaryData.length}</div>
+                        <Typography variant="body2" color="text.secondary">
+                            {currentStudentIndex + 1} of {summaryData.length}
+                        </Typography>
                     </div>
                 </div>
             )}
 
 
             {currentStudent ? (
-                <div className='border border-slate-400 bg-slate-100 rounded-lg mx-64'>
-                    <div className="p-4">
-                        <div className="mt-4">
+                <div className='border border-slate-200 bg-slate-50 text-slate-700 rounded-lg mx-64'>
+
+                    {currentStudent && (
+                        <div className="p-4 flex">
+                            <div className="flex items-center gap-3">
+                                <User className="w-6 h-6 text-slate-800" />
+                                <div>
+                                    <h2 className="text-xl font-semibold text-slate-700">{currentStudent.studentName}</h2>
+                                    <div className="text-sm text-slate-700">{currentStudent.studentEmail}</div>
+                                </div>
+                            </div>
+
+                            {currentStudent.score !== null ? (
+                                <div className="ml-auto text-lg font-bold text-slate-700 ">
+                                    Điểm: {currentStudent.score}
+                                </div>
+                            ) : (<div className='ml-auto  text-lg font-bold text-rose-500 '>Chưa chấm điểm</div>)}
+                        </div>
+                    )}
+                    <div className="px-4">
+                        <div className="">
                             <Calendar className="inline mb-1 mr-2" size={16} />Hạn chót: {formattedEndDate}
                             <div className="flex items-center gap-2">
                                 <Clock className="" size={16} />
-                                <div className="py-2 text-gray-700">Thời gian còn lại:</div>
+                                <div className="py-2 text-slate-700">Thời gian còn lại:</div>
                                 <div className=" flex items-center">
                                     {calculateRemainingTime(endDate)}
                                 </div>
                             </div>
                         </div>
+
+                        <div className="">
+                            <Calendar className="inline mb-1 mr-2" size={16} />Thời gian nộp:{calculateSubmissionTime(currentStudent.createdAt)}
+
+                        </div>
                     </div>
                     {/* Student Info */}
-                    {currentStudent && (
-                        <div className=" shadow rounded-lg p-4">
-                            <div className="flex items-center gap-3">
-                                <User className="w-6 h-6 text-gray-400" />
-                                <div>
-                                    <h2 className="text-xl font-semibold">{currentStudent.studentName}</h2>
-                                    <div className="text-sm text-gray-600">{currentStudent.studentEmail}</div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+
 
                     {/* Submission Status */}
                     {currentStudent && (
                         <div className=" shadow rounded-lg p-4">
-                            <h2 className="text-xl font-semibold mb-2">Bài nộp</h2>
+                            <h2 className="text-xl font-semibold mb-1">Bài nộp</h2>
                             <div className="space-y-4">
                                 {currentStudent.fileSubmissionUrl && (
                                     <div className="flex items-center gap-2">
@@ -237,7 +258,7 @@ export default function GradingInterface({ title, startDate, endDate }) {
                                     </div>
                                 )}
                                 {currentStudent.textSubmission && (
-                                    <div className="text-sm text-gray-600">
+                                    <div className="text-sm text-slate-600">
                                         {currentStudent.textSubmission}
                                     </div>
                                 )}
@@ -248,38 +269,36 @@ export default function GradingInterface({ title, startDate, endDate }) {
 
                     {/* Grading Section */}
                     {currentStudent && (
-                        <div className=" shadow rounded-lg p-6">
-                            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <div className=" shadow rounded-lg px-4 mb-4">
+                            <h2 className="text-xl font-semibold  flex items-center gap-2">
                                 Chấm điểm
-                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                                <HelpCircle className="w-4 h-4 text-slate-400" />
                             </h2>
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label htmlFor="grade" className="block text-sm font-medium text-gray-700">Thang điểm
-                                        10</label>
-                                    <input
-                                        type="number"
-                                        id="grade"
-                                        max="10"
-                                        value={currentStudent.score || ''}
-                                        className="p-2 mt-1 block w-full rounded-md border focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                                        onChange={(e) => {
-                                            const newScore = e.target.value ? parseFloat(e.target.value) : null;
-                                            const updatedSummaryData = [...summaryData];
-                                            updatedSummaryData[currentStudentIndex].score = newScore;
-                                            setSummaryData(updatedSummaryData);
-                                        }}
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <label htmlFor="grade" className="block text-sm font-medium text-slate-700">Thang điểm
+                                    10</label>
+                                <input
+                                    type="number"
+                                    id="grade"
+                                    max="10"
+                                    value={currentStudent.score || ''}
+                                    className="p-2 mt-1 block w-full rounded-md border focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                    onChange={(e) => {
+                                        const newScore = e.target.value ? parseFloat(e.target.value) : null;
+                                        const updatedSummaryData = [...summaryData];
+                                        updatedSummaryData[currentStudentIndex].score = newScore;
+                                        setSummaryData(updatedSummaryData);
+                                    }}
+                                />
 
-                                <div className="flex justify-end gap-2">
+                                <div className="flex justify-end gap-2 ">
                                     <button className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
                                         Hủy
                                     </button>
                                     <button
                                         onClick={handlePostGrade}
                                         className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                        Lưu thay đổi
+                                        Chấm điểm
                                     </button>
                                 </div>
                             </div>
@@ -287,7 +306,6 @@ export default function GradingInterface({ title, startDate, endDate }) {
                     )}
 
                 </div>) : (
-
                 <div className="text-slate-600 font-bold text-center flex justify-center items-center">Chưa có học sinh nào nộp bài</div>
             )}
 

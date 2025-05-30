@@ -356,7 +356,10 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
   );
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+    <Dialog open={open} onClose={(event, reason) => {
+      if (reason === 'backdropClick' || reason === 'escapeKeyDown') return;
+      onClose?.();
+    }} fullWidth maxWidth="lg" disableEscapeKeyDown >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {isEdit ? 'Chỉnh sửa Quiz' : 'Tạo mới Quiz'}
         <IconButton onClick={onClose}><CloseIcon /></IconButton>

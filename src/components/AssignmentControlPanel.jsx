@@ -67,8 +67,8 @@ export default function AssignmentControlPanel() {
             onChange={(e) => setTimeFilter(e.target.value)}
             className="appearance-none bg-white border border-slate-400 rounded-md py-2 pl-3 pr-10 text-sm leading-5 focus:outline-none focus:ring-1 focus:ring-primaryDark focus:border-primaryDark"
           >
-            <option value="this">Tháng này</option>
-            <option value="next">Tháng tiếp theo</option>
+            <option value="this">{t('this_month')}</option>
+            <option value="next">{t('next_month')}</option>
           </select>
           <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
         </div>
@@ -76,7 +76,7 @@ export default function AssignmentControlPanel() {
         <div className="relative flex-grow">
           <input
             type="text"
-            placeholder="Search by activity type or name"
+            placeholder={t('placeholder.search_by_name')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-slate-400 rounded-md py-2 pl-10 pr-3 text-sm leading-5 focus:outline-none focus:ring-1 focus:ring-primaryDark focus:border-primaryDark"

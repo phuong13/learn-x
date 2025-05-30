@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { axiosPrivate } from '@/axios/axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import { t } from 'i18next';
 
 const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
@@ -92,13 +93,13 @@ export default function MUICalendar() {
 
             <Box sx={{ p: 2, fontFamily: `'Inter', sans-serif` }}>
                 <Box mb={1}>
-                    <h2 className="text-lg font-semibold text-gray-800 mb-1">Lịch</h2>
+                    <h2 className="text-lg font-semibold text-gray-800 ml-2">{t('calendar')}</h2>
                     <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
                         <IconButton size="small" onClick={() => navigateMonth(-1)}>
                             <ChevronLeft fontSize="small" />
                         </IconButton>
                         <Typography variant="subtitle1" fontWeight="bold">
-                            Tháng {currentDate.getMonth() + 1} / {currentDate.getFullYear()}
+                            {t('month')} {currentDate.getMonth() + 1} / {currentDate.getFullYear()}
                         </Typography>
                         <IconButton size="small" onClick={() => navigateMonth(1)}>
                             <ChevronRight fontSize="small" />

@@ -11,7 +11,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import CourseGradeChart from '../components/CourseGradeChart.jsx';
 import GradeTable from '@components/GradeTable.jsx';
 import { useTranslation } from 'react-i18next';
-import { use } from 'react';
+import { Link } from 'react-router-dom';
 export default function CoursePageLayout() {
     const [selectedTab, setSelectedTab] = useState(0);
     const [course, setCourse] = useState(null);
@@ -197,17 +197,17 @@ export default function CoursePageLayout() {
                         <nav aria-label="breadcrumb">
                             <ol className="flex items-center space-x-2 text-sm">
                                 <li>
-                                    <a href="/" className="text-white hover:underline tru">
+                                    <Link to="/" className="text-white hover:underline tru">
                                         {t('home_page')}
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
                                     <span className="mx-2 text-slate-300">/</span>
                                 </li>
                                 <li>
-                                    <a href="/my-course" className="text-white hover:underline">
+                                    <Link to="/my-course" className="text-white hover:underline">
                                         {t('my_courses')}
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
                                     <span className="mx-2 text-slate-300">/</span>

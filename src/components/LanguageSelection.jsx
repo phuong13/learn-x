@@ -96,7 +96,7 @@ export default function LanguageSelection() {
             {languages.map((language) => (
               <button
                 key={language.code}
-                className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-left hover:bg-green-50 ${selectedLanguage.code === language.code ? "bg-green-100 font-semibold" : ""
+                className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-left hover:bg-sky-50 ${selectedLanguage.code === language.code ? "bg-green-100 font-semibold" : ""
                   }`}
                 role="menuitem"
                 onClick={() => selectLanguage(language)}

@@ -96,6 +96,21 @@ const StudentRegisteredLayout = () => {
         const value = e.target.value;
         setEmailList(value.split('\n'));
     };
+    const validateEmails = (emails) => {
+        if (!emails.length) {
+            toast.error('Danh sách email không được để trống!');
+            return false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        for (let email of emails) {
+            if (!emailRegex.test(email)) {
+                toast.error(`Email không hợp lệ: ${email}`);
+                return false;
+            }
+        }
+        return true;
+    };
+
 
     const handleSumbit = async () => {
         const textArea = document.querySelector('textarea');
@@ -106,8 +121,9 @@ const StudentRegisteredLayout = () => {
             .filter((email) => email);
         setEmailList(emails);
         const uniqueEmails = [...new Set(emailList)];
+        if (!validateEmails(uniqueEmails)) return;
+
         setEmailList(uniqueEmails);
-        console.log(uniqueEmails);
         const response = await axiosPrivate.post(`/course-registrations/register/${courseId}/list-email`, {
             emails: uniqueEmails,
         });
@@ -115,9 +131,9 @@ const StudentRegisteredLayout = () => {
         if (response.status === 200) {
             await fetchStudents(0);
             handleClose();
-            toast(response.data.message);
+            toast.success(response.data.message);
         } else {
-            toast(response.data.message, { type: 'error' });
+            toast.error(response.data.message, { type: 'error' });
         }
     };
 
@@ -129,23 +145,23 @@ const StudentRegisteredLayout = () => {
         console.log(response);
         if (response.status === 200) {
             await fetchStudents(0);
-            toast(response.data.message);
+            toast.success(response.data.message);
         } else {
-            toast(response.data.message, { type: 'error' });
+            toast.error(response.data.message, { type: 'error' });
         }
     };
 
     return (
         <div className="w-full h-full">
             <div className="flex justify-end items-center mb-2">
-            {authUser.role === 'TEACHER' && (
-                <button 
-                className="py-2 px-3 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors flex items-center"
-                 onClick={handleOpen}>
-                    <AddIcon/>
-                    Thêm sinh viên
-                </button>
-            )}
+                {authUser.role === 'TEACHER' && (
+                    <button
+                        className="py-2 px-3 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors flex items-center"
+                        onClick={handleOpen}>
+                        <AddIcon />
+                        Thêm sinh viên
+                    </button>
+                )}
             </div>
             <StudentRegisteredList
                 totalStudents={paginationInfo.totalElements}
@@ -155,7 +171,7 @@ const StudentRegisteredLayout = () => {
                 onDeleteStudents={handleDeleteStudent}
             />
 
-            
+
             <Dialog open={showModal} onClose={handleClose} maxWidth="sm" fullWidth hideBackdrop={false}>
                 <div className="relative bg-white rounded-lg shadow-xl">
                     <DialogTitle className="text-xl font-bold mb-4">Thêm sinh viên</DialogTitle>

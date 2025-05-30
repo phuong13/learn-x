@@ -43,15 +43,15 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
     const calculateSubmissionTime = (submissionTime) => {
         const date = new Date(endDate);
         const submissionDate = new Date(submissionTime);
-    
+
         const diffInMs = submissionDate - date;
         const absDiffInMs = Math.abs(diffInMs);
-    
+
         const diffInDays = Math.floor(absDiffInMs / (1000 * 60 * 60 * 24));
         const diffInHours = Math.floor((absDiffInMs / (1000 * 60 * 60)) % 24);
         const diffInMinutes = Math.floor((absDiffInMs / (1000 * 60)) % 60);
         const diffInSeconds = Math.floor((absDiffInMs / 1000) % 60);
-    
+
         if (submissionDate < date) {
             return (
                 <td className="py-3 text-blue-500">
@@ -68,7 +68,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             );
         }
     };
-    
+
     const formatDateArray = (dateArray) => {
         if (Array.isArray(dateArray) && dateArray.length >= 6) {
             const [year, month, day, hour, minute, second] = dateArray;
@@ -209,9 +209,9 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
-                    src="/src/assets/backround.jpg"
+                    src="/LEARNX/src/assets/backround.jpg"
                     alt="Online learning illustration"
-                    className="w-full h-full object-cover"
+                    className="w-full h-fit object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30" />
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
@@ -221,17 +221,17 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                 <ol className="flex items-center space-x-2">
                                     <i className="fa-solid fa-file-arrow-up text-white text-xl mr-2"></i>
                                     <li>
-                                        <a href="/" className="text-white hover:underline">
+                                        <Link to="/" className="text-white hover:underline">
                                             Trang chủ
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
                                         <span className="mx-2 text-gray-300">/</span>
                                     </li>
                                     <li>
-                                        <a href="/my-course" className="text-white hover:underline">
+                                        <Link to="/my-course" className="text-white hover:underline">
                                             Khóa học
-                                        </a>
+                                        </Link>
                                     </li>
 
                                     <li>
@@ -368,9 +368,11 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                                 <td className=" text-gray-600">
                                                     <div className="flex">
                                                         <Upload className="mr-2 text-blue-600" size={18} />
-                                                        <span className="text-blue-500">
-                                                            {assignmentSubmission.fileSubmissionUrl.split('/').pop()}
-                                                        </span>
+
+                                                        <a className="text-blue-500 hover:underline" href={`http://docs.google.com/gview?url=${assignmentSubmission.fileSubmissionUrl}&embedded=true`}>                                                            {assignmentSubmission.fileSubmissionUrl.split('/').pop()}
+                                                        </a>
+
+
                                                     </div>
                                                 </td>
                                             ) : (
@@ -397,8 +399,8 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                         <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-gray-700">Chỉnh sửa lần cuối</td>
                                             <td className="py-3 text-gray-600">
-                                                {assignmentSubmission && 
-                                                assignmentSubmission.updatedAt
+                                                {assignmentSubmission &&
+                                                    assignmentSubmission.updatedAt
                                                     ? format(
                                                         formatDateArray(assignmentSubmission.updatedAt),
                                                         'EEEE, dd \'tháng\' MM yyyy, hh:mm a',

@@ -16,10 +16,15 @@
     "time": "Thời gian",
     "sort_by_day": "Sắp xếp theo ngày",
     "calendar": "Lịch",
+    "month": "Tháng",
+    "this_month": "Tháng này",
+    "next_month": "Tháng sau",
     "course_content": "Nội dung khóa học",
     "student_list": "Danh sách sinh viên",
     "grades": "Điểm số",
     "teacher": "Giảng viên",
+    "opened": "Từ",
+    "due": "Đến",
     "tabs": {
         "courses": "Khóa học",
         "members": "Danh sách thành viên",
@@ -46,5 +51,11 @@
         "comments_count": "{{count}} bình luận về topic",
         "no_comments": "Chưa có bình luận nào.",
         "comment_input_placeholder": "Nhập bình luận về topic..."
+    },
+    "placeholder": {
+        "search_courses": "Tìm kiếm khoá học",
+        "search_forum": "Tìm kiếm forum",
+        "search_topic": "Tìm kiếm topic",
+        "search_by_name": "Tìm kiếm theo loại hoạt động hoặc tên bài tập"
     }
 }

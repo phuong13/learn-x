@@ -35,8 +35,8 @@ export default function UserMenuDropdown() {
     }, []);
 
     const menuItems = [
-        { label: t('my_profile') , href: '/profile' },
-        { label: t('logout'), href: '/logout' },
+        { label: t('my_profile') , href: '/LEARNX/profile' },
+        { label: t('logout'), href: '/LEARNX/logout' },
     ];
 
     return (
@@ -74,7 +74,6 @@ export default function UserMenuDropdown() {
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                     {menuItems.map(
                         (item, index) => (
-                            console.log(item),
                             (
                                 <a
                                     key={index}

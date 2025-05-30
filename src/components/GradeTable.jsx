@@ -52,7 +52,6 @@ export default function GradeTable() {
                         const quizzesWithSubmissionsPromises = quizzesResponse.map(async (quiz) => {
                             const submissionResponse = await axiosPrivate.get(
                                 `/quiz-submissions/student/quiz/${quiz.id}`,)
-                            console.log("🚀 ~ quizzesWithSubmissionsPromises ~ submissionResponse:", submissionResponse)
 
                             if (submissionResponse.status === 200) {
                                 const submissionData = submissionResponse.data.data;

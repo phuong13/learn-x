@@ -255,7 +255,9 @@ const AuthLayout = ({ type = 'login' }) => {
 
                             {form === 'login' && (
                                 <div className="flex justify-center mt-4 mb-6">
-                                    <button className="text-btn" onClick={handlePasswordReminder}>
+                                    <button className="text-btn" onClick={handlePasswordReminder}
+                                                type="button" 
+>
                                         Quên mật khẩu?
                                     </button>
                                 </div>
@@ -263,17 +265,17 @@ const AuthLayout = ({ type = 'login' }) => {
 
                             <input
                                 type="submit"
-                                className="btn btn--primary w-full hover:scale-[1.01] ease-in-out active:scale-[.98] active:duration-75 translate-all"
+                                className="btn btn--primary w-full hover:scale-[1.01] ease-in-out active:scale-[.98] active:duration-75 translate-all mt-6"
                                 value={form === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                             />
                         </form>
 
-                        <div className="relative my-6 flex items-center justify-center">
+                        <div className="relative my-4 flex items-center justify-center">
                             <span className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-border" />
                             <span className="relative z-10 bg-widget px-2 text-sm">hoặc</span>
                         </div>
 
-                        <div className="flex justify-center mb-6">
+                        <div className="flex justify-center mb-4">
                             <div className="btn btn--social btn--login border-2">
                                 <GoogleLogin
                                     theme="filled_black"
@@ -283,7 +285,7 @@ const AuthLayout = ({ type = 'login' }) => {
                             </div>
                         </div>
 
-                        <div className="flex justify-center gap-2.5">
+                        <div className="flex justify-center gap-2.5 ">
                             <p>{form === 'login' ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}</p>
                             <button
                                 className="text-btn"
