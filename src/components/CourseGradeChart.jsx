@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
-
+import PropTypes from 'prop-types';
 import CourseService from '../services/courses/course.service.js';
 import ModuleService from '../services/modules/module.service.js';
-import { PropTypes } from 'prop-types';
-import { BarChart } from '@mui/x-charts';
+import { PieChart } from '@mui/x-charts';
+import {
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+} from '@mui/material';
 
 const CourseGradeChart = ({ courseId }) => {
     const [assignments, setAssignments] = useState([]);
     const [selectedAssignment, setSelectedAssignment] = useState(null);
     const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
+    // Lấy danh sách module + bài tập
     useEffect(() => {
         if (courseId) {
             const fetchAllAssignments = async () => {
@@ -20,7 +26,9 @@ const CourseGradeChart = ({ courseId }) => {
                     allAssignments.push(...moduleAssignments);
                 }
                 setAssignments(allAssignments);
-                setSelectedAssignment(allAssignments[0].id);
+                if (allAssignments.length > 0) {
+                    setSelectedAssignment(allAssignments[0].id);
+                }
             };
             fetchAllAssignments();
         }
@@ -30,7 +38,8 @@ const CourseGradeChart = ({ courseId }) => {
         try {
             return await CourseService.getModulesByCourseId(courseId);
         } catch (err) {
-            console.log(err);
+            console.error(err);
+            return [];
         }
     };
 
@@ -38,7 +47,8 @@ const CourseGradeChart = ({ courseId }) => {
         try {
             return await ModuleService.getAssignmentsByModuleId(moduleId);
         } catch (err) {
-            console.log(err);
+            console.error(err);
+            return [];
         }
     };
 
@@ -46,22 +56,19 @@ const CourseGradeChart = ({ courseId }) => {
         try {
             return await ModuleService.getAssignmentSubmissions(assignmentId);
         } catch (err) {
-            console.log(err);
+            console.error(err);
+            return [];
         }
     };
 
+    // Lấy dữ liệu submissions để hiển thị biểu đồ
     useEffect(() => {
         const fetchData = async () => {
             const submissions = await fetchAssignmentSubmissions(selectedAssignment);
+            const filtered = submissions.filter((s) => s.score !== null);
 
-            const filteredSubmissions = submissions.filter((submission) => submission.score !== null);
-
-            const scoreCounts = filteredSubmissions.reduce((acc, submission) => {
-                const score = submission.score;
-                if (!acc[score]) {
-                    acc[score] = 0;
-                }
-                acc[score] += 1;
+            const scoreCounts = filtered.reduce((acc, s) => {
+                acc[s.score] = (acc[s.score] || 0) + 1;
                 return acc;
             }, {});
 
@@ -69,8 +76,8 @@ const CourseGradeChart = ({ courseId }) => {
             const data = labels.map((label) => scoreCounts[label]);
 
             setChartData({
-                labels: labels,
-                series: [{ data: data }],
+                labels,
+                series: [{ data }],
             });
         };
 
@@ -84,40 +91,56 @@ const CourseGradeChart = ({ courseId }) => {
     };
 
     return (
-        <div className="">
-            {assignments.length > 0 ? (<select
-                onChange={handleAssignmentChange}
-                value={selectedAssignment}
-                className="block w-32 p-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-slate-300 focus:slate-300 sm:text-sm">
+        <div className="p-4 w-full">
 
-                {assignments.map((assignment) => (
-                    <option key={assignment.id} value={assignment.id}>
-                        {assignment.title}
-                    </option>
-                ))}
-            </select>)
-                :
-                (<div className="text-slate-700 text-center">Chưa có bài tập trong môn học này</div>)}
+            {assignments.length > 0 ? (
+                <FormControl
+                    fullWidth
+                    sx={{
+                        maxWidth: 256, // tương đương sm:w-64
+                        mb: 3,
+                    }}
+                    size="small"
+                >
+                    <InputLabel id="assignmentSelect-label">Chọn bài tập</InputLabel>
+                    <Select
+                        labelId="assignmentSelect-label"
+                        id="assignmentSelect"
+                        value={selectedAssignment || ''}
+                        label="Chọn bài tập"
+                        onChange={handleAssignmentChange}
+                    >
+                        {assignments.map((assignment) => (
+                            <MenuItem key={assignment.id} value={assignment.id}>
+                                {assignment.title}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            ) : (
+                <p className="text-slate-500 text-center">Chưa có bài tập nào trong khóa học này.</p>
+            )}
 
-            {chartData.labels.length > 0 && (
-                <div className='mx-64'>
-                    <BarChart
-                        xAxis={[{ scaleType: 'band', data: chartData.labels, label: 'Thống kê điểm số', width: 20 }]}
+            {chartData.labels.length > 0 ? (
+                <div className="flex justify-center">
+                    <PieChart
                         series={[
                             {
-                                ...chartData.series[0],
-                                barThickness: 10, // 👈 Độ dày mỗi cột
+                                data: chartData.labels.map((label, index) => ({
+                                    id: label,
+                                    value: chartData.series[0].data[index],
+                                    label: `Điểm ${label}`,
+                                })),
+                                innerRadius: 20,
+                                outerRadius: 150,
+                                paddingAngle: 10,
                             },
                         ]}
-                        width={500}
-                        height={400}
-                        barLabel="value"
-                        barGapRatio={0.1} // 👈 Làm cột nhỏ lại
-                        yAxisProps={{
-                            tickFormat: (value) => (Number.isInteger(value) ? value : ''),
-                        }}
+                        width={450}
+                        height={300}
                     />
                 </div>
+            ) : (<p className="text-slate-600  text-center">Chưa có học sinh nào nộp ở bài tập này</p>
             )}
         </div>
     );

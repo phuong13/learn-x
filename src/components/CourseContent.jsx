@@ -61,7 +61,8 @@ const CourseContent = () => {
     const expandAll = () => setExpandedSections(modules.map((m) => m.id));
     const collapseAll = () => setExpandedSections([]);
 
-    return (
+    return (               
+
         <div className="flex">
             <CourseSidebar
                 modules={modules}
@@ -84,7 +85,6 @@ const CourseContent = () => {
                     </div>
                 )}
 
-                <Loader isLoading={isLoading} />
 
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                     {modules.map((module) => (

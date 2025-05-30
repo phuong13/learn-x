@@ -64,7 +64,7 @@ export default function InteractiveStepProgress() {
       </Stepper>
 
       <Box sx={{ mt: 2 }}>
-        {currentStep ===2 && <CreateCourseForm onSubmitSuccess={handleNext} />}
+        {currentStep ===0 && <CreateCourseForm onSubmitSuccess={handleNext} />}
         {currentStep === 1 &&
           <CreateCurriculumForm
             onSubmitSuccess={() => {
@@ -73,7 +73,7 @@ export default function InteractiveStepProgress() {
             }}
             initialModules={[]}
           />}
-        {currentStep === 0 && (
+        {currentStep === 2 && (
           <div className='flex flex-col items-center justify-center h-64'>
             <div className="text-xl font-bold mb- text-slate-700 mb-4">Xác nhận</div>
             <p className="text-lg text-slate-700 mb-4">
