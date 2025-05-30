@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import Backround from '../assets/backround.jpg';
 
 export default function Component() {
     const { t } = useTranslation();
@@ -9,7 +10,7 @@ export default function Component() {
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <img
-                    src="/assets/backround.jpg"
+                    src={Backround}
                     alt=""
                     className="w-full h-full object-cover transform scale-100"
                 />

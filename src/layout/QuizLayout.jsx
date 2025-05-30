@@ -8,6 +8,7 @@ import { useAuth } from '@hooks/useAuth.js';
 import { useCourseById } from '../store/useCourses';
 import { t } from 'i18next';
 import { useQuizById, getQuizSubmissionByQuizId, getStudentSubmissionsByQuizId } from '../store/useQuiz.jsx';
+import Backround from '../assets/backround.jpg';
 
 export default function QuizLayout({ title, content, startDate, endDate }) {
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
@@ -64,7 +65,7 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
-                    src="/assets/backround.jpg"
+                    src={Backround}
                     alt="Online learning illustration"
                     className="w-full h-fit object-cover"
                 />

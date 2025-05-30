@@ -5,7 +5,7 @@ import { vi } from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import { axiosPrivate } from '@/axios/axios.js';
 import { Link, useParams } from 'react-router-dom';
-
+import Backround from '../assets/backround.jpg';
 import Loader from '@components/Loader.jsx';
 import { toast } from 'react-toastify';
 import GradingSummary from '../components/GradingSummary';
@@ -209,7 +209,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
-                    src="/assets/backround.jpg"
+                    src={Backround}
                     alt="Online learning illustration"
                     className="w-full h-fit object-cover"
                 />
