@@ -17,10 +17,13 @@ import Tag from './Tag';
 import { useSubmitModules } from '../store/useModule';
 import { useParams } from 'react-router-dom';
 import { Quiz } from '@mui/icons-material';
+import Loader from './Loader';
 
 
 export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [] }) {
    const [modules, setModules] = useState([]);
+   const [loading, setLoading] = useState(false);
+   console.log("🚀 ~ Curriculum ~ loading:", loading)
    const [quizDialog, setQuizDialog] = useState({ open: false, moduleId: null, editData: null });
    const [lectureDialog, setLectureDialog] = useState({ open: false, moduleId: null, editData: null });
    const [assignmentDialog, setAssignmentDialog] = useState({ open: false, moduleId: null, editData: null });
@@ -237,16 +240,28 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
          console.error('Course ID is missing');
          return;
       }
-
-      const result = await submitModules(modules, courseId);
-      if (result.success && onSubmitSuccess) {
+      try {
+         setLoading(true); 
+         const result = await submitModules(modules, courseId);
+          if (result.success && onSubmitSuccess) {
+         setLoading(false);
          onSubmitSuccess();
       }
+      }
+      catch (error) {
+         console.error('Error submitting modules:', error); 
+         setLoading(false);
+         return;
+      }
+     
+      
+     
    };
 
 
    return (
       <Box display="flex" flexDirection="column" gap={2} sx={{ mx: 'auto', width: '100%' }}>
+         <Loader isLoading={loading} />
          <div className='mx-6 mt-6 flex flex-col gap-2'>
             {isEdit
                ? <div className='text-slate-700 font-bold text-lg'>Chỉnh sửa nội dung khoá học</div>

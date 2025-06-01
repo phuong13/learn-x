@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 
 import Topic from "./components/tag/Topic";
 import { useTopic } from "../../store/useTopic";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const Container = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -61,7 +63,9 @@ const Container = () => {
       )}
 
       {loading ? (
-        <div className="text-center text-slate-500 mt-4">{t("loading")}...</div>
+        <Box sx={{ display: 'flex' , justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <CircularProgress />
+        </Box>
       ) : topics.length > 0 && forumId ? (
         <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6 overflow-y-auto">
           {topics.map((topic) => (

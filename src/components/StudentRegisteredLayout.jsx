@@ -8,10 +8,11 @@ import { X } from 'lucide-react';
 import readXlsxFile from 'read-excel-file';
 import { toast } from 'react-toastify';
 import AddIcon from '@mui/icons-material/Add';
-
+import { Box, CircularProgress } from '@mui/material'; // Thêm import
 
 const StudentRegisteredLayout = () => {
     const [students, setStudents] = useState([]);
+    const [pending, setPending] = useState(false);
     const [paginationInfo, setPaginationInfo] = useState({
         totalPages: 0,
         totalElements: 0,
@@ -31,6 +32,7 @@ const StudentRegisteredLayout = () => {
     const { courseId } = useParams();
 
     const fetchStudents = async (page) => {
+        setPending(true);
         try {
             const pageable = {
                 page: page,
@@ -54,6 +56,9 @@ const StudentRegisteredLayout = () => {
             }
         } catch (error) {
             console.error('Error fetching students:', error);
+        }
+        finally {
+            setPending(false);
         }
     };
 
@@ -112,42 +117,58 @@ const StudentRegisteredLayout = () => {
     };
 
 
-    const handleSumbit = async () => {
-        const textArea = document.querySelector('textarea');
-        const value = textArea.value;
-        const emails = value
-            .split('\n')
-            .map((email) => email.trim())
-            .filter((email) => email);
-        setEmailList(emails);
-        const uniqueEmails = [...new Set(emailList)];
-        if (!validateEmails(uniqueEmails)) return;
+     const handleSumbit = async () => {
+        setPending(true); 
+         handleClose();
+        try {
+            const textArea = document.querySelector('textarea');
+            const value = textArea.value;
+            const emails = value
+                .split('\n')
+                .map((email) => email.trim())
+                .filter((email) => email);
+            setEmailList(emails);
+            const uniqueEmails = [...new Set(emails)];
+            if (!validateEmails(uniqueEmails)) {
+                setPending(false);
+                return;
+            }
 
-        setEmailList(uniqueEmails);
-        const response = await axiosPrivate.post(`/course-registrations/register/${courseId}/list-email`, {
-            emails: uniqueEmails,
-        });
-        console.log(response);
-        if (response.status === 200) {
-            await fetchStudents(0);
-            handleClose();
-            toast.success(response.data.message);
-        } else {
-            toast.error(response.data.message, { type: 'error' });
+            setEmailList(uniqueEmails);
+            const response = await axiosPrivate.post(`/course-registrations/register/${courseId}/list-email`, {
+                emails: uniqueEmails,
+            });
+            if (response.status === 200) {
+                await fetchStudents(0);
+                
+                toast.success(response.data.message);
+            } else {
+                toast.error(response.data.message, { type: 'error' });
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi gửi!', { type: 'error' });
+        } finally {
+            setPending(false); // Kết thúc loading
+           
         }
     };
 
-    const handleDeleteStudent = async (students) => {
-        console.log(students);
-        const response = await axiosPrivate.post(`/course-registrations/remove/${courseId}/list-email`, {
-            emails: students,
-        });
-        console.log(response);
-        if (response.status === 200) {
-            await fetchStudents(0);
-            toast.success(response.data.message);
-        } else {
-            toast.error(response.data.message, { type: 'error' });
+   const handleDeleteStudent = async (students) => {
+        setPending(true); // Bắt đầu loading khi xóa
+        try {
+            const response = await axiosPrivate.post(`/course-registrations/remove/${courseId}/list-email`, {
+                emails: students,
+            });
+            if (response.status === 200) {
+                await fetchStudents(0);
+                toast.success(response.data.message);
+            } else {
+                toast.error(response.data.message, { type: 'error' });
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi xóa!', { type: 'error' });
+        } finally {
+            setPending(false); // Kết thúc loading
         }
     };
 
@@ -163,13 +184,19 @@ const StudentRegisteredLayout = () => {
                     </button>
                 )}
             </div>
-            <StudentRegisteredList
-                totalStudents={paginationInfo.totalElements}
-                students={students}
-                paginationInfo={paginationInfo}
-                onPageChange={handlePageChange}
-                onDeleteStudents={handleDeleteStudent}
-            />
+            {pending ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <StudentRegisteredList
+                    totalStudents={paginationInfo.totalElements}
+                    students={students}
+                    paginationInfo={paginationInfo}
+                    onPageChange={handlePageChange}
+                    onDeleteStudents={handleDeleteStudent}
+                />
+            )}
 
 
             <Dialog open={showModal} onClose={handleClose} maxWidth="sm" fullWidth hideBackdrop={false}>

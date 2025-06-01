@@ -6,16 +6,14 @@ import QuizzHeader from '../components/QuizzHeader';
 import CourseSidebar from './CourseSidebar.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth.js';
-import { parseJavaLocalDateTime } from '@/utils/date.js';
 import { useSubmitModules } from '../store/useModule';
 import EditIcon from '@mui/icons-material/Edit';
-
-import Loader from './Loader';
+import { Box, CircularProgress } from '@mui/material'; // Thêm import
 import Lecture from './LectureComponent';
 import Resource from './ResourceComponent';
 
 const CourseContent = () => {
-    const [expandedSections, setExpandedSections] = useState([]);
+    const [expandedSections, setExpandedSections] = useState([])
     const [modules, setModules] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -31,6 +29,8 @@ const CourseContent = () => {
             const { success, modules: fetchedModules } = await getModules(courseId);
             if (success) {
                 setModules(fetchedModules);
+                setExpandedSections(fetchedModules.map(m => m.id)); // Mở mặc định tất cả modules
+
             }
             setIsLoading(false);
         };
@@ -61,7 +61,7 @@ const CourseContent = () => {
     const expandAll = () => setExpandedSections(modules.map((m) => m.id));
     const collapseAll = () => setExpandedSections([]);
 
-    return (               
+    return (
 
         <div className="flex">
             <CourseSidebar
@@ -84,85 +84,89 @@ const CourseContent = () => {
                         </button>
                     </div>
                 )}
-
-
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                    {modules.map((module) => (
-                        <div
-                            key={module.id}
-                            ref={(el) => (moduleRefs.current[module.id] = el)}
-                            className="border-b last:border-b-0"
-                        >
-                            <button
-                                onClick={() => toggleSection(module)}
-                                className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
+                {isLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (<>
+                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                        {modules.map((module) => (
+                            <div
+                                key={module.id}
+                                ref={(el) => (moduleRefs.current[module.id] = el)}
+                                className="border-b last:border-b-0"
                             >
-                                <span className="flex  gap-2 text-base font-semibold text-slate-600 items-center">
-                                    <School /> {module.title}
+                                <button
+                                    onClick={() => toggleSection(module)}
+                                    className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
+                                >
+                                    <span className="flex  gap-2 text-base font-semibold text-slate-600 items-center">
+                                        <School /> {module.title}
 
-                                </span>
-                                {expandedSections.includes(module.id) ? (
-                                    <ChevronDown className="h-5 w-5 text-slate-400" />
-                                ) : (
-                                    <ChevronRight className="h-5 w-5 text-slate-400" />
-                                )}
-                            </button>
+                                    </span>
+                                    {expandedSections.includes(module.id) ? (
+                                        <ChevronDown className="h-5 w-5 text-slate-400" />
+                                    ) : (
+                                        <ChevronRight className="h-5 w-5 text-slate-400" />
+                                    )}
+                                </button>
 
-                            {expandedSections.includes(module.id) && (
-                                <div className="px-4 pb-2">
-                                    {module.contents.map((item) => {
-                                        switch (item.type) {
-                                            case 'lecture':
-                                                return (
-                                                    <Lecture
-                                                        key={item.id}
-                                                        name={item.title}
-                                                        content={item.content}
-                                                    />
-                                                );
-                                            case 'resource': {
-                                                const ext = item.urlDocument?.split('.').pop();
-                                                const type = ['pdf', 'ppt', 'xlsx'].includes(ext) ? ext : 'word';
-                                                return (
-                                                    <Resource
-                                                        key={item.id}
-                                                        type={type}
-                                                        title={item.title}
-                                                        link={item.urlDocument}
-                                                    />
-                                                );
+                                {expandedSections.includes(module.id) && (
+                                    <div className="px-4 pb-2">
+                                        {module.contents.map((item) => {
+                                            switch (item.type) {
+                                                case 'lecture':
+                                                    return (
+                                                        <Lecture
+                                                            key={item.id}
+                                                            name={item.title}
+                                                            content={item.content}
+                                                        />
+                                                    );
+                                                case 'resource': {
+                                                    const ext = item.urlDocument?.split('.').pop();
+                                                    const type = ['pdf', 'ppt', 'xlsx'].includes(ext) ? ext : 'word';
+                                                    return (
+                                                        <Resource
+                                                            key={item.id}
+                                                            type={type}
+                                                            title={item.title}
+                                                            link={item.urlDocument}
+                                                        />
+                                                    );
+                                                }
+                                                case 'assignment':
+                                                    return (
+                                                        <SubmissionHeader
+                                                            key={item.id}
+                                                            courseID={courseId}
+                                                            id={item.id}
+                                                            title={item.title}
+                                                            startDate={item.startDate}
+                                                            endDate={item.endDate}
+                                                        />
+                                                    );
+                                                case 'quiz':
+                                                    return (
+                                                        <QuizzHeader
+                                                            key={item.id}
+                                                            courseID={courseId}
+                                                            id={item.id}
+                                                            title={item.title}
+                                                            startDate={item.startDate}
+                                                            endDate={item.endDate}
+                                                        />
+                                                    );
+                                                default:
+                                                    return null;
                                             }
-                                            case 'assignment':
-                                                return (
-                                                    <SubmissionHeader
-                                                        key={item.id}
-                                                        courseID={courseId}
-                                                        id={item.id}
-                                                        title={item.title}
-                                                        startDate={item.startDate}
-                                                        endDate={item.endDate}
-                                                    />
-                                                );
-                                            case 'quiz':
-                                                return (
-                                                    <QuizzHeader
-                                                        key={item.id}
-                                                        courseID={courseId}
-                                                        id={item.id}
-                                                        title={item.title}
-                                                        startDate={item.startDate}
-                                                        endDate={item.endDate}
-                                                    />
-                                                );
-                                            default:
-                                                return null;
-                                        }
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </>)}
             </div>
         </div>
     );

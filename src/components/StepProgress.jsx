@@ -7,11 +7,12 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
-
+import { useNavigate } from 'react-router-dom';
 const steps = ['Tạo khoá học mới', 'Tạo nội dung khoá học', 'Xác nhận'];
 
 export default function InteractiveStepProgress() {
   const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
   const [courseInfo, setCourseInfo] = useState(() => {
     const savedCourseInfo = localStorage.getItem('courseInfo');
     return savedCourseInfo ? JSON.parse(savedCourseInfo) : {};
@@ -38,7 +39,7 @@ export default function InteractiveStepProgress() {
     const { id } = JSON.parse(localStorage.getItem('courseInfo'));
     localStorage.removeItem('courseInfo');
     localStorage.removeItem('sections');
-    window.location.href = `/course-detail/${id}`;
+    navigate(`/course-detail/${id}`);
   };
 
   return (
@@ -64,7 +65,7 @@ export default function InteractiveStepProgress() {
       </Stepper>
 
       <Box sx={{ mt: 2 }}>
-        {currentStep ===0 && <CreateCourseForm onSubmitSuccess={handleNext} />}
+        {currentStep === 0 && <CreateCourseForm onSubmitSuccess={handleNext} />}
         {currentStep === 1 &&
           <CreateCurriculumForm
             onSubmitSuccess={() => {

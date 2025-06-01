@@ -109,7 +109,7 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
             </div>
 
             {/* Main Content */}
-            <div className="my-4 relative">
+            <div className="my-4">
                 <div className="bg-white shadow-lg overflow-hidden rounded-lg">
                     {/* Quiz Details */}
                     <div className="p-4 border-b border-slate-200">

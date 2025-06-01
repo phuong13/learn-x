@@ -8,17 +8,21 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    Box,
+    CircularProgress,
 } from '@mui/material';
 
 const CourseGradeChart = ({ courseId }) => {
     const [assignments, setAssignments] = useState([]);
     const [selectedAssignment, setSelectedAssignment] = useState(null);
     const [chartData, setChartData] = useState({ labels: [], series: [] });
+    const [pending, setPending] = useState(false); // Thêm pending
 
     // Lấy danh sách module + bài tập + quiz
     useEffect(() => {
         if (courseId) {
             const fetchAllAssignmentsAndQuizzes = async () => {
+                setPending(true); // Bắt đầu loading
                 const allAssignments = [];
                 const modules = await fetchModules(courseId);
                 for (const module of modules) {
@@ -35,6 +39,7 @@ const CourseGradeChart = ({ courseId }) => {
                 if (allAssignments.length > 0) {
                     setSelectedAssignment(`${allAssignments[0].type}-${allAssignments[0].id}`);
                 }
+                setPending(false);
             };
             fetchAllAssignmentsAndQuizzes();
         }
@@ -84,9 +89,9 @@ const CourseGradeChart = ({ courseId }) => {
         return [];
     };
 
-    // Lấy dữ liệu submissions để hiển thị biểu đồ
     useEffect(() => {
         const fetchData = async () => {
+            setPending(true);
             const submissions = await fetchSubmissions(selectedAssignment);
             const filtered = submissions.filter((s) => s.score !== null && s.score !== undefined);
 
@@ -102,6 +107,7 @@ const CourseGradeChart = ({ courseId }) => {
                 labels,
                 series: [{ data }],
             });
+            setPending(false);
         };
 
         if (selectedAssignment) {
@@ -115,65 +121,67 @@ const CourseGradeChart = ({ courseId }) => {
 
     return (
         <div className="p-4 w-full">
-            {assignments.length > 0 ? (
-                <FormControl
-                    fullWidth
-                    sx={{
-                        maxWidth: 256,
-                        mb: 3,
-                    }}
-                    size="small"
-                >
-                    <InputLabel id="assignmentSelect-label">Chọn bài tập/quiz</InputLabel>
-                    <Select
-                        labelId="assignmentSelect-label"
-                        id="assignmentSelect"
-                        value={selectedAssignment || ''}
-                        label="Chọn bài tập/quiz"
-                        onChange={handleAssignmentChange}
-                    >
-                        {assignments.map((item) => (
-                            <MenuItem key={`${item.type}-${item.id}`} value={`${item.type}-${item.id}`}>
-                                {item.type === 'assignment' ? 'Bài tập: ' : 'Quiz: '}
-                                {item.title}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            ) : (
-                <p className="text-slate-500 text-center">Chưa có bài tập hoặc quiz nào trong khóa học này.</p>
-            )}
-
-            {chartData.labels.length > 0 ? (
+            {pending ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
+                    <CircularProgress />
+                </Box>
+            ) : assignments.length > 0 ? (
                 <>
+                    <FormControl
+                        fullWidth
+                        sx={{
+                            maxWidth: 256,
+                            mb: 3,
+                        }}
+                        size="small"
+                    >
+                        <InputLabel id="assignmentSelect-label">Chọn bài tập/quiz</InputLabel>
+                        <Select
+                            labelId="assignmentSelect-label"
+                            id="assignmentSelect"
+                            value={selectedAssignment || ''}
+                            label="Chọn bài tập/quiz"
+                            onChange={handleAssignmentChange}
+                        >
+                            {assignments.map((item) => (
+                                <MenuItem key={`${item.type}-${item.id}`} value={`${item.type}-${item.id}`}>
+                                    {item.type === 'assignment' ? 'Bài tập: ' : 'Quiz: '}
+                                    {item.title}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
-                    <div className="relative flex flex-col items-center">
-
-                        <div className="flex justify-center  ml-20">
-                            <PieChart
-                                series={[
-                                    {
-                                        data: chartData.labels.map((label, index) => ({
-                                            id: label,
-                                            value: chartData.series[0].data[index],
-                                            label: `Điểm ${label} (${chartData.series[0].data[index]})`,
-                                        })),
-                                        innerRadius: 20,
-                                        outerRadius: 150,
-                                        paddingAngle: 1,
-                                    },
-                                ]}
-                                width={500}
-                                height={300}
-                            />
+                    {chartData.labels.length > 0 ? (
+                        <div className="relative flex flex-col items-center">
+                            <div className="text-lg font-bold text-slate-700 mb-4 text-center">
+                                Thống kê điểm số
+                            </div>
+                            <div className="flex justify-center">
+                                <PieChart
+                                    series={[
+                                        {
+                                            data: chartData.labels.map((label, index) => ({
+                                                id: label,
+                                                value: chartData.series[0].data[index],
+                                                label: `Điểm ${label} (${chartData.series[0].data[index]})`,
+                                            })),
+                                            innerRadius: 20,
+                                            outerRadius: 150,
+                                            paddingAngle: 1,
+                                        },
+                                    ]}
+                                    width={500}
+                                    height={300}
+                                />
+                            </div>
                         </div>
-                        <div className="text-lg font-bold text-slate-700 mt-4 text-center">
-                            Thống kê điểm số
-                        </div>
-                    </div>
+                    ) : (
+                        <p className="text-slate-600 text-center">Chưa có học sinh nào nộp ở mục này</p>
+                    )}
                 </>
             ) : (
-                <p className="text-slate-600 text-center">Chưa có học sinh nào nộp ở mục này</p>
+                <p className="text-slate-500 text-center">Chưa có bài tập hoặc quiz nào trong khóa học này.</p>
             )}
         </div>
     );

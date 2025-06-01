@@ -5,15 +5,18 @@ import { toast } from 'react-toastify';
 import SubmissionHeader from '@components/SubmissionHeader.jsx';
 import { t } from 'i18next';
 import QuizzHeader from './QuizzHeader';
+import { Box, CircularProgress } from '@mui/material'; // Thêm import
 
 export default function AssignmentControlPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [timeFilter, setTimeFilter] = useState('this'); // 'this' = tháng này, 'next' = tháng sau
   const [assignments, setAssignments] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
+  const [pending, setPending] = useState(false); // Thêm state pending
 
   useEffect(() => {
     const fetchAssignments = async () => {
+      setPending(true);
       const date = new Date();
       let month = date.getMonth() + 1;
       let year = date.getFullYear();
@@ -38,7 +41,8 @@ export default function AssignmentControlPanel() {
         })
         .catch((err) => {
           toast(err.response.data.message, { type: 'error' });
-        });
+        })
+        .finally(() => setPending(false));
     };
 
     fetchAssignments();
@@ -84,28 +88,33 @@ export default function AssignmentControlPanel() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
         </div>
       </div>
+      {pending ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
+          <CircularProgress />
+        </Box>
+      ) : (<>
+        {filteredAssignments.map((assignment) => (
+          <SubmissionHeader
+            courseID={assignment.courseId}
+            key={assignment.id}
+            id={assignment.id}
+            title={`${assignment.courseName} - ${assignment.title}`}
+            startDate={assignment.startDate}
+            endDate={assignment.endDate}
+          />
+        ))}
 
-      {filteredAssignments.map((assignment) => (
-        <SubmissionHeader
-          courseID={assignment.courseId}
-          key={assignment.id}
-          id={assignment.id}
-          title={`${assignment.courseName} - ${assignment.title}`}
-          startDate={assignment.startDate}
-          endDate={assignment.endDate}
-        />
-      ))}
-
-      {filteredQuizzes.map((quiz) => (
-        <QuizzHeader
-          courseID={quiz.courseId}
-          key={quiz.id}
-          id={quiz.id}
-          title={`${quiz.courseName} - ${quiz.title}`}
-          startDate={quiz.startDate}
-          endDate={quiz.endDate}
-        />
-      ))}
+        {filteredQuizzes.map((quiz) => (
+          <QuizzHeader
+            courseID={quiz.courseId}
+            key={quiz.id}
+            id={quiz.id}
+            title={`${quiz.courseName} - ${quiz.title}`}
+            startDate={quiz.startDate}
+            endDate={quiz.endDate}
+          />
+        ))}
+      </>)}
 
     </div>
   )

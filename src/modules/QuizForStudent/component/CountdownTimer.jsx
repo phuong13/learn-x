@@ -6,7 +6,6 @@ const CountdownTimer = ({ timeLimit, onTimeout }) => {
   const safeTimeLimit = Number(timeLimit) > 0 ? Number(timeLimit) : 60;
   const [timeLeft, setTimeLeft] = useState(safeTimeLimit);
 
-  // Reset timer nếu timeLimit thay đổi
   useEffect(() => {
     setTimeLeft(safeTimeLimit);
   }, [safeTimeLimit]);

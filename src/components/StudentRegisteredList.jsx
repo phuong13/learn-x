@@ -11,7 +11,6 @@ const StudentRegisteredList = ({
   onPageChange,
   onDeleteStudents,
 }) => {
-  console.log("🚀 ~ paginationInfo:", )
   // **Local copy** của students để xóa + re-render
   const [localStudents, setLocalStudents] = useState(students);
   const [currentPage, setCurrentPage] = useState(paginationInfo.pageNumber);

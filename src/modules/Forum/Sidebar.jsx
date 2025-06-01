@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
+import Loader from '../../components/Loader';
 import TagCourse from './components/tag/TagCourse';
 import { useCourses } from '../../store/useCourses';
 import { useForum } from '../../store/useForum';
@@ -10,8 +10,8 @@ import { TextField, InputAdornment, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 export const Sidebar = () => {
-  const { courses } = useCourses();
-  const { createForum } = useForum();
+  const { courses, loading } = useCourses();
+  const { createForum, loading: forumLoading } = useForum();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -54,22 +54,28 @@ export const Sidebar = () => {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {filteredCourses.length > 0 ? (
-          filteredCourses.map((course) => (
-            <TagCourse
-              key={course.id}
-              nameCourse={course.name}
-              onClick={() => handleCourseClick(course.id)}
-              isActive={activeCourseId === course.id}
-            />
-          ))
-        ) : (
-          <p className="text-center text-slate-700 py-4">
-            {t('forum.no_courses_found')}
-          </p>
-        )}
-      </div>
+      {(loading ) ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader isLoading />
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {filteredCourses.length > 0 ? (
+            filteredCourses.map((course) => (
+              <TagCourse
+                key={course.id}
+                nameCourse={course.name}
+                onClick={() => handleCourseClick(course.id)}
+                isActive={activeCourseId === course.id}
+              />
+            ))
+          ) : (
+            <p className="text-center text-slate-700 py-4">
+              {t('forum.no_courses_found')}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

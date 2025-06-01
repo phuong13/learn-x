@@ -2,6 +2,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 
+
 const baseURL = 'https://learnx-spring-app-86563bbf71fb.herokuapp.com/api/v1';
 
 export default axios.create({
@@ -35,8 +36,7 @@ axiosPrivate.interceptors.request.use(
                         token: refreshToken
                     });
                     if (!response.data?.data?.accessToken) {
-                        console.log('Failed to refresh token');
-                        window.location.href = '/login';
+                        useNavigate().navigate('/login');
                         return Promise.reject('Failed to refresh token');
                     }
                     const { accessToken, refreshToken: newRefreshToken, ...user } = response.data.data;
@@ -46,10 +46,10 @@ axiosPrivate.interceptors.request.use(
                     config.headers['Authorization'] = `Bearer ${accessToken}`;
                 } catch (err) {
                     console.error('Error refreshing token:', err);
-                    window.location.href = '/login';
+                    useNavigate().navigate('/login');
                     return Promise.reject(err);
                 }
-              
+
             }
         }
         return config;

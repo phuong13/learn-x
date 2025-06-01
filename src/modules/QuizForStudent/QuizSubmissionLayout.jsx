@@ -11,12 +11,15 @@ import { useQuizById, getSession, useSubmissionQuiz } from '../../store/useQuiz.
 import { parseJavaLocalDateTime } from '../../utils/date.js';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { CircularProgress, Box } from '@mui/material';
+import { is } from 'date-fns/locale';
 const QuizSubmissionLayout = () => {
 
   const [answers, setAnswers] = useState({});
   const { quizId, courseId } = useParams();
   const { questions, loading, error } = useQuestionByQuizId(quizId);
-  const [timeoutDialogOpen, setTimeoutDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+   const [timeoutDialogOpen, setTimeoutDialogOpen] = useState(false);
   const { quiz, quizTitle } = useQuizById(quizId);
   const { session } = getSession(quizId);
   const submissionQuiz = useSubmissionQuiz();
@@ -36,9 +39,14 @@ const QuizSubmissionLayout = () => {
     totalTimeTakenInSeconds = Math.max(Math.floor(totalTime / 1000), 0);
   }
   const handleSubmit = async () => {
-    await submissionQuiz(quizId, totalTimeTakenInSeconds, answers);
-    toast.success('Nộp bài thành công');
-    navigate(`/quiz/${courseId}/${quizId}`);
+    setIsLoading(true);
+    try {
+      await submissionQuiz(quizId, totalTimeTakenInSeconds, answers);
+      toast.success('Nộp bài thành công');
+      navigate(`/quiz/${courseId}/${quizId}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const totalQuestions = questions.length;
@@ -68,7 +76,13 @@ const QuizSubmissionLayout = () => {
 
 
 
-
+  if (loading||isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300, width: '100%' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div className='flex flex-row gap-6 p-6 min-h-[calc(100vh-193px)]'>

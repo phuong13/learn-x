@@ -56,20 +56,30 @@ const MyCourse = () => {
                 <div className='flex justify-end'>
                     <CourseFilter />
                 </div>
-                {!(courses.length > 0) && <div className="text-center justify-center">Bạn chưa đăng ký khóa học nào!</div>}
-                <div className="grid grid-cols-4 gap-4 mt-4">
-                    {Array.isArray(courses) &&
-                        courses.length > 0 &&
-                        courses.map((course) => (
-                            <CourseCard
-                                key={course.id}
-                                id={course.id}
-                                name={course.name}
-                                description={course.description}
-                                thumbnail={course.thumbnail}
-                            />
-                        ))}
-                </div>
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <Loader isLoading />
+                    </div>
+                ) : (
+                    <>
+                        {!(courses.length > 0) && (
+                            <div className="text-center justify-center">Bạn chưa đăng ký khóa học nào!</div>
+                        )}
+                        <div className="grid grid-cols-4 gap-4 mt-4">
+                            {Array.isArray(courses) &&
+                                courses.length > 0 &&
+                                courses.map((course) => (
+                                    <CourseCard
+                                        key={course.id}
+                                        id={course.id}
+                                        name={course.name}
+                                        description={course.description}
+                                        thumbnail={course.thumbnail}
+                                    />
+                                ))}
+                        </div>
+                    </>
+                )}
             </div>
             <Pagination
                 count={totalPages}
