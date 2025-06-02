@@ -68,7 +68,12 @@ export default function FormAssignment({
     };
 
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm"
+            sx={{
+                '& .MuiBackdrop-root': {
+                    backgroundColor: 'rgba(0,0,0,0.4) !important',
+                },
+            }}>
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 {isEdit ? 'Chỉnh sửa bài tập' : 'Tạo bài tập'}
                 <IconButton onClick={onClose}><CloseIcon /></IconButton>

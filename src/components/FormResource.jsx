@@ -49,6 +49,11 @@ export default function FormResource({ open, onClose, defaultData = {}, isEdit =
         onClose?.();
       }}
       fullWidth maxWidth="sm"
+      sx={{
+                '& .MuiBackdrop-root': {
+                    backgroundColor: 'rgba(0,0,0,0.4) !important',
+                },
+            }}
     >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {isEdit ? 'Chỉnh sửa tài nguyên' : 'Tạo tài nguyên'}

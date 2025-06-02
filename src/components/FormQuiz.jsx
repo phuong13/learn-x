@@ -359,7 +359,12 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
     <Dialog open={open} onClose={(event, reason) => {
       if (reason === 'backdropClick' || reason === 'escapeKeyDown') return;
       onClose?.();
-    }} fullWidth maxWidth="lg" disableEscapeKeyDown >
+    }} fullWidth maxWidth="lg" disableEscapeKeyDown
+      sx={{
+        '& .MuiBackdrop-root': {
+          backgroundColor: 'rgba(0,0,0,0.4) !important',
+        },
+      }} >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {isEdit ? 'Chỉnh sửa Quiz' : 'Tạo mới Quiz'}
         <IconButton onClick={onClose}><CloseIcon /></IconButton>

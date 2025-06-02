@@ -12,6 +12,7 @@ const Container = () => {
   const [newTopic, setNewTopic] = useState("");
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingCreate, setLoadingCreate] = useState(false); // loading cho tạo topic
 
   const { forumId } = useParams();
   const { t } = useTranslation();
@@ -36,7 +37,7 @@ const Container = () => {
 
   const handleCreateTopic = async () => {
     if (!newTopic.trim() || !forumId) return;
-
+    setLoadingCreate(true); // chỉ loading nút submit
     try {
       await createTopic({ content: newTopic, forumId });
       await fetchTopics();
@@ -44,6 +45,8 @@ const Container = () => {
       setNewTopic("");
     } catch (err) {
       console.error("Lỗi khi tạo topic:", err);
+    } finally {
+      setLoadingCreate(false);
     }
   };
 
@@ -63,7 +66,7 @@ const Container = () => {
       )}
 
       {loading ? (
-        <Box sx={{ display: 'flex' , justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <CircularProgress />
         </Box>
       ) : topics.length > 0 && forumId ? (
@@ -108,10 +111,11 @@ const Container = () => {
                 {t("forum.cancel")}
               </button>
               <button
-                className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
+                className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors flex items-center justify-center"
                 onClick={handleCreateTopic}
+                disabled={loadingCreate}
               >
-                {t("forum.submit")}
+                {loadingCreate ? <CircularProgress size={20} color="inherit" /> : t("forum.submit")}
               </button>
             </div>
           </div>

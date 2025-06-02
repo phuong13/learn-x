@@ -23,12 +23,11 @@ const QuizSubmissionLayout = () => {
   const { quiz, quizTitle } = useQuizById(quizId);
   const { session } = getSession(quizId);
   const submissionQuiz = useSubmissionQuiz();
-
-
   const navigate = useNavigate();
+
   let timeLeftSeconds = 0
   if (Array.isArray(session?.endTime)) {
-    const endDate = parseJavaLocalDateTime(session?.endTime);
+    const endDate = new Date(parseJavaLocalDateTime(session?.endTime).getTime() + 7 * 60 * 60 * 1000);
     const timeLeftMs = endDate.getTime() - Date.now();
     timeLeftSeconds = Math.max(Math.floor(timeLeftMs / 1000), 0);
   }
@@ -130,7 +129,7 @@ const QuizSubmissionLayout = () => {
         />
 
       </div>
-      <TimeoutDialog open={timeoutDialogOpen} />
+      <TimeoutDialog open={timeoutDialogOpen} onSubmit={handleSubmit}/>
 
     </div>
   )

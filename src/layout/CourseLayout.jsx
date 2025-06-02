@@ -14,14 +14,13 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import Loader from '../components/Loader.jsx';
+import EditCourseInfoModal from '../components/EditCourseInfoModal';
 
 
 export default function CoursePageLayout() {
     const [selectedTab, setSelectedTab] = useState(0);
     const [course, setCourse] = useState(null);
-    const [modules, setModules] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
     const [teacher, setTeacher] = useState(null);
     const [isOpenEditCourseInfoModal, setIsOpenEditCourseInfoModal] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -29,7 +28,7 @@ export default function CoursePageLayout() {
     const [categories, setCategories] = useState([]);
     const datePickerRef = useRef(null);
     const { authUser } = useAuth();
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [startDate, setStartDate] = useState(new Date());
     const [courseName, setCourseName] = useState('');
     const [description, setDescription] = useState('');
@@ -52,34 +51,28 @@ export default function CoursePageLayout() {
     const handleDateSelect = (date) => setStartDate(date);
     useEffect(() => {
         const fetchData = async () => {
-            const response = await axiosPrivate.get(`courses/${courseId}`);
-            if (response.status === 200) {
-                setCourse(response.data.data);
-                setCourseName(response.data.data.name);
-                setDescription(response.data.data.description);
-                setCategory(response.data.data.categoryId);
-                setStartDate(new Date(response.data.data.startDate));
-            }
-            const teacherResponse = await axiosPrivate.get(`courses/${courseId}/teacher`);
-            if (teacherResponse.status === 200) {
-                setTeacher(teacherResponse.data.data);
+            try {
+                const response = await axiosPrivate.get(`courses/${courseId}`);
+                if (response.status === 200) {
+                    setCourse(response.data.data);
+                    setCourseName(response.data.data.name);
+                    setDescription(response.data.data.description);
+                    setCategory(response.data.data.categoryId);
+                    setStartDate(new Date(response.data.data.startDate));
+                }
+                const teacherResponse = await axiosPrivate.get(`courses/${courseId}/teacher`);
+                if (teacherResponse.status === 200) {
+                    setTeacher(teacherResponse.data.data);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
             }
         };
         fetchData();
     }, [courseId]);
 
-    useEffect(() => {
-        const fetchModules = async () => {
-            try {
-                const response = await axiosPrivate.get(`courses/${courseId}/modules`);
-                setModules(response.data || []);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setIsLoading(false);}
-        };
-        fetchModules();
-    }, [courseId]);
+
 
     useEffect(() => {
         axiosPrivate
@@ -99,7 +92,7 @@ export default function CoursePageLayout() {
             if (response.status === 200) {
                 setIsConfirmDialogOpen(false);
                 navigate('/my-course');
-                toast(response.data.message);
+                toast.success(response.data.message);
             }
         } catch (err) {
             console.error(err);
@@ -152,18 +145,15 @@ export default function CoursePageLayout() {
 
     const handleSaveCourseInfo = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         const formData = new FormData();
         const formElements = e.target.elements;
 
         const params = new URLSearchParams();
         params.append('name', courseName);
         params.append('description', description);
-        params.append(
-            'categoryName',
-            formElements.category.value === 'new' ? formElements.newCategory.value : formElements.category.value,
-        );
+    
         params.append('startDate', startDate);
-        params.append('state', formElements.state.value);
         const urlParams = params.toString();
 
         const thumbnail = formElements.thumbnail.files[0];
@@ -174,15 +164,16 @@ export default function CoursePageLayout() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             if (response.status === 200) {
-                toast(response.data.message);
+                toast.success(response.data.message);
                 navigate(0);
             } else {
-                toast(response.data.message, { type: 'error' });
+                toast.error(response.data.message, { type: 'error' });
             }
         } catch (error) {
             console.error('Error submitting form:', error);
             toast(error.response.data.message, { type: 'error' });
         } finally {
+            setIsSubmitting(false);
             setIsOpenEditCourseInfoModal(false);
         }
     };
@@ -190,7 +181,7 @@ export default function CoursePageLayout() {
     return (
         <div className="bg-slate-100 min-h-[calc(100vh-193px)] flex flex-col">
             {isLoading && (
-               <Loader isLoading={isLoading}/>
+                <Loader isLoading={isLoading} />
             )}
             {<>
                 <div className="relative h-48 bg-emerald-200 overflow-hidden">
@@ -292,180 +283,32 @@ export default function CoursePageLayout() {
                 )}
 
                 {isOpenEditCourseInfoModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 ">
-                        <form
-                            onSubmit={handleSaveCourseInfo}
-                            className="bg-white shadow-xl rounded-lg w-full mx-96 max-h-[80vh] overflow-y-auto">
-                            <div className="px-6 py-8">
-                                <div className="text-2xl font-bold text-center text-slate-800 mb-8">
-                                    Chỉnh sửa thông tin khóa học
-                                </div>
-                                <div className="space-y-6">
-                                    <div>
-                                        <label htmlFor="category" className="block text-sm font-bold text-slate-700 mb-1">
-                                            Danh mục
-                                        </label>
-                                        <select
-                                            id="category"
-                                            name="category"
-                                            onChange={handleCategoryChange}
-                                            value={category}
-                                            className={inputClassName}>
-                                            <option value="">Chọn danh mục</option>
-                                            {categories.map((category) => (
-                                                <option key={category.id} value={category.name}>
-                                                    {category.name}
-                                                </option>
-                                            ))}
-                                            <option value="new">Thêm danh mục mới</option>
-                                        </select>
-                                    </div>
+                    <EditCourseInfoModal
+                        open={isOpenEditCourseInfoModal}
+                        onClose={() => setIsOpenEditCourseInfoModal(false)}
+                        onSubmit={handleSaveCourseInfo}
+                        inputClassName={inputClassName}
+                        categories={categories}
+                        category={category}
+                        handleCategoryChange={handleCategoryChange}
+                        showNewCategory={showNewCategory}
+                        newCategory={newCategory}
+                        setNewCategory={setNewCategory}
+                        courseName={courseName}
+                        setCourseName={setCourseName}
+                        description={description}
+                        setDescription={setDescription}
+                        startDate={startDate}
+                        handleDateSelect={handleDateSelect}
+                        datePickerRef={datePickerRef}
+                        selectedImage={selectedImage}
+                        handleImageChange={handleImageChange}
+                        course={course}
+                        isSubmitting={isSubmitting}
 
-                                    {showNewCategory && (
-                                        <div>
-                                            <label
-                                                htmlFor="newCategory"
-                                                className="block text-sm font-bold text-slate-700 mb-1">
-                                                Tên danh mục mới
-                                            </label>
-                                            <input
-                                                id="newCategory"
-                                                name="newCategory"
-                                                type="text"
-                                                placeholder="Nhập tên danh mục mới"
-                                                className={inputClassName}
-                                                onChange={(e) => setNewCategory(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div>
-                                        <label
-                                            htmlFor="courseName"
-                                            className="block text-sm font-bold text-slate-700 mb-1">
-                                            Tên khóa học
-                                        </label>
-                                        <input
-                                            id="courseName"
-                                            name="courseName"
-                                            type="text"
-                                            placeholder="Nhập tên khóa học"
-                                            className={inputClassName}
-                                            required
-                                            value={courseName}
-                                            onChange={(e) => setCourseName(e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor="description"
-                                            className="block text-sm font-bold text-slate-700 mb-1">
-                                            Mô tả
-                                        </label>
-                                        <textarea
-                                            id="description"
-                                            name="description"
-                                            rows={3}
-                                            placeholder="Nhập mô tả khóa học"
-                                            className={inputClassName}
-                                            value={description}
-                                            onChange={(e) => setDescription(e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="startDate" className="block text-sm font-bold text-slate-700 mb-1">
-                                            Ngày bắt đầu
-                                        </label>
-                                        <div
-                                            className="mt-1 relative w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                            onClick={() => datePickerRef.current.setOpen(true)}>
-                                            <DatePicker
-                                                id="startDate"
-                                                name="startDate"
-                                                selected={startDate}
-                                                onChange={handleDateSelect}
-                                                dateFormat="yyyy-MM-dd"
-                                                required
-                                                ref={datePickerRef}
-                                            />
-                                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                                <CalendarIcon className="h-5 w-5 text-slate-400" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="state" className="block text-sm font-bold text-slate-700 mb-1">
-                                            Trạng thái
-                                        </label>
-                                        <select id="state" name="state" defaultValue="OPEN" className={inputClassName}>
-                                            <option value="OPEN">OPEN</option>
-                                            <option value="CLOSED">CLOSED</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="thumbnail" className="block text-sm font-bold text-slate-700 mb-1">
-                                            Ảnh nền
-                                        </label>
-                                        <input
-                                            id="thumbnail"
-                                            name="thumbnail"
-                                            type="file"
-                                            accept="image/*"
-                                            className={`${inputClassName} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 
-                                        file:text-sm file:font-semibold file:bg-primaryDark file:text-white`}
-                                            onChange={handleImageChange}
-                                        />
-                                        {selectedImage && (
-                                            <div className="w-max img-wrapper block mx-auto mt-4">
-                                                <img
-                                                    src={selectedImage}
-                                                    alt="Selected"
-                                                    className="max-w-xs h-auto rounded-lg"
-                                                />
-                                            </div>
-                                        )}
-                                        {!selectedImage && (
-                                            <div className="w-max img-wrapper block mx-auto mt-4">
-                                                <img
-                                                    src={course?.thumbnail}
-                                                    alt="Selected"
-                                                    className="max-w-xs h-auto rounded-lg"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex justify-end">
-                                <div className="m-2 text-right">
-                                    <button
-                                        onClick={() => setIsOpenEditCourseInfoModal(false)}
-                                        className="py-2 px-4 w-full bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                        Hủy
-                                    </button>
-                                </div>
-
-                                <div className="m-2 text-right">
-                                    <button
-                                        type="submit"
-                                        className="py-2 px-4 w-full bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                        Lưu
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                    />
                 )}
-
-
             </>}
-
-
-
         </div>
     );
 }

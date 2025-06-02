@@ -272,7 +272,8 @@ export default function GradingInterface({ title, startDate, endDate }) {
                                                 <a href={`http://docs.google.com/gview?url=${currentStudent.fileSubmissionUrl}&embedded=true`}
                                                     target="_blank" rel="noopener noreferrer"
                                                     className="hover:underline text-blue-500">
-                                                    {currentStudent.fileSubmissionUrl.split('/').pop()}
+                                                    {decodeURIComponent(currentStudent.fileSubmissionUrl.split('/').pop())}
+
                                                 </a>
                                             </div>
                                         )}

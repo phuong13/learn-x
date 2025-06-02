@@ -44,6 +44,11 @@ export default function FormLecture({ open, onClose, defaultData = {}, isEdit = 
         onClose?.();
       }}
       fullWidth maxWidth="md"
+      sx={{
+        '& .MuiBackdrop-root': {
+          backgroundColor: 'rgba(0,0,0,0.4) !important',
+        },
+      }}
     >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {isEdit ? 'Chỉnh sửa bài giảng' : 'Tạo bài giảng'}

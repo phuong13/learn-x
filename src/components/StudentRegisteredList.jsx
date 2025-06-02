@@ -70,11 +70,11 @@ const StudentRegisteredList = ({
 
   return (
     <div className="w-full mx-auto bg-white shadow-md rounded-lg h-full">
-      {isTeacher && (
+      
         <div className=" text-xs px-6 py-2 bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold flex items-center sm:text-sm md:text-base">
           <p>Tổng số: {localStudents.length} sinh viên</p>
         </div>
-      )}
+    
 
       <ul className="divide-y divide-slate-200">
         {localStudents.map((student) => (

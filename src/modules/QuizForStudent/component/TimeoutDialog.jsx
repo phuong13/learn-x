@@ -2,11 +2,12 @@ import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const TimeoutDialog = ({ open }) => {
+const TimeoutDialog = ({ open, onSubmit }) => {
     const navigate = useNavigate();
     const { courseId, quizId } = useParams();
 
     const handleOk = () => {
+        onSubmit();
         navigate(`/quiz/${courseId}/${quizId}`);
     };
 

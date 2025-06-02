@@ -68,7 +68,8 @@ function transformModulesFromApi(modules) {
 // Component chính
 const EditModule = () => {
   const { courseId } = useParams();
-  const { getModules } = useSubmitModules();
+  const { getModules } = useSubmitModules()
+ 
   localStorage.removeItem('courseInfo');
 
   const [modules, setModules] = useState([]);
@@ -78,7 +79,6 @@ const EditModule = () => {
     const fetchModules = async () => {
       setLoading(true);
       const res = await getModules(courseId);
-      console.log("🚀 ~ fetchModules ~ res:", res)
       if (res.success) {
         setModules(transformModulesFromApi(res.modules));
       }

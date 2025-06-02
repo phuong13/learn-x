@@ -9,15 +9,15 @@ import { useCourseById } from '../store/useCourses';
 import { t } from 'i18next';
 import { useQuizById, getQuizSubmissionByQuizId, getStudentSubmissionsByQuizId } from '../store/useQuiz.jsx';
 import Backround from '../assets/backround.jpg';
+import StudentScoreListModal from '@components/StudentScoreListModal.jsx';
 
-export default function QuizLayout({ title, content, startDate, endDate }) {
+export default function QuizLayout({ title, courseName, startDate, endDate }) {
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
-    const { quizId } = useParams();
+        const [scoreModalOpen, setScoreModalOpen] = useState(false);
+    const { quizId, courseId } = useParams();
     const { quiz, quizTitle, loading } = useQuizById(quizId);
-    const { submission } = getQuizSubmissionByQuizId(quizId);
-    const { studentsubmit } = getStudentSubmissionsByQuizId(quizId);
-    const { courseId } = useParams();
-    const { courseName } = useCourseById(courseId);
+    const { submission, loading:loadingsub } = getQuizSubmissionByQuizId(quizId);
+    const { studentsubmit,loading:loadingstudent  } = getStudentSubmissionsByQuizId(quizId);
     const { authUser } = useAuth();
 
     const formattedStartDate =
@@ -61,7 +61,7 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
 
     return (
         <div className="">
-            <Loader isLoading={loading} />
+            <Loader isLoading={loading||loadingstudent||loadingsub} />
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
@@ -117,7 +117,7 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                         <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-slate-600">
                             <p className="mb-2 sm:mb-0">
                                 <Calendar className="inline mr-1" size={16} /> {t('opened')}: {formattedStartDate}
-                            </p> 
+                            </p>
                             <p>
                                 <Calendar className="inline mr-1" size={16} /> {t('due')}: {formattedEndDate}
                             </p>
@@ -129,10 +129,10 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                         <div className="text-lg font-semibold text-slate-700">Quiz: {quizTitle}</div>
                         <div className="text-base font-medium mb-2 text-slate-700">{quiz?.description}</div>
 
-
                         {authUser.role === 'TEACHER' ? (
                             <button
-                                className="mx-auto py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                className="mx-auto py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                                 onClick={() => setScoreModalOpen(true)}>
                                 Xem điểm các sinh viên
 
                             </button>
@@ -163,7 +163,6 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                             })()
                         )}
 
-
                     </div>
 
                     {/* Submission Status with Dropdown */}
@@ -180,6 +179,12 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                 <table className="w-full">
                                     <tbody>
                                         <tr className="border-b border-slate-300">
+                                            <td className="py-3 font-medium text-slate-700">Thời gian làm bài</td>
+                                            <td className="py-3 text-slate-600">
+                                                {quiz && quiz.timeLimit ? quiz.timeLimit : ''} phút
+                                            </td>
+                                        </tr>
+                                        <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-slate-700">Số lần làm cho phép</td>
                                             <td className="py-3 text-slate-600">
                                                 {quiz && quiz.attemptAllowed ? quiz.attemptAllowed : '1'}
@@ -193,7 +198,6 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                             </td>
                                         </tr>
 
-
                                         <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-slate-700">Điểm từng lần</td>
                                             <td className="py-3 text-slate-600">
@@ -201,7 +205,13 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                                                     <div className="flex flex-col gap-1">
                                                         {submission.map((s, idx) => (
                                                             <div key={s.id || idx}>
-                                                                Lần thứ {idx + 1}: {typeof s.score === 'number' ? s.score / 10 : ''} đ
+                                                                Lần thứ {idx + 1}: {
+                                                                    typeof s.score === 'number'
+                                                                        ? (Number.isInteger(s.score / 10)
+                                                                            ? (s.score / 10)
+                                                                            : (s.score / 10).toFixed(1))
+                                                                        : ''
+                                                                } đ
                                                             </div>
                                                         ))}
                                                     </div>
@@ -223,7 +233,6 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                             )}
                         </div>
                     )}
-
                     {/* Grading Summary for Teacher */}
                     {authUser.role === 'TEACHER' && (
                         <div className="p-6">
@@ -237,6 +246,13 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
                             {isStatusDropdownOpen && (
                                 <table className="w-full">
                                     <tbody>
+                                        <tr className="border-b border-slate-300">
+                                            <td className="py-3 font-medium text-slate-700">Thời gian làm bài</td>
+                                            <td className="py-3 text-slate-600">
+                                                
+                                                {quiz && quiz.timeLimit ? quiz.timeLimit : ''} phút
+                                            </td>
+                                        </tr>
                                         <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-slate-700">Số lần làm cho phép</td>
                                             <td className="py-3 text-slate-600">
@@ -253,7 +269,9 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
 
 
                                         <tr className="border-b border-slate-300">
-                                            <td className="py-3 font-medium text-slate-700">Thời gian còn lại</td>
+                                            <td className="py-3 font-medium text-slate-700">
+                                                Thời gian còn lại
+                                                </td>
                                             <td className="py-3 text-slate-600 flex items-center">
                                                 <Clock className="mr-2" size={16} />
                                                 {calculateRemainingTime(endDate)}
@@ -268,6 +286,13 @@ export default function QuizLayout({ title, content, startDate, endDate }) {
 
                 </div>
             </div>
+            <StudentScoreListModal
+                open={scoreModalOpen}
+                onClose={() => setScoreModalOpen(false)}
+                submissions={studentsubmit || []}
+                isQuiz={true}
+                title={quizTitle || title}
+            />
         </div>
     );
 }

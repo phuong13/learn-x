@@ -20,10 +20,9 @@ import { Quiz } from '@mui/icons-material';
 import Loader from './Loader';
 
 
-export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [] }) {
+export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initialModules = [] }) {
    const [modules, setModules] = useState([]);
    const [loading, setLoading] = useState(false);
-   console.log("🚀 ~ Curriculum ~ loading:", loading)
    const [quizDialog, setQuizDialog] = useState({ open: false, moduleId: null, editData: null });
    const [lectureDialog, setLectureDialog] = useState({ open: false, moduleId: null, editData: null });
    const [assignmentDialog, setAssignmentDialog] = useState({ open: false, moduleId: null, editData: null });
@@ -262,9 +261,9 @@ export default function Curriculum({ isEdit, onSubmitSuccess, initialModules = [
    return (
       <Box display="flex" flexDirection="column" gap={2} sx={{ mx: 'auto', width: '100%' }}>
          <Loader isLoading={loading} />
-         <div className='mx-6 mt-6 flex flex-col gap-2'>
+         <div className='ml-10 mt-6 flex flex-col gap-2'>
             {isEdit
-               ? <div className='text-slate-700 font-bold text-lg'>Chỉnh sửa nội dung khoá học</div>
+               ? <div className='text-slate-700 font-bold text-xl'>Chỉnh sửa nội dung khoá học: {courseName}</div>
                : <div className='text-slate-700 font-bold text-lg'>Tạo nội dung khoá học</div>}
 
             <button
