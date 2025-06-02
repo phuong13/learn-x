@@ -52,7 +52,7 @@ const Quiz = () => {
 
     return (
         <>
-            <DocumentTitle title="Nộp bài" />
+            <DocumentTitle title="Quiz" />
             <div className="flex flex-col min-h-[calc(100vh-193px)]">
                 <div className="flex-1 pr-6 pl-6">
                     {isLoading ? (

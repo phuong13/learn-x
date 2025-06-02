@@ -6,35 +6,45 @@ import { useEffect, useState } from 'react';
 import { axiosPrivate } from '@/axios/axios.js';
 import DocumentTitle from '@components/DocumentTitle.jsx';
 import GradingInterface from '../components/GradeForStudent';
+import Loader from '@components/Loader'; // Nếu bạn đã có component Loader
+
 const Grading = () => {
     const { courseId } = useParams();
     const { assignmentId } = useParams();
     const [assignment, setAssignment] = useState(null);
     const [course, setCourse] = useState(null);
-    // const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
-            const response = await axiosPrivate.get(`courses/${courseId}`);
-            if (response.status === 200) {
-                setCourse(response.data.data);
-                console.log(course);
+            setIsLoading(true);
+            try {
+                const response = await axiosPrivate.get(`courses/${courseId}`);
+                if (response.status === 200) {
+                    setCourse(response.data.data);
+                }
+            } catch (err) {
+                console.log(err);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchData();
     }, [courseId]);
+
     useEffect(() => {
         const fetchData = async () => {
-            const response = await axiosPrivate
-                .get(`/assignments/${assignmentId}`, {
+            setIsLoading(true);
+            try {
+                const response = await axiosPrivate.get(`/assignments/${assignmentId}`, {
                     headers: { 'Content-Type': 'application/json' },
-                })
-                .then((res) => {
-                    return res.data.data;
-                })
-                .catch((err) => {
-                    console.log(err);
                 });
-            setAssignment(response);
+                setAssignment(response.data.data);
+            } catch (err) {
+                console.log(err);
+            } finally {
+                setIsLoading(false);
+            }
         }
         fetchData();
     }, [assignmentId]);
@@ -43,7 +53,14 @@ const Grading = () => {
         <>
             <DocumentTitle title="Nộp bài" />
             <div className="flex flex-col min-h-[calc(100vh-193px)]">
-                {assignment && <GradingInterface title={assignment.title} startDate={assignment.startDate} endDate={assignment.endDate} />}
+                {isLoading && <Loader isLoading={isLoading} />}
+                {!isLoading && assignment && (
+                    <GradingInterface
+                        title={assignment.title}
+                        startDate={assignment.startDate}
+                        endDate={assignment.endDate}
+                    />
+                )}
             </div>
         </>
     );

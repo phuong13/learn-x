@@ -6,6 +6,8 @@ import QuestionList from './component/QuestionList'
 import QuizQuestion from './component/QuizQuestion';
 import CountdownTimer from './component/CountdownTimer'
 import TimeoutDialog from './component/TimeoutDialog.jsx';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+
 import { useQuestionByQuizId } from '../../store/useQuiz.jsx';
 import { useQuizById, getSession, useSubmissionQuiz } from '../../store/useQuiz.jsx';
 import { parseJavaLocalDateTime } from '../../utils/date.js';
@@ -14,7 +16,7 @@ import { toast } from 'react-toastify';
 import { CircularProgress, Box } from '@mui/material';
 import { is } from 'date-fns/locale';
 const QuizSubmissionLayout = () => {
-
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [answers, setAnswers] = useState({});
   const { quizId, courseId } = useParams();
   const { questions, loading, error } = useQuestionByQuizId(quizId);
@@ -40,9 +42,9 @@ const QuizSubmissionLayout = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
+      navigate(`/quiz/${courseId}/${quizId}`);
       await submissionQuiz(quizId, totalTimeTakenInSeconds, answers);
       toast.success('Nộp bài thành công');
-      navigate(`/quiz/${courseId}/${quizId}`);
     } finally {
       setIsLoading(false);
     }
@@ -104,9 +106,7 @@ const QuizSubmissionLayout = () => {
               </button>
             ) : (
               <button
-                onClick={() => {
-                  handleSubmit();
-                }}
+                onClick={() => setOpenConfirmDialog(true)}
                 className="py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
               >
                 Nộp bài
@@ -130,6 +130,24 @@ const QuizSubmissionLayout = () => {
 
       </div>
       <TimeoutDialog open={timeoutDialogOpen} onSubmit={handleSubmit}/>
+
+      <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+        <DialogTitle>Xác nhận nộp bài</DialogTitle>
+        <DialogContent>Bạn chắc chắn muốn nộp bài? Sau khi nộp sẽ không thể sửa lại.</DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirmDialog(false)} color="inherit">Hủy</Button>
+          <Button
+            onClick={() => {
+              setOpenConfirmDialog(false);
+              handleSubmit();
+            }}
+            color="primary"
+            variant="contained"
+          >
+            Xác nhận nộp bài
+          </Button>
+        </DialogActions>
+      </Dialog>
 
     </div>
   )

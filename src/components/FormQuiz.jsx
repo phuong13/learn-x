@@ -7,7 +7,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { formatDateTimeLocal } from '../utils/date.js';
+import FormQuestionBank from './FormQuestionBank';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 
@@ -15,12 +15,14 @@ import dayjs from 'dayjs';
 export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = false, onSubmit }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [openQuestionBank, setOpenQuestionBank] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [retakeLimit, setRetakeLimit] = useState(0);
   const [duration, setDuration] = useState(0);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [questions, setQuestions] = useState([]);
+  console.log("🚀 ~ FormQuiz ~ questions:", questions)
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -75,8 +77,8 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
     if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
       newErrors.endTime = 'Ngày kết thúc phải sau ngày bắt đầu';
     }
-    if (retakeLimit < 0) newErrors.retakeLimit = 'Số lần làm lại không hợp lệ';
-    if (duration < 0) newErrors.duration = 'Thời gian làm bài không hợp lệ';
+    if (retakeLimit <= 0) newErrors.retakeLimit = 'Số lần làm lại không hợp lệ';
+    if (duration <= 0) newErrors.duration = 'Thời gian làm bài không hợp lệ';
 
     if (questions.length === 0) {
       newErrors.questions = 'Phải có ít nhất một câu hỏi';
@@ -200,6 +202,43 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
 
 
     setQuestions(updated);
+  };
+
+  const handleSelectQuestion = (selectedQuestions) => {
+    if (!selectedQuestions || selectedQuestions.length === 0) {
+      setOpenQuestionBank(false);
+      return;
+    }
+    setQuestions([
+      ...questions,
+      ...selectedQuestions.map((question) => ({
+        // id: question.id,
+        text: question.content || question.text,
+        type:
+          question.questionType === 'SINGLE_CHOICE' ? 'single'
+            : question.questionType === 'MULTIPLE_CHOICE' ? 'multiple'
+              : question.questionType === 'TRUE_FALSE' ? 'truefalse'
+                : question.questionType === 'FILL_IN_THE_BLANK' ? 'fitb'
+                  : question.questionType?.toLowerCase() || 'single',
+        ...(question.questionType === 'FILL_IN_THE_BLANK'
+          ? {
+            content: question.content || '',
+            answerContent: question.answers[0].answerContent || '',
+
+          }
+          : {
+            answers: (question.options || []).map((opt) => ({
+              text: opt.content,
+              isCorrect: Array.isArray(question.answers)
+                ? question.answers.some(
+                  (ans) => ans.answerId === opt.id.optionId
+                )
+                : false,
+            })),
+          }),
+      }))
+    ]);
+    setOpenQuestionBank(false);
   };
 
   const handleAnswerChange = (qIndex, aIndex, value) => {
@@ -359,7 +398,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
     <Dialog open={open} onClose={(event, reason) => {
       if (reason === 'backdropClick' || reason === 'escapeKeyDown') return;
       onClose?.();
-    }} fullWidth maxWidth="lg" disableEscapeKeyDown
+    }} fullWidth maxWidth="xl" disableEscapeKeyDown
       sx={{
         '& .MuiBackdrop-root': {
           backgroundColor: 'rgba(0,0,0,0.4) !important',
@@ -419,6 +458,9 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
 
           <Grid item xs={12} display="flex" alignItems="center" justifyContent="space-between">
             <Typography variant="h6" mt={2}>Danh sách câu hỏi</Typography>
+            <Button onClick={() => setOpenQuestionBank(true)} variant="outlined" size="small" color="secondary">
+              + Chọn từ ngân hàng câu hỏi
+            </Button>
             <FormControlLabel
               control={<Switch checked={shuffleQuestions} onChange={(e) => setShuffleQuestions(e.target.checked)} color="primary" />}
               label="Shuffle"
@@ -451,6 +493,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
             <Button onClick={handleAddQuestion} variant="outlined" size="small">
               + Thêm câu hỏi
             </Button>
+
           </Grid>
         </Grid>
       </DialogContent>
@@ -461,6 +504,14 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
           {isEdit ? 'Cập nhật' : 'Tạo'}
         </Button>
       </DialogActions>
+
+
+
+      <FormQuestionBank
+        open={openQuestionBank}
+        onClose={() => setOpenQuestionBank(false)}
+        onSelect={handleSelectQuestion}
+      />
     </Dialog>
   );
 }

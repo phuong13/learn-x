@@ -6,20 +6,19 @@ import { Calendar, ChevronLeft, ChevronRight, Clock, HelpCircle, User } from 'lu
 import { toast } from 'react-toastify';
 import DocumentTitle from '../components/DocumentTitle';
 import { IconButton, Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
-import { parseISO, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, format } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 import { CircularProgress, Box } from '@mui/material';
 
 export default function GradingInterface({ title, startDate, endDate }) {
     const [summaryData, setSummaryData] = useState([]);
     const [currentStudent, setCurrentStudent] = useState(null);
     const [course, setCourse] = useState(null);
-    const [assignmentSubmission, setAssignmentSubmission] = useState(null);
     const [currentStudentIndex, setCurrentStudentIndex] = useState(0);
     const [document, setDocument] = useState(null);
-
-
     const { assignmentId } = useParams();
     const [isLoading, setIsLoading] = useState(false);
+    const [isGrading, setIsGrading] = useState(false);
+
     const { courseId } = useParams();
 
     const calculateSubmissionTime = (submissionTime) => {
@@ -73,6 +72,7 @@ export default function GradingInterface({ title, startDate, endDate }) {
                 duration: 1000,
             });
         } else {
+            setIsGrading(true);
             await axiosPrivate.post(`/assignment-submissions/${assignmentId}/${currentStudent.studentId}/score`, {
                 score: currentStudent.score,
             }).then((res) => {
@@ -84,6 +84,8 @@ export default function GradingInterface({ title, startDate, endDate }) {
                 toast.error(err.response.data.message, {
                     duration: 1000,
                 });
+            }).finally(() => {
+                setIsGrading(false);
             });
         }
     };
@@ -174,7 +176,6 @@ export default function GradingInterface({ title, startDate, endDate }) {
                                                 </Link>
                                             </>
                                         )}
-
                                     </div>
                                 </div>
                             </div>
@@ -317,7 +318,10 @@ export default function GradingInterface({ title, startDate, endDate }) {
                                             </button>
                                             <button
                                                 onClick={handlePostGrade}
-                                                className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                                className="py-2 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors flex items-center gap-2"
+                                                disabled={isGrading}
+                                            >
+                                                {isGrading && <CircularProgress size={20} color="inherit" />}
                                                 Chấm điểm
                                             </button>
                                         </div>

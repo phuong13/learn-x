@@ -162,3 +162,31 @@ export const getStudentSubmissionsByQuizId = (quizId) => {
 
   return { studentsubmit, loading, error };
 }
+
+export const getQuestionBankByType = (type) => {
+  const axiosPrivate = useAxiosPrivate();
+  const [questionBank, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!type) return;
+
+    const fetchQuestions = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosPrivate.get(`/question-quizzes?type=${type}`);
+        setQuestions(response.data.data);
+      } catch (err) {
+        console.error('Lỗi khi lấy câu hỏi:', err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [type]);
+
+  return { questionBank, loading, error };
+}
