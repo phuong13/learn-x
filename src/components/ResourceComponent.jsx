@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
 export default function Resource({ type, title, link }) {
   // Map loại tài liệu với biểu tượng Font Awesome

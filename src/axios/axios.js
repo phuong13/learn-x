@@ -36,7 +36,7 @@ axiosPrivate.interceptors.request.use(
                         token: refreshToken
                     });
                     if (!response.data?.data?.accessToken) {
-                        useNavigate().navigate('/login');
+                        window.location.href = '/LEARNX/#/login/';
                         return Promise.reject('Failed to refresh token');
                     }
                     const { accessToken, refreshToken: newRefreshToken, ...user } = response.data.data;
@@ -46,7 +46,7 @@ axiosPrivate.interceptors.request.use(
                     config.headers['Authorization'] = `Bearer ${accessToken}`;
                 } catch (err) {
                     console.error('Error refreshing token:', err);
-                    useNavigate().navigate('/login');
+                    window.location.href = '/LEARNX/#/login/';
                     return Promise.reject(err);
                 }
 

@@ -443,7 +443,7 @@ export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initia
          <button
             type="button"
             onClick={handleDone}
-            className="flex w-40 justify-center mx-auto gap-2 py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors font-semibold hover:shadow-lg"
+            className="flex w-40 mb-4 justify-center mx-auto gap-2 py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors font-semibold hover:shadow-lg"
          >
             Xong
          </button>

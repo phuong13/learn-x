@@ -65,7 +65,7 @@ const MyCourse = () => {
                     </div>
                 ) : (
                     <>
-                        {!(courses.length > 0) && (
+                        {!(courses?.length > 0) && (
                             <div className="text-center justify-center">Bạn chưa đăng ký khóa học nào!</div>
                         )}
                         <div className="grid grid-cols-4 gap-4 mt-4">
