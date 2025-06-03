@@ -29,7 +29,7 @@ const QuizSubmissionLayout = () => {
 
   let timeLeftSeconds = 0
   if (Array.isArray(session?.endTime)) {
-    const endDate = new Date(parseJavaLocalDateTime(session?.endTime).getTime() + 7 * 60 * 60 * 1000);
+    const endDate = new Date(parseJavaLocalDateTime(session?.endTime).getTime());
     const timeLeftMs = endDate.getTime() - Date.now();
     timeLeftSeconds = Math.max(Math.floor(timeLeftMs / 1000), 0);
   }

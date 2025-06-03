@@ -61,7 +61,7 @@ function App() {
         transition={Bounce}
       />
 
-      <Suspense>
+      <Suspense fallback={<Loader isLoading />}>
         <ScrollToTop />
         <Routes>
           {/* Public Routes */}

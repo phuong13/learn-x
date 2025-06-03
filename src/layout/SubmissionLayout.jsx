@@ -167,10 +167,10 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                     },
                 });
                 setIsLoading(false);
-                console.log(response);
 
                 if (response.status === 200) {
-                    toast.success(response.data.message);
+                    toast.success('Chỉnh sửa bài thành công');
+
                     setAssignmentSubmission(response.data.data);
                 } else {
                     toast.error(response.data.message, { type: 'error' });
@@ -189,11 +189,10 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-                console.log(response);
                 setIsLoading(false);
 
                 if (response.status === 201 || response.status === 200) {
-                    toast.success(response.data.message);
+                    toast.success('Nộp bài thành công');
                     setAssignmentSubmission(response.data.data);
                 } else {
                     toast.error(response.data.message, { type: 'error' });
@@ -357,8 +356,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                                     label={decodeURIComponent(assignmentSubmission.fileSubmissionUrl.split('/').pop())}
                                                     color="success"
                                                     variant="outlined"
-                                                    onDelete={() => setUploadedFile(null)}
-                                                    deleteIcon={<CancelIcon />}
+                                                    
                                                     sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
                                                 />
                                             </div>

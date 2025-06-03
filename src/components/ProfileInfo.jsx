@@ -66,6 +66,7 @@ const ProfileInfo = () => {
             formData.append('avatar', avatar);
         }
 
+
         setIsLoading(true);
 
         try {
@@ -75,9 +76,12 @@ const ProfileInfo = () => {
                 },
             });
             if (response.status === 200) {
+                window.location.reload();
                 console.log(response.data);
                 localStorage.setItem('user', JSON.stringify(response.data.data));
+
                 toast('Cập nhật thông tin thành công!', { type: 'success' });
+
             }
         } catch (error) {
             console.error(error);
@@ -133,7 +137,7 @@ const ProfileInfo = () => {
     };
 
     return (
-        <div 
+        <div
             // initial={{ opacity: 0 }}
             // animate={{ opacity: 1 }}
             // transition={{ duration: 0.5 }}
@@ -157,7 +161,7 @@ const ProfileInfo = () => {
                 transition:Bounce
             />
             <div className="mx-8 py-2 sm:px-3 lg:px-4 bg-white rounded-md my-4">
-                    <h1 className="text-xl font-bold text-gray-900">{t('personal_information')}</h1>
+                <h1 className="text-xl font-bold text-gray-900">{t('personal_information')}</h1>
             </div>
             {isOpenRequestRole && (
                 <div className="z-50 fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center">
@@ -176,7 +180,7 @@ const ProfileInfo = () => {
             )}
             <main>
                 <div className="mx-8 py-2 sm:px-3 lg:px-4 bg-white rounded-md my-4">
-                    <Loader isLoading={isLoading} />
+                    {/* <Loader isLoading={isLoading} /> */}
                     <div
                         // initial={{ y: 20, opacity: 0 }}
                         // animate={{ y: 0, opacity: 1 }}

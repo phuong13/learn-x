@@ -13,13 +13,13 @@ import StudentScoreListModal from '@components/StudentScoreListModal.jsx';
 
 export default function QuizLayout({ title, courseName, startDate, endDate }) {
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
-        const [scoreModalOpen, setScoreModalOpen] = useState(false);
+    const [scoreModalOpen, setScoreModalOpen] = useState(false);
     const { quizId, courseId } = useParams();
     const { quiz, quizTitle, loading } = useQuizById(quizId);
-    const { submission, loading:loadingsub } = getQuizSubmissionByQuizId(quizId);
-    const { studentsubmit,loading:loadingstudent  } = getStudentSubmissionsByQuizId(quizId);
+    const { submission, loading: loadingsub } = getQuizSubmissionByQuizId(quizId);
+    console.log("🚀 ~ QuizLayout ~ submission:", submission)
+    const { studentsubmit, loading: loadingstudent } = getStudentSubmissionsByQuizId(quizId);
     const { authUser } = useAuth();
-
     const formattedStartDate =
         startDate && !isNaN(new Date(startDate))
             ? format(new Date(startDate), 'EEEE, dd \'tháng\' MM yyyy, hh:mm a', { locale: vi })
@@ -61,7 +61,7 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
 
     return (
         <div className="">
-            <Loader isLoading={loading||loadingstudent||loadingsub} />
+            <Loader isLoading={loading || loadingstudent || loadingsub} />
             {/* Header Banner */}
             <div className="relative h-48 bg-emerald-200 overflow-hidden">
                 <img
@@ -132,7 +132,7 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
                         {authUser.role === 'TEACHER' ? (
                             <button
                                 className="mx-auto py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
-                                 onClick={() => setScoreModalOpen(true)}>
+                                onClick={() => setScoreModalOpen(true)}>
                                 Xem điểm các sinh viên
 
                             </button>
@@ -249,7 +249,7 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
                                         <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-slate-700">Thời gian làm bài</td>
                                             <td className="py-3 text-slate-600">
-                                                
+
                                                 {quiz && quiz.timeLimit ? quiz.timeLimit : ''} phút
                                             </td>
                                         </tr>
@@ -271,7 +271,7 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
                                         <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-slate-700">
                                                 Thời gian còn lại
-                                                </td>
+                                            </td>
                                             <td className="py-3 text-slate-600 flex items-center">
                                                 <Clock className="mr-2" size={16} />
                                                 {calculateRemainingTime(endDate)}
