@@ -1,18 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
 import Topic from "./components/tag/Topic";
 import { useTopic } from "../../store/useTopic";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill';
+import {RippleButton} from "@components/ui/ripple-button.jsx";
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '90%',
+  maxWidth: 600,
+  bgcolor: 'background.paper',
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 4,
+};
 
 const Container = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [newTopic, setNewTopic] = useState("");
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingCreate, setLoadingCreate] = useState(false); // loading cho tạo topic
+  const [loadingCreate, setLoadingCreate] = useState(false);
 
   const { forumId } = useParams();
   const { t } = useTranslation();
@@ -37,7 +54,7 @@ const Container = () => {
 
   const handleCreateTopic = async () => {
     if (!newTopic.trim() || !forumId) return;
-    setLoadingCreate(true); // chỉ loading nút submit
+    setLoadingCreate(true);
     try {
       await createTopic({ content: newTopic, forumId });
       await fetchTopics();
@@ -53,12 +70,12 @@ const Container = () => {
   return (
     <div className="flex flex-col gap-4 p-4 h-full focus:outline-none" tabIndex={-1}>
       {forumId ? (
-        <button
-          className="py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
-          onClick={() => setShowPopup(true)}
+        <RippleButton
+                   onClick={() => setShowPopup(true)}
+
         >
           {t("forum.create_topic")}
-        </button>
+        </RippleButton>
       ) : (
         <div className="text-lg text-center text-slate-600 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
           {t("forum.please_select_forum")}
@@ -89,38 +106,46 @@ const Container = () => {
         )
       )}
 
-      {/* Popup Create Topic */}
-      {showPopup && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-30"
-        >
-          <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] max-w-xl h-[405px]">
-            <h2 className="text-lg text-slate-600 font-semibold mb-2">{t("forum.new_topic_title")}</h2>
-            <textarea
-              className="w-full h-[300px] border border-slate-300 focus:border-slate-400 outline-none p-2 rounded-md text-slate-600"
-              placeholder={t("forum.new_topic_placeholder")}
-              value={newTopic}
-              onChange={(e) => setNewTopic(e.target.value)}
-              autoFocus
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
-                onClick={() => setShowPopup(false)}
-              >
-                {t("forum.cancel")}
-              </button>
-              <button
-                className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors flex items-center justify-center"
-                onClick={handleCreateTopic}
-                disabled={loadingCreate}
-              >
-                {loadingCreate ? <CircularProgress size={20} color="inherit" /> : t("forum.submit")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal Create Topic */}
+      <Modal
+        open={showPopup}
+        onClose={() => setShowPopup(false)}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Box sx={modalStyle}>
+          <Typography id="modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
+            {t("forum.new_topic_title")}
+          </Typography>
+          <ReactQuill
+            theme="snow"
+            value={newTopic}
+            onChange={setNewTopic}
+            style={{ height: 200, marginBottom: 52 }}
+            placeholder={t("forum.new_topic_placeholder")}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => setShowPopup(false)}
+              sx={{ borderRadius: 2 }}
+              disabled={loadingCreate}
+            >
+              {t("forum.cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCreateTopic}
+              sx={{ borderRadius: 2 }}
+              disabled={loadingCreate}
+            >
+              {loadingCreate ? <CircularProgress size={20} color="inherit" /> : t("forum.submit")}
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </div>
   );
 };

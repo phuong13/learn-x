@@ -9,12 +9,11 @@ import { useAuth } from '@hooks/useAuth.js';
 import DocumentTitle from '@components/DocumentTitle';
 import Loader from '../components/Loader';
 import { Pagination } from '@mui/material';
-import {t} from 'i18next';
 const MyCourse = () => {
     const { authUser } = useAuth();
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const pageSize = 12;
+    const pageSize = 8;
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
@@ -82,6 +81,7 @@ const MyCourse = () => {
                                             description={course.description}
                                             thumbnail={course.thumbnail}
                                         />
+                                        
                                     ))}
                         </div>
                     </>

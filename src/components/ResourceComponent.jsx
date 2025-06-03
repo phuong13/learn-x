@@ -13,7 +13,7 @@ export default function Resource({ type, title, link }) {
   };
 
   return (
-    <div className="flex items-start gap-4 py-1  border-t border-slate-400">
+    <div className="flex items-start gap-4 py-1  border-t border-slate-300">
       {/* Icon */}
       <div className="">
         <i className={`fa-solid ${icons[type]} text-2xl`}></i>

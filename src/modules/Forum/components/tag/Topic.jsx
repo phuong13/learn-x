@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useTopicComment } from "../../../../store/useTopicComment";
 import profileUser from "../../../../assets/profile-user.png";
+import { FaSpinner } from "react-icons/fa";
 
 const Topic = ({ user, content, createAt, topicId }) => {
   const me = JSON.parse(localStorage.getItem("user") || "{}");
   const { createTopicComment, getTopicComment } = useTopicComment();
   const { t } = useTranslation();
+  const [isCommentLoading, setIsCommentLoading] = useState(false);
 
   const [commentContent, setCommentContent] = useState("");
   const [comment, setComment] = useState([]);
@@ -15,6 +17,7 @@ const Topic = ({ user, content, createAt, topicId }) => {
 
   const fetchComment = async () => {
     const data = await getTopicComment(topicId);
+    console.log("🚀 ~ fetchComment ~ data:", data)
     setComment(data.data || []);
   };
 
@@ -23,14 +26,20 @@ const Topic = ({ user, content, createAt, topicId }) => {
   }, []);
 
   const handleCreateComment = async () => {
-    if (commentContent.trim()) {
+    if (commentContent.trim() && !isCommentLoading) {
+      setIsCommentLoading(true);
       await createTopicComment({ content: commentContent, topicId });
       setCommentContent("");
-      fetchComment();
+      await fetchComment();
+      setIsCommentLoading(false);
     }
   };
-
-  return (
+  const handleInputKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleCreateComment();
+    }
+  }; return (
     <div className="w-full p-4 bg-white rounded-lg shadow-lg border border-slate-200">
       {/* User info and post header */}
       <div className=" flex items-center gap-2">
@@ -52,7 +61,7 @@ const Topic = ({ user, content, createAt, topicId }) => {
 
       {/* Nội dung topic */}
       <div className="flex my-2 mx-4">
-        <p className="text-slate-700 text-sm "><span className="text-slate-700 text-base font-semibold"></span> {content}</p>
+        <p className="text-slate-700 text-sm "><p dangerouslySetInnerHTML={{ __html: content }} /></p>
       </div>
 
       {/* Comment section */}
@@ -75,7 +84,7 @@ const Topic = ({ user, content, createAt, topicId }) => {
                 <div key={item.id} className="flex items-start gap-2">
                   <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-300">
                     <img
-                      src={profileUser}
+                      src={item.account.avatarUrl || profileUser}
                       alt=""
                       className="w-full h-full object-cover"
                     />
@@ -98,7 +107,7 @@ const Topic = ({ user, content, createAt, topicId }) => {
       <div className="px-4 flex items-center gap-3 mt-2">
         <div className="flex-shrink-0 w-[30px] h-[30px] rounded-full overflow-hidden border border-slate-300">
           <img
-            src={me.avatar || profileUser}
+            src={me.avatar}
             alt=""
             className="w-full h-full object-cover"
           />
@@ -108,14 +117,21 @@ const Topic = ({ user, content, createAt, topicId }) => {
             type="text"
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
+            onKeyDown={handleInputKeyDown}
+
             placeholder={t('topic.comment_input_placeholder')}
             className="w-full py-2 px-3 border-b border-slate-300 focus:outline-none text-slate-600 "
           />
           <button
             className="absolute right-2 top-1/2 -translate-y-1/2 contrast-50 hover:contrast-200 transition"
             onClick={handleCreateComment}
+            disabled={isCommentLoading}
           >
-            <Send className="w-5 h-5" />
+            {isCommentLoading ? (
+              <FaSpinner className="w-5 h-5 animate-spin text-primaryDark" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>

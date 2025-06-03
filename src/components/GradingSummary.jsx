@@ -31,35 +31,40 @@ export default function GradingSummary({ timeRemaining }) {
     ).length;
     const needsGrading = summaryData.filter((item) => item.score === null || item.score === undefined).length;
 
-    return (
-        <div className="mx-auto p-4">
-            <h2 className="text-lg font-semibold text-slate-700">Thống kê điểm số</h2>
-            <div className="rounded-lg overflow-hidden">
-                <div className="divide-y divide-slate-200">
-                    {/*<div className="flex items-center p-4 hover:bg-slate-50 transition-colors">*/}
-                    {/*  <Users className="w-5 h-5 mr-4" />*/}
-                    {/*  <span className="text-slate-700">Học sinh tham gia</span>*/}
-                    {/*  <span className="ml-auto font-semibold text-slate-900">{participants}</span>*/}
-                    {/*</div>*/}
-                    <div className="flex items-center p-2 ">
-                        <FileCheck className="w-5 h-5 text-green-500 mr-4" />
-                        <span className="text-slate-700">Đã nộp bài</span>
-                        <span className="ml-auto font-semibold text-slate-700">{submitted}</span>
-                    </div>
-                    <div className="flex items-center p-2 hover:bg-slate-50 transition-colors">
-                        <ClipboardList className="w-5 h-5 text-yellow-500 mr-4" />
-                        <span className="text-slate-700">Cần chấm điểm</span>
-                        <span className="ml-auto font-semibold text-slate-700">{needsGrading}</span>
-                    </div>
-                    <div className="flex items-center p-2 hover:bg-slate-50 transition-colors">
-                        <Clock className="w-5 h-5 text-red-500 mr-4" />
-                        <span className="text-slate-700">Thời gian còn lại</span>
-                        <span className="ml-auto font-semibold text-slate-700">{timeRemaining}</span>
-                    </div>
-                </div>
-            </div>
+   // ...existing code...
+return (
+    <div className=" p-4">
+        <h2 className="text-lg font-semibold text-slate-700 mb-2">Thống kê điểm số</h2>
+        <div className="rounded-lg overflow-hidden bg-white shadow">
+            <table className="w-full">
+                <tbody>
+                    <tr className="border-b border-slate-300">
+                        <td className="py-3 flex items-center font-medium text-slate-700">
+                            <FileCheck className="w-5 h-5 text-green-500 mr-3" />
+                            Đã nộp bài
+                        </td>
+                        <td className="py-3 font-semibold text-slate-700">{submitted}</td>
+                    </tr>
+                    <tr className="border-b border-slate-300">
+                        <td className="py-3 flex items-center font-medium text-slate-700">
+                            <ClipboardList className="w-5 h-5 text-yellow-500 mr-3" />
+                            Cần chấm điểm
+                        </td>
+                        <td className="py-3 font-semibold text-slate-700">{needsGrading}</td>
+                    </tr>
+                    <tr>
+                        <td className="py-3 flex items-center font-medium text-slate-700">
+                            <Clock className="w-5 h-5 text-red-500 mr-3" />
+                            Thời gian còn lại
+                        </td>
+                        <td className="py-3 font-semibold text-slate-700">{timeRemaining}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    );
+    </div>
+);
+// ...existing code...
 }
 
 GradingSummary.propTypes = {

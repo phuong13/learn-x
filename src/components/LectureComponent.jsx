@@ -8,12 +8,12 @@ export default function Lecture({ name, content }) {
   const cleanedContent = match ? content.replace(match[0], '') : content;
 
   return (
-      <div className="flex items-start gap-4 py-1 select-text border-t border-slate-400">
+      <div className="flex items-start gap-4 py-1 select-text border-t border-slate-300">
          {/* Icon */}
             <MenuBookIcon className="text-blue-500" fontSize="medium" />
             {/* Content */}
         <div className="flex-1">
-          <div className="text-sm text-slate-600 flex flex-col justìy-center">
+          <div className="text-sm text-slate-600 flex flex-col justify-center">
             <div className="flex gap-1">
               <span className="text-sm font-bold">{name}</span>
             </div>

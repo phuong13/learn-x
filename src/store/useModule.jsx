@@ -156,7 +156,21 @@ export const useSubmitModules = () => {
                   currentQuestionIds.push(res.data.data.id);
                 } else {
                   currentQuestionIds.push(q.id);
-                  await axiosPrivate.patch(`${url}/${q.id}`, questionPayload);
+
+                  // So sánh với old question, nếu không đổi thì bỏ qua PATCH
+                  const oldQ = oldQuestions.find(oq => oq.id === q.id);
+                  const isChanged =
+                    !oldQ ||
+                    oldQ.content !== q.content ||
+                    (q.type !== "fitb" && JSON.stringify(oldQ.options) !== JSON.stringify(q.options)) ||
+                    (q.type === "fitb" && oldQ.answerContent !== q.answerContent) ||
+                    (q.type === "multiple"
+                      ? JSON.stringify(oldQ.answers) !== JSON.stringify(q.answer)
+                      : q.type !== "fitb" && oldQ.answer !== q.answer);
+
+                  if (isChanged) {
+                    await axiosPrivate.patch(`${url}/${q.id}`, questionPayload);
+                  }
                 }
               }
 

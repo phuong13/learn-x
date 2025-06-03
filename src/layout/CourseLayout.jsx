@@ -184,7 +184,7 @@ export default function CoursePageLayout() {
                 <Loader isLoading={isLoading} />
             )}
             {<>
-                <div className="relative h-48 bg-emerald-200 overflow-hidden">
+                <div className="relative h-48 bg-slate-200 overflow-hidden">
                     <img
                         src={course?.thumbnail}
                         alt="Online learning illustration"
@@ -232,11 +232,11 @@ export default function CoursePageLayout() {
                             )}
                         </div>
                     </div>
-                    {teacher && (
+                     
                         <div className="absolute bottom-4 left-4 text-white bg-primaryDark px-4 py-2 rounded-lg text-sm font-semibold">
-                            {t('teacher')}: {teacher.fullName}
+                            {t('teacher')}: {teacher?.fullName ? teacher.fullName : 'Đang tải...'}
                         </div>
-                    )}
+                    
                 </div>
 
                 <nav className="bg-white border-b px-4">

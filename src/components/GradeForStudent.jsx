@@ -5,7 +5,7 @@ import { axiosPrivate } from '@/axios/axios.js';
 import { Calendar, ChevronLeft, ChevronRight, Clock, HelpCircle, User } from 'lucide-react';
 import { toast } from 'react-toastify';
 import DocumentTitle from '../components/DocumentTitle';
-import { IconButton, Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
+import { IconButton, Select, MenuItem, FormControl, InputLabel, Typography, TextField, Chip } from '@mui/material';
 import { parseISO, format } from 'date-fns';
 import { CircularProgress, Box } from '@mui/material';
 
@@ -236,10 +236,36 @@ export default function GradingInterface({ title, startDate, endDate }) {
                                     </div>
 
                                     {currentStudent.score !== null ? (
-                                        <div className="ml-auto text-lg font-bold text-slate-700 ">
-                                            Điểm: {currentStudent.score}
-                                        </div>
-                                    ) : (<div className='ml-auto  text-lg font-bold text-rose-500 '>Chưa chấm điểm</div>)}
+                                        <Chip
+                                            label={`Điểm: ${currentStudent.score}`}
+                                            color="success"
+                                            variant="filled"
+                                            className="ml-auto text-lg "
+                                            sx={{
+                                                fontSize: '1.1rem',
+                                                px: 2,
+                                                py: 1,
+                                                bgcolor: '#8CD77A',
+                                                color: 'white',
+                                                borderRadius: '8px',
+                                            }}
+                                        />
+                                    ) : (
+                                        <Chip
+                                            label="Chưa chấm điểm"
+                                            color="error"
+                                            variant="filled"
+                                            className="ml-auto text-lg "
+                                            sx={{
+                                                fontSize: '1.1rem',
+                                                px: 2,
+                                                py: 2,
+                                                bgcolor: '#E44640',
+                                                color: 'white',
+                                                borderRadius: '8px',
+                                            }}
+                                        />
+                                    )}
                                 </div>
                             )}
                             <div className="px-4">
@@ -291,24 +317,44 @@ export default function GradingInterface({ title, startDate, endDate }) {
                             {/* Grading Section */}
                             {currentStudent && (
                                 <div className=" shadow rounded-lg px-4 mb-4">
-                                    <h2 className="text-xl font-semibold  flex items-center gap-2">
+                                    <h2 className="text-xl font-semibold flex items-center gap-2 mb-2">
+                                        Nhận xét
+                                        <HelpCircle className="w-4 h-4 text-slate-400" />
+                                    </h2>
+                                    <TextField
+                                        label="Nhận xét cho học sinh"
+                                        multiline
+                                        minRows={3}
+                                        fullWidth
+                                        variant="outlined"
+                                        className="mb-4"
+                                    // value={comment} // Nếu bạn có state cho nhận xét
+                                    // onChange={e => setComment(e.target.value)}
+                                    />
+                                    <h2 className="text-xl font-semibold  pt-4 flex items-center gap-2">
                                         Chấm điểm
                                         <HelpCircle className="w-4 h-4 text-slate-400" />
                                     </h2>
                                     <div className="space-y-2">
                                         <label htmlFor="grade" className="block text-sm font-medium text-slate-700">Thang điểm
                                             10</label>
-                                        <input
+                                        <TextField
                                             type="number"
                                             id="grade"
-                                            max="10"
-                                            value={currentStudent.score || ''}
-                                            className="p-2 mt-1 block w-full rounded-md border focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                            inputProps={{ max: 10, min: 0 }}
+                                            value={currentStudent.score ?? ''}
+                                            fullWidth
+                                            size="small"
+                                            className="mt-1"
                                             onChange={(e) => {
-                                                const newScore = e.target.value ? parseFloat(e.target.value) : null;
-                                                const updatedSummaryData = [...summaryData];
-                                                updatedSummaryData[currentStudentIndex].score = newScore;
-                                                setSummaryData(updatedSummaryData);
+                                                const value = e.target.value;
+                                                // Chỉ nhận giá trị từ 1 đến 10 hoặc rỗng
+                                                if (value === '' || (Number(value) >= 1 && Number(value) <= 10)) {
+                                                    const newScore = value ? parseFloat(value) : null;
+                                                    const updatedSummaryData = [...summaryData];
+                                                    updatedSummaryData[currentStudentIndex].score = newScore;
+                                                    setSummaryData(updatedSummaryData);
+                                                }
                                             }}
                                         />
 

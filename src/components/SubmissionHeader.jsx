@@ -10,7 +10,7 @@ export default function SubmissionHeader({ courseID, id, title, startDate, endDa
     const formattedEndDate = format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
 
     return (
-        <div className="flex items-start gap-4 border-t py-1 border-slate-400">
+        <div className="flex items-start gap-4 border-t py-1 border-slate-300">
             {/* Icon */}
             <AssignmentIcon className="text-pink-500" fontSize="medium" />
 

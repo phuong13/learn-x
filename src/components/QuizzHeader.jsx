@@ -10,7 +10,7 @@ export default function QuizzHeader({ courseID, id, title, startDate, endDate })
     const formattedEndDate = format(new Date(endDate), "EEEE, dd 'tháng' MM yyyy, hh:mm a", { locale: vi });
 
     return (
-        <div className="flex items-start gap-4 border-t py-1 border-slate-400">
+        <div className="flex items-start gap-4 border-t py-1 border-slate-300">
             {/* Icon */}
             <QuizIcon className="text-primary" fontSize="medium" />
             {/* Content */}

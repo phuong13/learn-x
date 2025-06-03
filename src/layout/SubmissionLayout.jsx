@@ -33,7 +33,6 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
     };
 
     const [isLoading, setIsLoading] = useState(true);
-    console.log("🚀 ~ SubmissionLayout ~ isLoading:", isLoading)
 
     const [assignmentSubmission, setAssignmentSubmission] = useState(null);
 
@@ -273,12 +272,12 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                 <div className="pb-2" dangerouslySetInnerHTML={{ __html: content }} />
 
                                 {authUser.role === 'TEACHER' ? (
+                                    <Link to={`/grading/${courseId}/${assignmentId}`} className="text-white flex justify-center">
                                     <button
                                         className="py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                        <Link to={`/grading/${courseId}/${assignmentId}`} className="text-white">
-                                            Chấm điểm
-                                        </Link>
+                                            Chấm điểm 
                                     </button>
+                                        </Link>
                                 ) : (
                                     <button
                                         onClick={toggleFolderVisibility}

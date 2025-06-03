@@ -78,7 +78,7 @@ const CourseContent = () => {
                     <div className="flex justify-end">
                         <button
                             onClick={() => navigate(`/course-detail/${courseId}/edit`)}
-                            className="py-2 px-3 bg-primaryDark text-white rounded-lg hover:bg-secondary hover:shadow-lg transition-colors flex items-center">
+                            className="py-2 px-3 text-sm bg-primaryDark text-white rounded-lg hover:bg-secondary hover:shadow-lg transition-colors flex items-center">
                             <EditIcon fontSize='small' />
                             Chỉnh sửa
                         </button>
@@ -98,9 +98,9 @@ const CourseContent = () => {
                             >
                                 <button
                                     onClick={() => toggleSection(module)}
-                                    className="w-full px-4 py-2 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
+                                    className="w-full px-4 py-3 bg-blue-50 flex justify-between items-center hover:bg-opacity-80 focus:outline-none"
                                 >
-                                    <span className="flex  gap-2 text-base font-semibold text-slate-600 items-center">
+                                    <span className="flex  gap-2 text-base font-bold text-slate-700 items-center">
                                         <School /> {module.title}
 
                                     </span>
@@ -112,7 +112,7 @@ const CourseContent = () => {
                                 </button>
 
                                 {expandedSections.includes(module.id) && (
-                                    <div className="px-4 pb-2">
+                                    <div className="px-4 ml-6 pb-2">
                                         {module.contents.map((item) => {
                                             switch (item.type) {
                                                 case 'lecture':

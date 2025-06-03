@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import Backround from '../assets/backround.jpg';
+import { RippleButton } from "./ui/ripple-button";
 
 export default function Component() {
     const { t } = useTranslation();
@@ -27,13 +28,13 @@ export default function Component() {
                     <p className="my-6 max-w-md mx-auto text-base text-gray-700 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
                         {t('landing.description')}
                     </p>
-                    <button className="py-3 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                    <RippleButton className="py-3 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
                         <Link
                             to="/my-course"
                         >
                             {t('landing.button_text')}
                         </Link>
-                    </button>
+                    </RippleButton>
                 </div>
             </div>
         </div>

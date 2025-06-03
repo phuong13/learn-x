@@ -1,91 +1,124 @@
 import React, { useState } from 'react';
-import { List, ListItem, ListItemText, ListItemIcon, Collapse, IconButton } from '@mui/material';
-import { ExpandMore, ExpandLess, School, Menu, ChevronLeft } from '@mui/icons-material';
-import PropTypes from 'prop-types';
+import {
+    List, ListItem, ListItemText, ListItemIcon, Collapse, IconButton, Tooltip
+} from '@mui/material';
+import {
+    ExpandMore, ExpandLess, School, Menu, ChevronLeft,
+    Quiz, Assignment, InsertDriveFile
+} from '@mui/icons-material';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
-const CourseSidebar = ({ modules, expandedSections, toggleSection, scrollToModule, expandAll, collapseAll }) => {
-    console.log("🚀 ~ CourseSidebar ~ modules:", modules)
+import PropTypes from 'prop-types';
+import { UnfoldMore, UnfoldLess } from '@mui/icons-material';
+
+
+const typeIcon = {
+    lecture: <MenuBookIcon color="primary" />,
+    quiz: <Quiz sx={{ color: '#45DFB1' }}/>,
+    assignment: <Assignment sx={{ color: '#EC4899' }} />,
+    resource: <InsertDriveFile sx={{ color: '#F3533A' }} />,
+};
+
+const typeLabel = {
+    lecture: 'Bài giảng',
+    quiz: 'Quiz',
+    assignment: 'Bài tập',
+    resource: 'Tài liệu',
+};
+
+const CourseSidebar = ({
+    modules, expandedSections, toggleSection, scrollToModule, expandAll, collapseAll
+}) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
+    const toggleSidebar = () => setIsOpen(!isOpen);
 
+    // ...existing code...
     return (
-        <div className={` p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-fit' : 'w-8'}  relative`}>
+        <div className={`p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-56' : 'w-4'} relative`}>
             <IconButton
                 onClick={toggleSidebar}
-                className="absolute top-0 right-2 "
+                className="absolute top-0 right-2"
                 size="small"
             >
-                {isOpen ? <ChevronLeft /> : <Menu />}
+                 <Menu />
             </IconButton>
             {isOpen && (
-                <div className={`${isOpen ? '' : 'hidden'} bg-blue-50 rounded-lg`}>
-                    <div className="flex justify-evenly">
-                        <button
-                            className="p-2 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors mr-2"
-                            onClick={expandAll}>
-                            Mở rộng
-                        </button>
-                        <button
-                            className="p-2 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
-                            onClick={collapseAll}>
-                            Thu nhỏ
-                        </button>
-                    </div>
-                    <List component="nav">
+                <div className=" rounded-lg">
+                    <List component="nav" dense>
                         {modules.map((module) => (
                             <React.Fragment key={module.id}>
                                 <ListItem
-                                    button={true}
+                                    button
                                     onClick={() => {
                                         toggleSection(module);
                                         scrollToModule(module.id);
                                     }}
+                                    sx={{
+                                        py: 0.7,
+                                        fontWeight: 600,
+                                        bgcolor: '#e0e7ef',
+                                        borderRadius: '6px',
+                                        mb: 0.5,
+                                    }}
                                 >
-                                    <ListItemIcon>
-                                        <School />
+                                    <ListItemIcon sx={{ minWidth: 32 }}>
+                                        <School fontSize="small" />
                                     </ListItemIcon>
-                                    <ListItemText primary={module.title} />
+                                    <ListItemText
+                                        primary={module.title}
+                                        className="truncate overflow-hidden whitespace-nowrap"
+
+                                        primaryTypographyProps={{
+                                            fontWeight: 600, fontSize: 15, className: 'truncate',
+                                            noWrap: true,
+                                        }}
+                                    />
                                     {expandedSections.includes(module.id) ? <ExpandLess /> : <ExpandMore />}
                                 </ListItem>
-                                {/* <Collapse in={expandedSections.includes(module.id)} timeout="auto" unmountOnExit>
+                                <Collapse in={expandedSections.includes(module.id)} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
-                                        {module.contents &&
-                                            module.contents
-                                                .filter((item) => item.type === 'lecture')
-                                                .map((lecture) => (
-                                                    <ListItem button key={lecture.id} className="pl-8">
-                                                        <ListItemText primary={lecture.title} />
-                                                    </ListItem>
-                                                ))}
+                                        {module.contents && module.contents.map((item) => (
+                                            <ListItem
+                                                button
+                                                key={item.id}
+                                                className="pl-8"
+                                                sx={{
 
+                                                    py: 0.5,
+                                                    bgcolor: '#f6f8fa',
+                                                    borderLeft: '3px solid #cbd5e1',
+                                                    mb: 0.5,
+                                                    width: '100%',
+                                                    overflow: 'hidden',
+                                                }}
+                                            >
+                                                <ListItemIcon sx={{ minWidth: 28 }}>
+                                                    <Tooltip title={typeLabel[item.type] || ''}>
+                                                        {typeIcon[item.type] || <InsertDriveFile fontSize="small" />}
+                                                    </Tooltip>
+                                                </ListItemIcon>
+                                                <ListItemText
+                                                    primary={item.title}
+                                                    className="truncate overflow-hidden whitespace-nowrap"
+
+                                                    primaryTypographyProps={{
+                                                        fontSize: 13, color: '#334155', className: 'truncate',
+                                                        noWrap: true,
+                                                    }}
+                                                />
+                                            </ListItem>
+                                        ))}
                                     </List>
-                                </Collapse> */}
+                                </Collapse>
                             </React.Fragment>
                         ))}
                     </List>
                 </div>
             )}
-            {!isOpen && (
-                <div className="flex flex-col w-full items-center pt-16">
-                    {modules.map((module) => (
-                        <IconButton
-                            key={module.id}
-                            onClick={() => {
-                                toggleSection(module);
-                                scrollToModule(module.id);
-                            }}
-                            className=""
-                        >
-                            {/* <School /> */}
-                        </IconButton>
-                    ))}
-                </div>
-            )}
         </div>
     );
+    // ...existing code...
 };
 
 CourseSidebar.propTypes = {
@@ -95,7 +128,6 @@ CourseSidebar.propTypes = {
     scrollToModule: PropTypes.func.isRequired,
     expandAll: PropTypes.func.isRequired,
     collapseAll: PropTypes.func.isRequired,
-}
+};
 
 export default CourseSidebar;
-
