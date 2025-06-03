@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import Loader from '../components/Loader.jsx';
 import EditCourseInfoModal from '../components/EditCourseInfoModal';
+import { to } from '@react-spring/web';
 
 
 export default function CoursePageLayout() {
@@ -95,7 +96,8 @@ export default function CoursePageLayout() {
                 toast.success(response.data.message);
             }
         } catch (err) {
-            console.error(err);
+            toast.warning('Đã có học sinh làm bài quiz, vì vậy không được xoá môn học' )
+            setIsConfirmDialogOpen(false);
         } finally {
             setIsLoading(false);
         }

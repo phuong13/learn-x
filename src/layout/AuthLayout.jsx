@@ -65,7 +65,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 const { email, fullName, avatar, role } = result.data;
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
-                navigate('/my-course');
+                navigate('/');
             } else {
                 toast.success(result.response?.data?.message || 'Đăng nhập thất bại', { type: 'error' });
             }
@@ -99,7 +99,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 const { email, fullName, avatar, role } = result.data;
                 setAuthUser({ email, fullName, avatar, role });
                 setIsAuthenticated(true);
-                navigate('/my-course');
+                navigate('/');
             } else {
                 toast(result.response?.data?.message || 'Google login thất bại', { type: 'error' });
             }

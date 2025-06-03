@@ -35,7 +35,7 @@ const CourseSidebar = ({
 
     // ...existing code...
     return (
-        <div className={`p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-56' : 'w-4'} relative`}>
+        <div className={`p-2 transition-all duration-300 ease-in-out ${isOpen ? 'w-56' : 'w-12'} relative`}>
             <IconButton
                 onClick={toggleSidebar}
                 className="absolute top-0 right-2"
