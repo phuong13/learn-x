@@ -259,7 +259,7 @@ export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initia
 
 
    return (
-      <Box display="flex" flexDirection="column" gap={2} sx={{ mx: 'auto', width: '100%' }}>
+      <Box display="flex" flexDirection="column" gap={2} sx={{ mx: 'auto', width: '80%' }}>
          <Loader isLoading={loading} />
          <div className='ml-10 mt-6 flex flex-col gap-2'>
             {isEdit

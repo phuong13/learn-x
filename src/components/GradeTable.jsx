@@ -163,7 +163,8 @@ export default function GradeTable() {
                                             <div className="flex flex-col gap-1">
                                                 {submission.map((s, idx) => (
                                                     <div key={s.id || idx}>
-                                                        <span className='font-medium'>Lần {idx + 1}:</span> {typeof s.score === 'number' ? s.score : 'Chưa có điểm'}
+                                                        <span className='font-medium'>Lần {idx + 1}:</span>{' '}
+                                                        {typeof s.score === 'number' ? (s.score / 10).toFixed(1) : 'Chưa có điểm'}
                                                     </div>
                                                 ))}
                                             </div>

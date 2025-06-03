@@ -270,19 +270,18 @@ export default function GradingInterface({ title, startDate, endDate }) {
                             )}
                             <div className="px-4">
                                 <div className="">
-                                    <Calendar className="inline mb-1 mr-2" size={16} />Hạn chót: {formattedEndDate}
+                                    <div className='flex items-center font-semibold gap-2'><Calendar className=" mb-1 mr-2" size={16} />Hạn chót: <div className='font-medium'> {formattedEndDate}</div></div>
                                     <div className="flex items-center gap-2">
-                                        <Clock className="" size={16} />
-                                        <div className="py-2 text-slate-700">Thời gian còn lại:</div>
+                                        <Clock className="font-semibold" size={16} />
+                                        <div className="py-2 text-slate-700 font-semibold">Thời gian còn lại:</div>
                                         <div className=" flex items-center">
                                             {calculateRemainingTime(endDate)}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="">
-                                    <Calendar className="inline mb-1 mr-2" size={16} />Thời gian nộp:{calculateSubmissionTime(currentStudent.createdAt)}
-
+                                <div className="flex items-center gap-2 font-semibold">
+                                    <Calendar className="inline mb-1 mr-2 " size={16} />Thời gian nộp: {calculateSubmissionTime(currentStudent.createdAt)}
                                 </div>
                             </div>
                             {/* Student Info */}

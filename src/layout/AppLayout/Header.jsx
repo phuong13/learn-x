@@ -10,7 +10,7 @@ function Header() {
             <div className="bg-gradient-to-r from-primary to-secondary p-2 px-4 sticky top-0 z-50">
                 <div className="flex justify-between items-center">
                     <div className="text-white text-xl font-bold">
-                        <Link to="/" className="hover:text-gray-200">
+                        <Link to="/" className="hover:text-gray-200 ">
                             <img src={LogoLearnX} alt="Logo" width={150} height={40} />
                         </Link>
                     </div>

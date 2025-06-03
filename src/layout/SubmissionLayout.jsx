@@ -10,12 +10,20 @@ import Loader from '@components/Loader.jsx';
 import { toast } from 'react-toastify';
 import GradingSummary from '../components/GradingSummary';
 import { useAuth } from '@hooks/useAuth.js';
-
+import Chip from '@mui/material/Chip';
+import CancelIcon from '@mui/icons-material/Cancel';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import DownloadIcon from '@mui/icons-material/Download';
 export default function SubmissionLayout({ title, content, startDate, endDate }) {
     const [isFolderVisible, setIsFolderVisible] = useState(false);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
     const [uploadedFile, setUploadedFile] = useState(null); // Trạng thái cho tệp đã tải lên
     const [course, setCourse] = useState(null);
+    const [isDragActive, setIsDragActive] = useState(false);
 
     const formattedStartDate =
         startDate && !isNaN(new Date(startDate))
@@ -267,65 +275,113 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                             </div>
 
                             {/* Submission Instructions */}
-                            <div className="p-4 border-b border-slate-700">
+                            <div className="p-4 border-b border-slate-700 flex flex-col ">
                                 <h2 className="text-lg font-semibold mb-2 text-slate-700">Hướng dẫn nộp bài</h2>
                                 <div className="pb-2" dangerouslySetInnerHTML={{ __html: content }} />
 
                                 {authUser.role === 'TEACHER' ? (
                                     <Link to={`/grading/${courseId}/${assignmentId}`} className="text-white flex justify-center">
-                                    <button
-                                        className="py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                            Chấm điểm 
-                                    </button>
-                                        </Link>
+                                        <button
+                                            className="py-2 px-6  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                            Chấm điểm
+                                        </button>
+                                    </Link>
                                 ) : (
-                                    <button
-                                        onClick={toggleFolderVisibility}
-                                        className="py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                                        {assignmentSubmission ? 'Sửa bài nộp' : 'Thêm bài nộp'}
-                                    </button>
+                                    <div className="flex justify-center">
+                                        <button
+                                            onClick={toggleFolderVisibility}
+                                            className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors flex items-center w-fit gap-2"
+                                        >
+                                            <i className="fa-solid fa-folder-plus"></i>
+                                            {assignmentSubmission ? 'Sửa bài nộp' : 'Thêm bài nộp'}
+                                        </button>
+                                    </div>
                                 )}
 
                                 {/* Folder luôn hiển thị khi người dùng nhấn vào nút */}
                                 {isFolderVisible && (
-                                    <div className="mt-2 p-4 bg-slate-100 rounded-lg shadow-md">
-                                        <div className="text-lg font-semibold mb-2 text-slate-800">Tải tệp bài nộp của bạn</div>
-                                        {uploadedFile && (
-                                            <div className='mt-2'>
-                                                <span className="text-gray-700 mr-4">File đã chọn: </span>
-                                                <span className="text-blue-700 mr-4">{uploadedFile.name}</span>
-                                            </div>
-                                        )}
+                                    <div
+                                        className={`mt-2 p-4 pt-12 bg-slate-100 rounded-lg shadow-md border-2 border-dashed transition-colors duration-200 ${isDragActive ? 'border-blue-400 bg-blue-50' : 'border-slate-300'}`}
+                                        onDragOver={e => {
+                                            e.preventDefault();
+                                            setIsDragActive(true);
+                                        }}
+                                        onDragLeave={e => {
+                                            e.preventDefault();
+                                            setIsDragActive(false);
+                                        }}
+                                        onDrop={e => {
+                                            e.preventDefault();
+                                            setIsDragActive(false);
+                                            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                                setUploadedFile(e.dataTransfer.files[0]);
+                                            }
+                                        }}
+                                        onClick={() => {
+                                            // Khi click vào khung sẽ trigger input file ẩn
+                                            document.getElementById('hidden-upload-input')?.click();
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         {!uploadedFile && (
-                                            <input
-                                                type="file"
-                                                accept=".pdf,.doc,.docx,.xlsx,.xls"
-                                                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer"
-                                                onChange={handleFileChange}
-                                            />
-                                        )}
-                                        {assignmentSubmission && !uploadedFile && assignmentSubmission.fileSubmissionUrl && (
-                                            <div className='mt-2'>
-                                                <span className="text-gray-700 mr-4">File đã nộp: </span>
-                                                <span className="text-blue-700 mr-4">
-                                                    {decodeURIComponent(assignmentSubmission.fileSubmissionUrl.split('/').pop())}
-                                                </span>
+                                            <div className="text-base font-semibold mb-2 text-center text-slate-500">
+                                                Kéo & thả file vào đây hoặc click để chọn file
                                             </div>
                                         )}
-                                        <div className="flex justify-center mt-4">
+
+
+                                        {uploadedFile && (
+                                            <div className="mt-2 flex justify-center">
+
+                                                <Chip
+                                                    label={uploadedFile.name}
+                                                    color="primary"
+                                                    onDelete={() => setUploadedFile(null)}
+                                                    deleteIcon={<CancelIcon />}
+                                                    variant="outlined"
+                                                    sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
+                                                />
+                                            </div>
+                                        )}
+                                        {/* Input file ẩn */}
+                                        <input
+                                            id="hidden-upload-input"
+                                            type="file"
+                                            accept=".pdf,.doc,.docx,.xlsx,.xls"
+                                            style={{ display: 'none' }}
+                                            onChange={handleFileChange}
+                                        />
+                                        {assignmentSubmission && !uploadedFile && assignmentSubmission.fileSubmissionUrl && (
+                                            <div className="mt-2 flex justify-center">
+                                                <Chip
+                                                    label={decodeURIComponent(assignmentSubmission.fileSubmissionUrl.split('/').pop())}
+                                                    color="success"
+                                                    variant="outlined"
+                                                    onDelete={() => setUploadedFile(null)}
+                                                    deleteIcon={<CancelIcon />}
+                                                    sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
+                                                />
+                                            </div>
+                                        )}
+                                        <div className="flex justify-center mt-12">
                                             <button
-                                                onClick={() => handleSubmitAssignmentSubmission()}
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    handleSubmitAssignmentSubmission();
+                                                }}
                                                 disabled={!uploadedFile}
-                                                className={`mr-4 text-white text-m px-3 py-1 rounded-lg transition-colors shadow-md ${uploadedFile ? 'bg-blue-400 hover:bg-blue-600' : 'bg-slate-300 cursor-not-allowed'
+                                                className={` text-white text-m px-3 py-1 rounded-lg transition-colors shadow-md ${uploadedFile ? 'bg-blue-400 hover:bg-blue-600' : 'bg-slate-300 cursor-not-allowed'
                                                     }`}>
                                                 Nộp bài
                                             </button>
-
-                                            <button
+                                            {/* <button
                                                 className="mr-4 bg-rose-400 text-white text-m px-3 py-1 rounded-lg hover:bg-rose-700 transition-colors shadow-md"
-                                                onClick={() => handleFileDelete()}>
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    handleFileDelete();
+                                                }}>
                                                 Huỷ chọn
-                                            </button>
+                                            </button> */}
                                         </div>
                                     </div>
                                 )}
