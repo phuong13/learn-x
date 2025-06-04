@@ -68,7 +68,7 @@ export default function UserMenuDropdown() {
             </button>
 
             {isOpen && (
-                <div className="absolute z-10 mt-2 bg-white border border-slate-200 rounded-md shadow-lg right-0 min-w-[180px]">
+                <div className="absolute z-10 mt-2 bg-white border border-slate-200 rounded-md shadow-lg right-0 min-w-[170px]">
                     <div className="py-1" role="menu" aria-orientation="vertical">
                         {menuItems.map((item, idx) => (
                             <Link

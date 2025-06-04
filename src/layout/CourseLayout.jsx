@@ -6,16 +6,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { axiosPrivate } from '@/axios/axios.js';
 import { useAuth } from '@hooks/useAuth.js';
 import { toast } from 'react-toastify';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CourseGradeChart from '../components/CourseGradeChart.jsx';
 import GradeTable from '@components/GradeTable.jsx';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
 import Loader from '../components/Loader.jsx';
 import EditCourseInfoModal from '../components/EditCourseInfoModal';
-import { to } from '@react-spring/web';
 
 
 export default function CoursePageLayout() {
@@ -96,8 +93,8 @@ export default function CoursePageLayout() {
                 toast.success(response.data.message);
             }
         } catch (err) {
-            toast.warning('Đã có học sinh làm bài quiz, vì vậy không được xoá môn học' )
             setIsConfirmDialogOpen(false);
+            toast.warning('Đã có học sinh làm bài quiz, vì vậy không được xoá môn học')
         } finally {
             setIsLoading(false);
         }
@@ -154,7 +151,7 @@ export default function CoursePageLayout() {
         const params = new URLSearchParams();
         params.append('name', courseName);
         params.append('description', description);
-    
+
         params.append('startDate', startDate);
         const urlParams = params.toString();
 
@@ -181,7 +178,7 @@ export default function CoursePageLayout() {
     };
 
     return (
-        <div className="bg-slate-100 min-h-[calc(100vh-193px)] flex flex-col">
+        <div className="bg-slate-100 min-h-[calc(100vh-170px)] flex flex-col">
             {isLoading && (
                 <Loader isLoading={isLoading} />
             )}
@@ -234,11 +231,11 @@ export default function CoursePageLayout() {
                             )}
                         </div>
                     </div>
-                     
-                        <div className="absolute bottom-4 left-4 text-white bg-primaryDark px-4 py-2 rounded-lg text-sm font-semibold">
-                            {t('teacher')}: {teacher?.fullName ? teacher.fullName : 'Đang tải...'}
-                        </div>
-                    
+
+                    <div className="absolute bottom-4 left-4 text-white bg-primaryDark px-4 py-2 rounded-lg text-sm font-semibold">
+                        {t('teacher')}: {teacher?.fullName ? teacher.fullName : 'Đang tải...'}
+                    </div>
+
                 </div>
 
                 <nav className="bg-white border-b px-4">

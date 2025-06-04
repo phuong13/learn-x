@@ -7,7 +7,7 @@ export default function Component() {
     const { t } = useTranslation();
 
     return (
-        <div className="relative min-h-[calc(100vh-193px)] flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[calc(100vh-170px)] flex items-center justify-center overflow-hidden">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <img

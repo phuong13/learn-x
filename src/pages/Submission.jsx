@@ -51,7 +51,7 @@ const Submission = () => {
     return (
         <>
             <DocumentTitle title="Nộp bài" />
-            <div className="flex flex-col min-h-[calc(100vh-193px)]">
+            <div className="flex flex-col min-h-[calc(100vh-170px)]">
                 <div className="flex-1 pr-6 pl-6">
                     {isLoading ? (
                         <Loader isLoading={isLoading} className="flex justify-center items-center h-full" />

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useAuth } from '@hooks/useAuth.js';
+import { RippleButton } from "./ui/ripple-button";
 
 export const ChangePasswordModal = ({ visible, onClose, getResponse }) => {
     const axiosPrivate = useAxiosPrivate();
@@ -39,7 +40,7 @@ export const ChangePasswordModal = ({ visible, onClose, getResponse }) => {
         <div
             className="fixed inset-0 z-50 bg-black bg-opacity-20 backdrop-blur-sm flex justify-center items-center"
             onClick={handleOutsideClick}>
-            <div className="bg-white px-8 pt-8 pb-4 rounded-md w-1/4">
+            <div className="bg-white px-8 pt-8 pb-4 rounded-xl w-1/4">
                 <form onSubmit={handleChangePassword}>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Mật khẩu cũ</label>
@@ -63,17 +64,17 @@ export const ChangePasswordModal = ({ visible, onClose, getResponse }) => {
                         />
                     </div>
                     <div className="flex justify-end">
-                        <button
+                        <RippleButton
                             type="button"
                             className="font-medium mr-2 px-4 py-2 bg-gray-300 rounded-md"
                             onClick={onClose}>
                             Hủy
-                        </button>
-                        <button
+                        </RippleButton>
+                        <RippleButton
                             type="submit"
                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#00ba9d] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300">
                             Đổi mật khẩu
-                        </button>
+                        </RippleButton>
                     </div>
                 </form>
             </div>

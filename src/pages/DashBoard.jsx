@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 const DashBoard = () => {
     const { t } = useTranslation();
     return (
-        <div className="flex flex-col min-h-[calc(100vh-193px)]">
+        <div className="flex flex-col min-h-[calc(100vh-170px)]">
             <DocumentTitle title="Bảng điều khiển" />
                 <AssignmentControlPanel />
                 <Calendar />

@@ -86,7 +86,7 @@ const QuizSubmissionLayout = () => {
   }
 
   return (
-    <div className='flex flex-row gap-6 p-6 min-h-[calc(100vh-193px)]'>
+    <div className='flex flex-row gap-6 p-6 min-h-[calc(100vh-170px)]'>
       <div className='flex flex-col gap-4 w-3/4'>
         <Breadcrum quizTitle={quizTitle || ''} />
         <div className='bg-white shadow-md rounded-lg p-4 flex-1'>

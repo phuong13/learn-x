@@ -5,9 +5,8 @@ import { useAuth } from '@hooks/useAuth.js';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useTranslation } from 'react-i18next';
-
+import { RippleButton } from "./ui/ripple-button";
 import Loader from './Loader';
-
 import { ToastContainer, toast } from 'react-toastify';
 
 const ProfileInfo = () => {
@@ -142,6 +141,7 @@ const ProfileInfo = () => {
             // animate={{ opacity: 1 }}
             // transition={{ duration: 0.5 }}
             className="min-h-[calc(100vh-223px)] bg-gradient-to-br from-gray-100 to-gray-200">
+            <Loader isLoading={isLoading} />
             <ChangePasswordModal
                 visible={showChangePassword}
                 onClose={() => setShowChangePassword(false)}
@@ -293,21 +293,27 @@ const ProfileInfo = () => {
                                                 onClick={handleChangePassword}
                                                 className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 mr-3">
                                                 <FaKey className="mr-2" />
-                                                {t('change_password')}                                            </button>
-                                            <button
-                                                type="button"
-                                                disabled={authUser.role === 'TEACHER'}
-                                                onClick={() => setIsOpenRequestRole(true)}
-                                                className={`z-99 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 ${authUser.role === 'TEACHER' ? 'bg-neutral-400 text-gray-500' : ''}`}>
-                                                <FaLock className="mr-2" />
-                                                {t('teacher_requests')}
+                                                {t('change_password')}
+
                                             </button>
+
+                                            {authUser.role !== 'TEACHER' && (
+                                                <button
+                                                    type="button"
+                                                    disabled={authUser.role === 'TEACHER'}
+                                                    onClick={() => setIsOpenRequestRole(true)}
+                                                    className={`z-99 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300 ${authUser.role === 'TEACHER' ? 'bg-neutral-400 text-gray-500' : ''}`}>
+                                                    <FaLock className="mr-2" />
+                                                    {t('teacher_requests')}
+                                                </button>
+                                            )}
+
                                         </div>
-                                        <button
+                                        <RippleButton
                                             type="submit"
                                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#00ba9d] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ba9d] transition-all duration-300">
                                             {t('save_changes')}
-                                        </button>
+                                        </RippleButton>
                                     </motion.div>
                                 </form>
                             </div>

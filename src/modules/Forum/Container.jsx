@@ -71,7 +71,7 @@ const Container = () => {
     <div className="flex flex-col gap-4 p-4 h-full focus:outline-none" tabIndex={-1}>
       {forumId ? (
         <RippleButton
-                   onClick={() => setShowPopup(true)}
+                     onClick={() => setShowPopup(true)}
 
         >
           {t("forum.create_topic")}

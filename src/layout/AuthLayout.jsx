@@ -70,7 +70,7 @@ const AuthLayout = ({ type = 'login' }) => {
                 toast.success(result.response?.data?.message || 'Đăng nhập thất bại', { type: 'error' });
             }
         } catch (error) {
-            toast(error.response?.data?.message || 'Đã xảy ra lỗi', { type: 'error' });
+            // toast( 'Đã xảy ra lỗi', { type: 'error' });
         } finally {
             setIsLoading(false);
         }

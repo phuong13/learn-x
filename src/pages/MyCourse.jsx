@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
-import Header from '@layout/Header';
-import Footer from '@layout/Footer.jsx';
+
 import CourseCard from '../components/CourseCard';
 import CourseFilter from '../components/CourseFilter';
-import Navbar from '@layout/NavBar.jsx';
 import CourseService from '../services/courses/course.service';
 import { useAuth } from '@hooks/useAuth.js';
 import DocumentTitle from '@components/DocumentTitle';
@@ -51,7 +49,7 @@ const MyCourse = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-[calc(100vh-217px)] m-4">
+        <div className="flex flex-col min-h-[calc(100vh-170px)] mt-4 mx-4">
             <DocumentTitle title="Khóa học của tôi" />
             <div className="flex-grow p-3 rounded-lg bg-white shadow-sm">
                
@@ -91,7 +89,7 @@ const MyCourse = () => {
                 count={totalPages}
                 page={page + 1}
                 color="primaryDark"
-                className="flex justify-center mt-2"
+                className="flex justify-center my-2"
                 onChange={handlePageChange}
             />
         </div>

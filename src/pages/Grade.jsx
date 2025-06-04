@@ -52,7 +52,7 @@ const Grading = () => {
     return (
         <>
             <DocumentTitle title="Nộp bài" />
-            <div className="flex flex-col min-h-[calc(100vh-193px)]">
+            <div className="flex flex-col min-h-[calc(100vh-170px)]">
                 {isLoading && <Loader isLoading={isLoading} />}
                 {!isLoading && assignment && (
                     <GradingInterface
