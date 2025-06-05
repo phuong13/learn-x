@@ -139,9 +139,8 @@ const StudentRegisteredLayout = () => {
                 emails: uniqueEmails,
             });
             if (response.status === 200) {
-                await fetchStudents(0);
-                
                 toast.success(response.data.message);
+                await fetchStudents(0);
             } else {
                 toast.error(response.data.message, { type: 'error' });
             }

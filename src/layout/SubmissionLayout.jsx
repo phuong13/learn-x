@@ -12,18 +12,15 @@ import GradingSummary from '../components/GradingSummary';
 import { useAuth } from '@hooks/useAuth.js';
 import Chip from '@mui/material/Chip';
 import CancelIcon from '@mui/icons-material/Cancel';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import CloudDoneIcon from '@mui/icons-material/CloudDone';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import DownloadIcon from '@mui/icons-material/Download';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 export default function SubmissionLayout({ title, content, startDate, endDate }) {
     const [isFolderVisible, setIsFolderVisible] = useState(false);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
     const [uploadedFile, setUploadedFile] = useState(null); // Trạng thái cho tệp đã tải lên
     const [course, setCourse] = useState(null);
     const [isDragActive, setIsDragActive] = useState(false);
+    const [textSubmission, setTextSubmission] = useState('');
 
     const formattedStartDate =
         startDate && !isNaN(new Date(startDate))
@@ -105,6 +102,8 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                 const res = await axiosPrivate.get(`/assignment-submissions/${assignmentId}/logged-in`);
                 if (res.data.data.fileSubmissionUrl != null) {
                     setAssignmentSubmission(res.data.data);
+                    setTextSubmission(res.data.data.textSubmission || '');
+
                 } else {
                     setAssignmentSubmission(null);
                 }
@@ -148,60 +147,78 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
         setUploadedFile(event.target.files[0]);
     };
 
-    const handleFileDelete = () => {
-        setUploadedFile(null); // Xoá file
-        setIsFolderVisible(!isFolderVisible);
 
-    };
 
-    const handleSubmitAssignmentSubmission = async () => {
-        const formData = new FormData();
-        formData.append('document', uploadedFile);
+   const handleSubmitAssignmentSubmission = async () => {
+    try {
+        if (assignmentSubmission) {
+            // Cập nhật bài nộp đã có
+            const assignmentData = {
+                textSubmission: textSubmission,
+            };
 
-        try {
-            if (assignmentSubmission) {
-                setIsLoading(true);
-                const response = await axiosPrivate.patch(`/assignment-submissions/${assignmentId}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                setIsLoading(false);
-
-                if (response.status === 200) {
-                    toast.success('Chỉnh sửa bài thành công');
-
-                    setAssignmentSubmission(response.data.data);
-                } else {
-                    toast.error(response.data.message, { type: 'error' });
-                }
-            } else {
-                const submissionData = {
-                    assignmentId,
-                    textSubmission: '',
-                };
-
-                formData.append('assignment', new Blob([JSON.stringify(submissionData)], { type: 'application/json' }));
-
-                setIsLoading(true);
-                const response = await axiosPrivate.post(`/assignment-submissions`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                setIsLoading(false);
-
-                if (response.status === 201 || response.status === 200) {
-                    toast.success('Nộp bài thành công');
-                    setAssignmentSubmission(response.data.data);
-                } else {
-                    toast.error(response.data.message, { type: 'error' });
-                }
+            // Tạo FormData riêng biệt
+            const formData = new FormData();
+            formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
+            
+            // Thêm file nếu có
+            if (uploadedFile) {
+                formData.append('document', uploadedFile);
             }
-        } catch (error) {
-            toast.error(error.response.data.message, { type: 'error' });
+
+            setIsLoading(true);
+            const response = await axiosPrivate.patch(`/assignment-submissions/${assignmentId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setIsLoading(false);
+
+            if (response.status === 200) {
+                toast.success('Chỉnh sửa bài thành công');
+                setAssignmentSubmission(response.data.data);
+                setIsFolderVisible(false); // Đóng form sau khi submit thành công
+            } else {
+                toast.error(response.data.message || 'Có lỗi xảy ra');
+            }
+        } else {
+            // Tạo bài nộp mới
+            const assignmentData = {
+                assignmentId: parseInt(assignmentId),
+                textSubmission: textSubmission,
+            };
+
+            // Tạo FormData riêng biệt
+            const formData = new FormData();
+            formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
+            
+            // Thêm file nếu có
+            if (uploadedFile) {
+                formData.append('document', uploadedFile);
+            }
+
+            setIsLoading(true);
+            const response = await axiosPrivate.post(`/assignment-submissions`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setIsLoading(false);
+
+            if (response.status === 201 || response.status === 200) {
+                toast.success('Nộp bài thành công');
+                setAssignmentSubmission(response.data.data);
+                setIsFolderVisible(false); // Đóng form sau khi submit thành công
+            } else {
+                toast.error(response.data.message || 'Có lỗi xảy ra');
+            }
         }
-    };
+    } catch (error) {
+        setIsLoading(false);
+        console.error('Error submitting assignment:', error);
+        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi nộp bài');
+    }
+};
 
     return (
         <div className="">
@@ -299,87 +316,112 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
 
                                 {/* Folder luôn hiển thị khi người dùng nhấn vào nút */}
                                 {isFolderVisible && (
-                                    <div
-                                        className={`mt-2 p-4 pt-12 bg-slate-100 rounded-lg shadow-md border-2 border-dashed transition-colors duration-200 ${isDragActive ? 'border-blue-400 bg-blue-50' : 'border-slate-300'}`}
-                                        onDragOver={e => {
-                                            e.preventDefault();
-                                            setIsDragActive(true);
-                                        }}
-                                        onDragLeave={e => {
-                                            e.preventDefault();
-                                            setIsDragActive(false);
-                                        }}
-                                        onDrop={e => {
-                                            e.preventDefault();
-                                            setIsDragActive(false);
-                                            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                                                setUploadedFile(e.dataTransfer.files[0]);
-                                            }
-                                        }}
-                                        onClick={() => {
-                                            // Khi click vào khung sẽ trigger input file ẩn
-                                            document.getElementById('hidden-upload-input')?.click();
-                                        }}
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        {!uploadedFile && (
-                                            <div className="text-base font-semibold mb-2 text-center text-slate-500">
-                                                Kéo & thả file vào đây hoặc click để chọn file
-                                            </div>
-                                        )}
+                                    <div className="mt-4 space-y-4">
+                                        {/* Rich Text Editor */}
+                                        <div className="bg-white p-4 rounded-lg border border-slate-200">
+                                            <h3 className="text-lg font-semibold mb-3 text-slate-700">Nội dung bài làm</h3>
+                                            <ReactQuill
+                                                theme="snow"
+                                                value={textSubmission}
+                                                onChange={setTextSubmission}
 
+                                                placeholder="Nhập nội dung bài làm của bạn..."
+                                                style={{
+                                                    height: '200px',
+                                                    marginBottom: '50px'
+                                                }}
+                                            />
+                                        </div>
+                                        <h3 className="pl-4 text-lg font-semibold  text-slate-700">File đính kèm (không bắt buộc)</h3>
+                                        {/* File Upload */}
+                                        <div
+                                            className={`p-4 pt-6 bg-slate-50 rounded-lg shadow-md border-2 border-dashed transition-colors duration-200 ${isDragActive ? 'border-blue-400 bg-blue-50' : 'border-slate-300'}`}
+                                            onDragOver={e => {
+                                                e.preventDefault();
+                                                setIsDragActive(true);
+                                            }}
+                                            onDragLeave={e => {
+                                                e.preventDefault();
+                                                setIsDragActive(false);
+                                            }}
+                                            onDrop={e => {
+                                                e.preventDefault();
+                                                setIsDragActive(false);
+                                                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                                    setUploadedFile(e.dataTransfer.files[0]);
+                                                }
+                                            }}
+                                            onClick={() => {
+                                                document.getElementById('hidden-upload-input')?.click();
+                                            }}
+                                            style={{ cursor: 'pointer' }}
+                                        >
 
-                                        {uploadedFile && (
-                                            <div className="mt-2 flex justify-center">
+                                            {!uploadedFile && (
+                                                <div className="text-base font-semibold mb-6 text-center text-slate-500">
+                                                    Kéo & thả file vào đây hoặc click để chọn file
+                                                </div>
+                                            )}
 
-                                                <Chip
-                                                    label={uploadedFile.name}
-                                                    color="primary"
-                                                    onDelete={() => setUploadedFile(null)}
-                                                    deleteIcon={<CancelIcon />}
-                                                    variant="outlined"
-                                                    sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
-                                                />
-                                            </div>
-                                        )}
-                                        {/* Input file ẩn */}
-                                        <input
-                                            id="hidden-upload-input"
-                                            type="file"
-                                            accept=".pdf,.doc,.docx,.xlsx,.xls"
-                                            style={{ display: 'none' }}
-                                            onChange={handleFileChange}
-                                        />
-                                        {assignmentSubmission && !uploadedFile && assignmentSubmission.fileSubmissionUrl && (
-                                            <div className="mt-2 flex justify-center">
-                                                <Chip
-                                                    label={decodeURIComponent(assignmentSubmission.fileSubmissionUrl.split('/').pop())}
-                                                    color="success"
-                                                    variant="outlined"
-                                                    
-                                                    sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
-                                                />
-                                            </div>
-                                        )}
-                                        <div className="flex justify-center mt-12">
+                                            {uploadedFile && (
+                                                <div className="mt-2 flex justify-center">
+                                                    <Chip
+                                                        label={uploadedFile.name}
+                                                        color="primary"
+                                                        onDelete={() => setUploadedFile(null)}
+                                                        deleteIcon={<CancelIcon />}
+                                                        variant="outlined"
+                                                        sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <input
+                                                id="hidden-upload-input"
+                                                type="file"
+                                                accept=".pdf,.doc,.docx,.xlsx,.xls"
+                                                style={{ display: 'none' }}
+                                                onChange={handleFileChange}
+                                            />
+
+                                            {assignmentSubmission && !uploadedFile && assignmentSubmission.fileSubmissionUrl && (
+                                                <div className="mt-2 flex justify-center">
+                                                    <Chip
+                                                        label={decodeURIComponent(assignmentSubmission.fileSubmissionUrl.split('/').pop())}
+                                                        color="success"
+                                                        variant="outlined"
+                                                        sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Submit Buttons */}
+                                        <div className="flex justify-center gap-4">
+                                            <button
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    // setIsFolderVisible(false);
+                                                    setTextSubmission(assignmentSubmission?.textSubmission || '');
+                                                    setUploadedFile(null);
+                                                }}
+                                                className="bg-slate-500 text-white text-m px-6 py-2 rounded-lg hover:bg-slate-600 transition-colors shadow-md"
+                                            >
+                                                Hủy
+                                            </button>
                                             <button
                                                 onClick={e => {
                                                     e.stopPropagation();
                                                     handleSubmitAssignmentSubmission();
                                                 }}
-                                                disabled={!uploadedFile}
-                                                className={` text-white text-m px-3 py-1 rounded-lg transition-colors shadow-md ${uploadedFile ? 'bg-blue-400 hover:bg-blue-600' : 'bg-slate-300 cursor-not-allowed'
-                                                    }`}>
-                                                Nộp bài
+                                                disabled={!textSubmission.trim() && !uploadedFile}
+                                                className={`text-white text-m px-6 py-2 rounded-lg transition-colors shadow-md ${textSubmission.trim() || uploadedFile
+                                                    ? 'bg-blue-500 hover:bg-blue-600'
+                                                    : 'bg-slate-300 cursor-not-allowed'
+                                                    }`}
+                                            >
+                                                {assignmentSubmission ? 'Cập nhật bài nộp' : 'Nộp bài'}
                                             </button>
-                                            {/* <button
-                                                className="mr-4 bg-rose-400 text-white text-m px-3 py-1 rounded-lg hover:bg-rose-700 transition-colors shadow-md"
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    handleFileDelete();
-                                                }}>
-                                                Huỷ chọn
-                                            </button> */}
                                         </div>
                                     </div>
                                 )}
