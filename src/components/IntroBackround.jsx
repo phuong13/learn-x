@@ -28,13 +28,15 @@ export default function Component() {
                     <p className="my-6 max-w-md mx-auto text-base text-gray-700 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
                         {t('landing.description')}
                     </p>
-                    <RippleButton className="py-3 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
-                        <Link
-                            to="/my-course"
-                        >
+                    <Link
+                        to="/my-course"
+                    >
+                        <RippleButton className="py-3 px-6 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+
                             {t('landing.button_text')}
-                        </Link>
-                    </RippleButton>
+
+                        </RippleButton>
+                    </Link>
                 </div>
             </div>
         </div>

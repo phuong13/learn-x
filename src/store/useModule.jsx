@@ -201,7 +201,7 @@ export const useSubmitModules = () => {
                   (a) => a.id === contentId && a.type === 'assignment'
                 );
 
-                if (!old || old.title !== item.title || old.content !== item.content) {
+                if (!old || old.title !== item.title || old.content !== item.content || old.startDate !== item.startDate || old.endDate !== item.endDate || old.state !== item.state) {
                   await axiosPrivate.patch(`/assignments/${contentId}`, payload);
                 }
               }

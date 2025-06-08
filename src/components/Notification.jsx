@@ -1,31 +1,31 @@
-// components/Notification.jsx
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { axiosPrivate } from '@/axios/axios';
 import { useAuth } from '@hooks/useAuth';
+import {
+    Badge,
+    IconButton,
+    Popover,
+    List,
+    ListItem,
+    ListItemText,
+    Typography,
+    Divider,
+    Box,
+    Paper
+} from '@mui/material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function Notification() {
     const { authUser } = useAuth();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
-    const [showNotifications, setShowNotifications] = useState(false);
-    const dropdownRef = useRef(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate();
 
     const keyPrefix = authUser?.email || 'guest';
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowNotifications(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+    const open = Boolean(anchorEl);
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -44,12 +44,16 @@ function Notification() {
         fetchNotifications();
     }, [keyPrefix]);
 
-    const toggleNotifications = () => {
-        setShowNotifications((prev) => !prev);
-        if (!showNotifications) {
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+        if (!open) {
             setUnreadCount(0);
             localStorage.setItem(`unread_count_${keyPrefix}`, 0);
         }
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
     };
 
     const deleteNotification = async (id) => {
@@ -63,41 +67,109 @@ function Notification() {
         }
     };
 
+    const handleNotificationClick = (notification) => {
+        deleteNotification(notification.id);
+        navigate(notification.url);
+        handleClose();
+    };
+
     return (
-        <div className="relative" ref={dropdownRef}>
-            <i
-                className={`fas fa-bell text-slate-400 cursor-pointer relative hover:text-slate-300 ${
-                    showNotifications ? 'text-slate-300' : ''
-                }`}
-                onClick={toggleNotifications}
-            ></i>
-            {unreadCount > 0 && (
-                <span className="absolute inline-flex items-center justify-center w-4 h-4 text-xs font-bold leading-none text-white bg-[#f66754] rounded-full -bottom-1 -right-3">
-                    {unreadCount}
-                </span>
-            )}
-            {showNotifications && (
-                <div className="absolute right-[-6px] mt-2 w-64 bg-white rounded-md shadow-lg z-10">
+        <>
+            <IconButton
+                onClick={handleClick}
+                sx={{
+                    color: 'rgba(148, 163, 184, 1)',
+                    '&:hover': {
+                        color: 'rgba(203, 213, 225, 1)',
+                    }
+                }}
+            >
+                <Badge badgeContent={unreadCount} color="error">
+                    <NotificationsIcon />
+                </Badge>
+            </IconButton>
+
+            <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                PaperProps={{
+                    sx: {
+                        width: 320,
+                        maxHeight: 400,
+                        mt: 1,
+                    }
+                }}
+            >
+                <Paper sx={{ width: '100%' }}>
+                    <Box sx={{ pl: 2, borderBottom: '1px solid #e0e0e0'  }}>
+                        <Typography variant="inherit" component="div">
+                            Thông báo
+                        </Typography>
+                    </Box>
+
                     {notifications.length > 0 ? (
-                        notifications.map((notification, index) => (
-                            <div
-                                key={index}
-                                onClick={() => {
-                                    deleteNotification(notification.id);
-                                    navigate(notification.url);
-                                    toggleNotifications();
-                                }}
-                                className="text-sm p-2 border-b border-slate-200 hover:bg-slate-300 hover:rounded-md last:border-b-0"
-                            >
-                                {notification.message}
-                            </div>
-                        ))
+                        <List sx={{ p: 0, maxHeight: 300, overflow: 'auto' }}>
+                            {notifications.map((notification, index) => (
+                                <div key={notification.id || index}>
+                                    <ListItem
+                                        sx={{
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                                backgroundColor: '#f5f5f5',
+                                            },
+                                            py: 1,
+                                            px: 1.5,
+                                        }}
+                                        onClick={() => handleNotificationClick(notification)}
+                                    >
+                                        <ListItemText
+                                            primary={
+                                                <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                                                    {notification.message}
+                                                </Typography>
+                                            }
+                                            sx={{ pr: 1 }}
+                                        />
+                                        <IconButton
+                                            size="small"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteNotification(notification.id);
+                                            }}
+                                            sx={{
+                                                color: '#9e9e9e',
+                                                '&:hover': {
+                                                    color: '#f44336',
+                                                    backgroundColor: 'rgba(244, 67, 54, 0.04)',
+                                                }
+                                            }}
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </ListItem>
+                                    {index < notifications.length - 1 && <Divider />}
+                                </div>
+                            ))}
+                        </List>
                     ) : (
-                        <div className="p-2 text-sm text-slate-500">Không có thông báo mới</div>
+                        <Box sx={{ p: 3, textAlign: 'center' }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Không có thông báo mới
+                            </Typography>
+                        </Box>
                     )}
-                </div>
-            )}
-        </div>
+                </Paper>
+            </Popover>
+        </>
     );
 }
 

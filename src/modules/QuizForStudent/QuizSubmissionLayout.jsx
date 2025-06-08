@@ -42,9 +42,9 @@ const QuizSubmissionLayout = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      navigate(`/quiz/${courseId}/${quizId}`);
       await submissionQuiz(quizId, totalTimeTakenInSeconds, answers);
       toast.success('Nộp bài thành công');
+      navigate(`/quiz/${courseId}/${quizId}`);
     } finally {
       setIsLoading(false);
     }

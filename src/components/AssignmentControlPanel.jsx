@@ -92,7 +92,7 @@ export default function AssignmentControlPanel() {
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
           <CircularProgress />
         </Box>
-      ) : (<>
+      ) : (<div className='flex flex-col gap-2 max-h-60 overflow-y-auto'>
         {filteredAssignments.map((assignment) => (
           <SubmissionHeader
             courseID={assignment.courseId}
@@ -114,7 +114,7 @@ export default function AssignmentControlPanel() {
             endDate={quiz.endDate}
           />
         ))}
-      </>)}
+      </div>)}
 
     </div>
   )

@@ -18,6 +18,7 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
     const [isFolderVisible, setIsFolderVisible] = useState(false);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(true);
     const [uploadedFile, setUploadedFile] = useState(null); // Trạng thái cho tệp đã tải lên
+    console.log("🚀 ~ SubmissionLayout ~ uploadedFile:", uploadedFile)
     const [course, setCourse] = useState(null);
     const [isDragActive, setIsDragActive] = useState(false);
     const [textSubmission, setTextSubmission] = useState('');
@@ -100,13 +101,10 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
             setIsLoading(true);
             try {
                 const res = await axiosPrivate.get(`/assignment-submissions/${assignmentId}/logged-in`);
-                if (res.data.data.fileSubmissionUrl != null) {
-                    setAssignmentSubmission(res.data.data);
-                    setTextSubmission(res.data.data.textSubmission || '');
 
-                } else {
-                    setAssignmentSubmission(null);
-                }
+                setAssignmentSubmission(res.data.data);
+                setTextSubmission(res.data.data.textSubmission || '');
+
             } catch {
                 setAssignmentSubmission(null);
             } finally {
@@ -149,76 +147,74 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
 
 
 
-   const handleSubmitAssignmentSubmission = async () => {
-    try {
-        if (assignmentSubmission) {
-            // Cập nhật bài nộp đã có
-            const assignmentData = {
-                textSubmission: textSubmission,
-            };
+    const handleSubmitAssignmentSubmission = async () => {
+        try {
+            console.log("🚀 ~ handleSubmitAssignmentSubmission ~ assignmentSubmission:", assignmentSubmission)
+            if (assignmentSubmission) {
+                // Cập nhật bài nộp đã có
 
-            // Tạo FormData riêng biệt
-            const formData = new FormData();
-            formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
-            
-            // Thêm file nếu có
-            if (uploadedFile) {
-                formData.append('document', uploadedFile);
-            }
+                // Tạo FormData riêng biệt
+                const formData = new FormData();
+                formData.append('textSubmission', textSubmission);
 
-            setIsLoading(true);
-            const response = await axiosPrivate.patch(`/assignment-submissions/${assignmentId}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            setIsLoading(false);
+                if (uploadedFile) {
+                    // Nếu có file mới, thêm vào FormData
+                    formData.append('document', uploadedFile);
+                }
 
-            if (response.status === 200) {
-                toast.success('Chỉnh sửa bài thành công');
-                setAssignmentSubmission(response.data.data);
-                setIsFolderVisible(false); // Đóng form sau khi submit thành công
+                setIsLoading(true);
+                const response = await axiosPrivate.patch(`/assignment-submissions/${assignmentId}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                setIsLoading(false);
+
+                if (response.status === 200) {
+                    toast.success('Chỉnh sửa bài thành công');
+                    setAssignmentSubmission(response.data.data);
+                    setIsFolderVisible(false); // Đóng form sau khi submit thành công
+                } else {
+                    toast.error(response.data.message || 'Có lỗi xảy ra');
+                }
             } else {
-                toast.error(response.data.message || 'Có lỗi xảy ra');
-            }
-        } else {
-            // Tạo bài nộp mới
-            const assignmentData = {
-                assignmentId: parseInt(assignmentId),
-                textSubmission: textSubmission,
-            };
+                // Tạo bài nộp mới
+                const assignmentData = {
+                    assignmentId: parseInt(assignmentId),
+                    textSubmission: textSubmission,
+                };
 
-            // Tạo FormData riêng biệt
-            const formData = new FormData();
-            formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
-            
-            // Thêm file nếu có
-            if (uploadedFile) {
+                // Tạo FormData riêng biệt
+                const formData = new FormData();
+                formData.append('assignment', new Blob([JSON.stringify(assignmentData)], { type: 'application/json' }));
+
+                // Thêm file nếu có
+
                 formData.append('document', uploadedFile);
-            }
 
-            setIsLoading(true);
-            const response = await axiosPrivate.post(`/assignment-submissions`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+
+                setIsLoading(true);
+                const response = await axiosPrivate.post(`/assignment-submissions`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                setIsLoading(false);
+
+                if (response.status === 201 || response.status === 200) {
+                    toast.success('Nộp bài thành công');
+                    setAssignmentSubmission(response.data.data);
+                    // setIsFolderVisible(false); // Đóng form sau khi submit thành công
+                } else {
+                    toast.error(response.data.message || 'Có lỗi xảy ra');
+                }
+            }
+        } catch (error) {
             setIsLoading(false);
-
-            if (response.status === 201 || response.status === 200) {
-                toast.success('Nộp bài thành công');
-                setAssignmentSubmission(response.data.data);
-                setIsFolderVisible(false); // Đóng form sau khi submit thành công
-            } else {
-                toast.error(response.data.message || 'Có lỗi xảy ra');
-            }
+            console.error('Error submitting assignment:', error);
+            toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi nộp bài');
         }
-    } catch (error) {
-        setIsLoading(false);
-        console.error('Error submitting assignment:', error);
-        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi nộp bài');
-    }
-};
+    };
 
     return (
         <div className="">
@@ -386,9 +382,11 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
 
                                             {assignmentSubmission && !uploadedFile && assignmentSubmission.fileSubmissionUrl && (
                                                 <div className="mt-2 flex justify-center">
+
                                                     <Chip
                                                         label={decodeURIComponent(assignmentSubmission.fileSubmissionUrl.split('/').pop())}
                                                         color="success"
+                                                        
                                                         variant="outlined"
                                                         sx={{ fontWeight: 500, fontSize: 15, px: 1.5 }}
                                                     />

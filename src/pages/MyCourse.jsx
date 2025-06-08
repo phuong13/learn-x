@@ -51,7 +51,7 @@ const MyCourse = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-[calc(100vh-170px)] mt-4 mx-4">
+        <div className="flex flex-col min-h-[calc(100vh-190px)] mt-4 mx-4">
             <DocumentTitle title="Khóa học của tôi" />
             <div className="flex-grow p-3 rounded-lg bg-white shadow-sm">
 
