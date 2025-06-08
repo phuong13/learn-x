@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import TopicSkeleton from "@components/ui/TopicSkeleton";
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import {RippleButton} from "@components/ui/ripple-button.jsx";
@@ -83,9 +84,11 @@ const Container = () => {
       )}
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <CircularProgress />
-        </Box>
+         <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <TopicSkeleton key={index} />
+          ))}
+        </div>
       ) : topics.length > 0 && forumId ? (
         <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6 overflow-y-auto">
           {topics.map((topic) => (

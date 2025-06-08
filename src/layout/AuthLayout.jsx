@@ -120,13 +120,13 @@ const AuthLayout = ({ type = 'login' }) => {
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-[minmax(0,_1030px)_minmax(0,_1fr)]">
                 {width >= 1024 && (
                     <div className="lg:flex relative hidden justify-center items-center h-full">
-                        <div className="w-80 h-80 bg-gradient-to-tr from-emerald-500 to-slate-300 rounded-full animate-bounce" />
+                        <div className="w-80 h-80 bg-gradient-to-tr from-emerald-600 to-slate-300 rounded-full animate-bounce" />
                         <div className="w-full absolute bottom-0 h-1/2 bg-white/10 backdrop-blur-lg" />
                     </div>
                 )}
-                <div className="bg-widget flex items-center justify-center w-full py-10 px-4 lg:p-[60px]">
+                <div className="bg-widget flex items-center justify-center w-full rounded-3xl py-10 px-4 lg:p-[60px]">
                     <Spring
-                        className="max-w-[540px] w-full bg-white px-10 py-20 rounded-3xl border-2 border-gray-red shadow-lg"
+                        className="max-w-[540px] w-full bg-white px-10 py-20  border-2 border-gray-red shadow-lg"
                         type="slideUp"
                         duration={400}
                         delay={300}>
@@ -138,7 +138,7 @@ const AuthLayout = ({ type = 'login' }) => {
                             className="mt-5"
                             onSubmit={handleSubmit(form === 'login' ? onSubmitLogin : onSubmitRegister)}>
                             <Loader isLoading={isLoading} />
-                            <div className="flex flex-col gap-5">
+                            <div className="flex flex-col gap-5 rounded-3xl">
                                 {form === 'register' && (
                                     <div className="field-wrapper">
                                         <label htmlFor="fullName" className="field-label">

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Loader from '../../components/Loader';
+import CourseItemSkeleton from '@components//ui/CourseItemSkeleton';
 import TagCourse from './components/tag/TagCourse';
 import { useCourses } from '../../store/useCourses';
 import { useForum } from '../../store/useForum';
@@ -54,9 +55,11 @@ export const Sidebar = () => {
         />
       </div>
 
-      {(loading ) ? (
-        <div className="flex-1 flex items-center justify-center">
-          <Loader isLoading />
+      {(loading) ? (
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <CourseItemSkeleton key={index} />
+          ))}
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto custom-scrollbar">
