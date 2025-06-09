@@ -7,29 +7,31 @@ import QuizQuestion from './component/QuizQuestion';
 import CountdownTimer from './component/CountdownTimer'
 import TimeoutDialog from './component/TimeoutDialog.jsx';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-
+import Loader from '../../components/Loader.jsx';
 import { useQuestionByQuizId } from '../../store/useQuiz.jsx';
 import { useQuizById, getSession, useSubmissionQuiz } from '../../store/useQuiz.jsx';
 import { parseJavaLocalDateTime } from '../../utils/date.js';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CircularProgress, Box } from '@mui/material';
-import { is } from 'date-fns/locale';
 const QuizSubmissionLayout = () => {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [answers, setAnswers] = useState({});
   const { quizId, courseId } = useParams();
   const { questions, loading, error } = useQuestionByQuizId(quizId);
   const [isLoading, setIsLoading] = useState(false);
-   const [timeoutDialogOpen, setTimeoutDialogOpen] = useState(false);
+  const [timeoutDialogOpen, setTimeoutDialogOpen] = useState(false);
   const { quiz, quizTitle } = useQuizById(quizId);
   const { session } = getSession(quizId);
+  // console.log("🚀 ~ QuizSubmissionLayout ~ session:", session)
   const submissionQuiz = useSubmissionQuiz();
   const navigate = useNavigate();
 
   let timeLeftSeconds = 0
   if (Array.isArray(session?.endTime)) {
     const endDate = new Date(parseJavaLocalDateTime(session?.endTime).getTime());
+    console.log("🚀 ~ QuizSubmissionLayout ~ endDate:", endDate)
+    console.log("🚀 ~ QuizSubmissionLayout ~ Date.now():", Date.now())
     const timeLeftMs = endDate.getTime() - Date.now();
     timeLeftSeconds = Math.max(Math.floor(timeLeftMs / 1000), 0);
   }
@@ -77,18 +79,13 @@ const QuizSubmissionLayout = () => {
 
 
 
-  if (loading||isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300, width: '100%' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  
 
   return (
     <div className='flex flex-row gap-6 p-6 min-h-[calc(100vh-170px)]'>
       <div className='flex flex-col gap-4 w-3/4'>
         <Breadcrum quizTitle={quizTitle || ''} />
+        <Loader isLoading={loading || isLoading}></Loader>
         <div className='bg-white shadow-md rounded-lg p-4 flex-1'>
           <QuizQuestion
             index={currentQuestion - 1}
@@ -129,7 +126,7 @@ const QuizSubmissionLayout = () => {
         />
 
       </div>
-      <TimeoutDialog open={timeoutDialogOpen} onSubmit={handleSubmit}/>
+      <TimeoutDialog open={timeoutDialogOpen} onSubmit={handleSubmit} />
 
       <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
         <DialogTitle>Xác nhận nộp bài</DialogTitle>
