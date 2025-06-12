@@ -294,7 +294,8 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                 {authUser.role === 'TEACHER' ? (
                                     <Link to={`/grading/${courseId}/${assignmentId}`} className="text-white flex justify-center">
                                         <button
-                                            className="py-2 px-6  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                            className="py-2 px-6   bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors">
                                             Chấm điểm
                                         </button>
                                     </Link>
@@ -302,7 +303,8 @@ export default function SubmissionLayout({ title, content, startDate, endDate })
                                     <div className="flex justify-center">
                                         <button
                                             onClick={toggleFolderVisibility}
-                                            className="py-2 px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors flex items-center w-fit gap-2"
+                                            className="py-2 px-6  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg hover:bg-secondary transition-colors flex items-center w-fit gap-2"
                                         >
                                             <i className="fa-solid fa-folder-plus"></i>
                                             {assignmentSubmission ? 'Sửa bài nộp' : 'Thêm bài nộp'}

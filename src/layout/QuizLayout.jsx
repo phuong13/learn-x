@@ -131,7 +131,8 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
 
                         {authUser.role === 'TEACHER' ? (
                             <button
-                                className="mx-auto py-2 px-4  bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                                className="mx-auto py-2 px-4   bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors"
                                 onClick={() => setScoreModalOpen(true)}>
                                 Xem điểm các sinh viên
 
@@ -154,7 +155,8 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
                                 }
                                 return (
                                     <button
-                                        className="mx-auto py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors">
+                                        className="mx-auto py-2 px-4  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg hover:bg-secondary transition-colors">
                                         <Link to={`/quiz-submission/${courseId}/${quizId}`} className="text-white">
                                             Bắt đầu làm bài Quiz
                                         </Link>

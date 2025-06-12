@@ -48,7 +48,7 @@ export default function CourseFilter({ onSearch }) {
                 {authUser?.role === 'TEACHER' && (
                     <Link to="/add-course">
                         <button
-                            className="ml-2 h-10 px-2 text-base bg-primaryDark text-center text-white rounded-lg hover:bg-secondary transition-colors flex items-center justify-center gap-1 min-w-44"
+                            className="ml-2 h-10 px-2 text-base bg-gradient-to-br from-[#5BCEC9] to-[#14919B] shadow-md hover:shadow-lgtext-center text-white rounded-lg  transition-colors flex items-center justify-center gap-1 min-w-44"
                             style={{ lineHeight: 1 }}
                         >
                             <AddIcon className="w-4 h-4" fontSize="small" />

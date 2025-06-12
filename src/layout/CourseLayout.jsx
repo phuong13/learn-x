@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Loader from '../components/Loader.jsx';
 import EditCourseInfoModal from '../components/EditCourseInfoModal';
+import DiscussionContainer from '../modules/Discussion/DiscussionContainer.jsx';
 
 
 export default function CoursePageLayout() {
@@ -37,7 +38,8 @@ export default function CoursePageLayout() {
     const tabs = [
         t('tabs.courses'),
         t('tabs.members'),
-        t('tabs.scores')
+        t('tabs.scores'),
+        t('tabs.discussion'),
     ];
     const inputClassName =
         'mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm';
@@ -136,6 +138,13 @@ export default function CoursePageLayout() {
                         {authUser.role === 'STUDENT' && <GradeTable courseId={courseId} />}
                     </div>
                 );
+            case 3:
+                return (
+                    <div className="">
+                        <DiscussionContainer forumId={courseId} />
+                    </div>
+                )
+
 
             default:
                 return null;
@@ -272,7 +281,8 @@ export default function CoursePageLayout() {
                                     Không
                                 </button>
                                 <button
-                                    className="py-2 px-2 w-full bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors"
+                                    className="py-2 px-2 w-full  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors"
                                     onClick={handleDeleteCourse}>
                                     Có
                                 </button>

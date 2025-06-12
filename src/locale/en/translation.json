@@ -2,6 +2,7 @@
     "home_page": "Home",
     "dashboard": "Dashboard",
     "my_courses": "My Courses",
+    "discussion": "Discussion",
     "manage_courses": "Manage Courses",
     "my_profile": "My Profile",
     "logout": "Logout",
@@ -28,7 +29,8 @@
     "tabs": {
         "courses": "Courses",
         "members": "Members",
-        "scores": "Scores"
+        "scores": "Scores",
+        "discussion": "Discussion"
     },
     "landing": {
         "title_top": "ONLINE TEACHING",

@@ -20,8 +20,9 @@ import { Quiz } from '@mui/icons-material';
 import Loader from './Loader';
 
 
-export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initialModules = [] }) {
+export default function Curriculum({ courseName, isEdit, onSubmitSuccess, initialModules = [] }) {
    const [modules, setModules] = useState([]);
+   console.log("🚀 ~ Curriculum ~ modules:", modules)
    const [loading, setLoading] = useState(false);
    const [quizDialog, setQuizDialog] = useState({ open: false, moduleId: null, editData: null });
    const [lectureDialog, setLectureDialog] = useState({ open: false, moduleId: null, editData: null });
@@ -81,11 +82,16 @@ export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initia
    };
 
 
-   const handleRemoveContent = (moduleId, contentId) => {
+   const handleRemoveContent = (moduleId, contentId, contentType) => {
       setModules(prev =>
          prev.map(mod =>
             mod.id === moduleId
-               ? { ...mod, contents: mod.contents.filter(c => c.id !== contentId) }
+               ? {
+                  ...mod,
+                  contents: mod.contents.filter(c =>
+                     !(c.id === contentId && c.type === contentType)
+                  )
+               }
                : mod
          )
       );
@@ -240,21 +246,21 @@ export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initia
          return;
       }
       try {
-         setLoading(true); 
+         setLoading(true);
          const result = await submitModules(modules, courseId);
-          if (result.success && onSubmitSuccess) {
-         setLoading(false);
-         onSubmitSuccess();
-      }
+         if (result.success && onSubmitSuccess) {
+            setLoading(false);
+            onSubmitSuccess();
+         }
       }
       catch (error) {
-         console.error('Error submitting modules:', error); 
+         console.error('Error submitting modules:', error);
          setLoading(false);
          return;
       }
-     
-      
-     
+
+
+
    };
 
 
@@ -269,7 +275,8 @@ export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initia
             <button
                type="button"
                onClick={handleAddChapter}
-               className="flex ml-6 gap-2 py-2 px-2 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors w-fit"
+               className="flex ml-6 gap-2 py-2 px-2  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg hover:bg-secondary transition-colors w-fit"
             >
                <AddIcon />
                Thêm chương
@@ -338,7 +345,7 @@ export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initia
                                              : ''
 
                               }
-                              onRemove={() => handleRemoveContent(module.id, item.id)}
+                              onRemove={() => handleRemoveContent(module.id, item.id, item.type)} // Thêm type
                               onEdit={() => handleEditContent(module.id, item)}
                            />
                         ))}
@@ -443,7 +450,8 @@ export default function Curriculum({ courseName ,isEdit, onSubmitSuccess, initia
          <button
             type="button"
             onClick={handleDone}
-            className="flex w-40 mb-4 justify-center mx-auto gap-2 py-2 px-4 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors font-semibold hover:shadow-lg"
+            className="flex w-40 mb-4 justify-center mx-auto gap-2 py-2 px-4  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md text-white rounded-lg hover:bg-secondary transition-colors font-semibold hover:shadow-lg"
          >
             Xong
          </button>

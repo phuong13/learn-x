@@ -4,6 +4,7 @@ import Curriculum from './CreateCurriculumForm';
 import { useSubmitModules } from '../store/useModule';
 import { CircularProgress, Box } from '@mui/material';
 import { toast } from 'react-toastify';
+import BackButton from './ui/BackButton';
 
 // Hàm chuyển đổi dữ liệu câu hỏi từ API về format form
 function transformQuestionFromApi(raw) {
@@ -69,7 +70,7 @@ function transformModulesFromApi(modules) {
 const EditModule = () => {
   const { courseId } = useParams();
   const { getModules } = useSubmitModules()
- 
+
   localStorage.removeItem('courseInfo');
 
   const [modules, setModules] = useState([]);
@@ -97,19 +98,25 @@ const EditModule = () => {
   }
 
   return (
-  
-    <Curriculum
-      isEdit={true}
-      initialModules={modules}
-      onSubmitSuccess={
-        () => {
-          toast.success('Cập nhật module thành công!')
-          window.history.back();
+    <>
+      <div className='ml-4'>
+        <BackButton />
+      </div>
+
+      <Curriculum
+        isEdit={true}
+        initialModules={modules}
+        onSubmitSuccess={
+          () => {
+            toast.success('Cập nhật module thành công!')
+            window.history.back();
+          }
         }
-      }
-      
-    />
+
+      />
+    </>
   );
+
 };
 
 export default EditModule;

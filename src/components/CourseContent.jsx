@@ -78,7 +78,8 @@ const CourseContent = () => {
                     <div className="flex justify-end">
                         <button
                             onClick={() => navigate(`/course-detail/${courseId}/edit`)}
-                            className="py-2 px-3 text-sm bg-primaryDark text-white rounded-lg hover:bg-secondary hover:shadow-lg transition-colors flex items-center">
+                            className="py-2 px-3 text-sm  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg hover:bg-secondary transition-colors flex items-center">
                             <EditIcon fontSize='small' />
                             Chỉnh sửa
                         </button>

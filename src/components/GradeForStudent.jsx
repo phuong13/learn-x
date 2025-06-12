@@ -394,13 +394,14 @@ export default function GradingInterface({ title, startDate, endDate }) {
                                                         setScore(currentStudent.score ?? '');
                                                         setFeedback(currentStudent.feedback ?? '');
                                                     }}
-                                                    className="flex-1 py-2 px-3 bg-slate-400 text-white rounded-lg hover:bg-slate-500 transition-colors font-medium"
+                                                    className="flex-1 py-2 px-3 bg-slate-300 text-white rounded-lg hover:bg-slate-400 transition-colors font-medium"
                                                 >
                                                     Hủy
                                                 </button>
                                                 <button
                                                     onClick={handlePostGrade}
-                                                    className="flex-1 py-2 px-3 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors font-medium flex items-center justify-center gap-2"
+                                                    className="flex-1 py-2 px-3  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+                                                           shadow-md hover:shadow-lg text-white rounded-lg hover:bg-secondary transition-colors font-medium flex items-center justify-center gap-2"
                                                     disabled={isSubmitting || score === ''}
                                                 >
                                                     {isSubmitting && <CircularProgress size={20} color="inherit" />}

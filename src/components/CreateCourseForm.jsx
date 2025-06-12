@@ -81,7 +81,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}
-   >
+    >
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <Loader isLoading={isLoading} />
         <div className="mx-48 border border-slate-300 rounded-lg">
@@ -230,10 +230,11 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
               </div>
             </div>
 
-            <div className="px-6 py-4 bg-slate-50 text-right">
+            <div className="px-6 py-4 bg-slate-50 text-center">
               <button
                 type="submit"
-                className="py-3 w-full px-6 bg-primaryDark text-white rounded-lg hover:bg-secondary transition-colors"
+                className="py-3 w-64 px-6  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg transition-colors"
               >
                 Tạo khóa học
               </button>

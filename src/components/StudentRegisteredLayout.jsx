@@ -176,7 +176,8 @@ const StudentRegisteredLayout = () => {
             <div className="flex justify-end items-center mb-2">
                 {authUser.role === 'TEACHER' && (
                     <button
-                        className="py-2 px-3 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors flex items-center"
+                        className="py-2 px-3  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors flex items-center"
                         onClick={handleOpen}>
                         <AddIcon />
                         Thêm sinh viên
@@ -219,7 +220,8 @@ const StudentRegisteredLayout = () => {
                                 onChange={handleTextareaChange}></textarea>
                             <button
                                 onClick={handleSumbit}
-                                className="w-full py-2 px-4 bg-primaryDark text-white rounded-lg  hover:bg-secondary transition-colors">
+                                className="w-full py-2 px-4  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors">
                                 Gửi
                             </button>
                         </div>

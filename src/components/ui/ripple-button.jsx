@@ -39,7 +39,8 @@ export function RippleButton({ children, color = "rgba(255, 255, 255, 0.3)", dur
   return (
     <button
       ref={buttonRef}
-      className={`py-2 px-4 bg-primaryDark text-white rounded-lg relative overflow-hidden ${className || ""}`}
+      className={`py-2 px-4  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+    shadow-md hover:shadow-lg text-white rounded-lg relative overflow-hidden ${className || ""}`}
       onClick={addRipple}
       {...props}
     >

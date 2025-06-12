@@ -3,6 +3,7 @@
     "dashboard": "Bảng điều khiển",
     "my_courses": "Khóa học của tôi",
     "manage_courses": "Quản lý khóa học",
+    "discussion": "Thảo luận",
     "my_profile": "Hồ sơ của tôi",
     "logout": "Đăng xuất",
     "personal_information": "Thông tin cá nhân",
@@ -28,7 +29,8 @@
     "tabs": {
         "courses": "Khóa học",
         "members": "Danh sách sinh viên",
-        "scores": "Điểm số"
+        "scores": "Điểm số",
+        "discussion": "Thảo luận"
     },
     "landing": {
         "title_top": "DẠY HỌC TRỰC TUYẾN",
