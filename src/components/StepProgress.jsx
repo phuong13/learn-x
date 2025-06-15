@@ -6,6 +6,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
+import { RippleButton } from '@components/ui/ripple-button.jsx';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 const steps = ['Tạo khoá học mới', 'Tạo nội dung khoá học', 'Xác nhận'];
@@ -50,12 +51,14 @@ export default function InteractiveStepProgress() {
             <StepLabel
               sx={{
                 '& .MuiStepLabel-label': {
-                  fontSize: '0.825rem',        // tăng cỡ chữ
-                  fontWeight: 'bold',     // đậm hơn nếu cần
+                  fontSize: '0.825rem',  
+                  fontWeight: 'bold',    
                 },
                 '& .MuiSvgIcon-root': {
-                  fontSize: '1.75rem',       // tăng kích thước icon (số bước)
+                  fontSize: '1.75rem',
+                  color: '#51C1BF',
                 },
+
               }}
             >
               {label}
@@ -80,31 +83,16 @@ export default function InteractiveStepProgress() {
             <p className="text-lg text-slate-700 mb-4">
               Lưu ý, hãy ấn vào nút ✔ sau khi đã điền thông tin khóa học.
             </p>
-            <Button
+            <RippleButton
               variant="contained"
               color="primary"
               onClick={handleRedirectCourseDetail}
             >
               Chuyển hướng
-            </Button>
+            </RippleButton>
           </div>
         )}
       </Box>
-
-      {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-        <Button
-          disabled={currentStep === 0}
-          onClick={handlePrevious}
-          variant="outlined"
-        >
-          Previous
-        </Button>
-        {currentStep < steps.length - 1 && (
-          <Button onClick={handleNext} variant="contained">
-            Next
-          </Button>
-        )}
-      </Box> */}
     </Box>
   );
 }

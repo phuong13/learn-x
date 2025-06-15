@@ -1,16 +1,52 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
-
+import {
+  Box,
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Grid,
+  Collapse,
+  CircularProgress,
+  styled
+} from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import TextField from '@mui/material/TextField';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import SaveIcon from '@mui/icons-material/Save';
 
 import { axiosPrivate } from '../axios/axios';
-import Loader from './Loader';
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+});
 
 const CreateCourseForm = ({ onSubmitSuccess }) => {
+  const [formData, setFormData] = useState({
+    category: '',
+    newCategory: '',
+    courseName: '',
+    courseCode: '',
+    description: '',
+    state: 'OPEN',
+    thumbnail: null
+  });
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -22,226 +58,285 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
       .catch((err) => console.error('Failed to fetch categories:', err));
   }, []);
 
-  const handleCategoryChange = (e) => {
-    setShowNewCategory(e.target.value === 'new');
+  const handleInputChange = (field) => (event) => {
+    const value = event.target.value;
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+    if (field === 'category') {
+      setShowNewCategory(value === 'new');
+    }
   };
 
-  const handleOnSubmit = async (e) => {
-    e.preventDefault();
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setFormData(prev => ({ ...prev, thumbnail: file }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData();
-    const formElements = e.target.elements;
+    const formDataToSend = new FormData();
     const courseInfo = {
-      name: formElements.courseName.value,
-      description: formElements.description.value,
+      name: formData.courseName,
+      code: formData.courseCode,
+      description: formData.description,
       startDate: startDate,
-      categoryName:
-        formElements.category.value === 'new'
-          ? formElements.newCategory.value
-          : formElements.category.value,
-      state: formElements.state.value,
+      categoryName: formData.category === 'new' ? formData.newCategory : formData.category,
+      state: formData.state,
     };
 
-    formData.append(
+    formDataToSend.append(
       'courseInfo',
       new Blob([JSON.stringify(courseInfo)], {
         type: 'application/json',
       })
     );
 
-    const thumbnail = formElements.thumbnail.files[0];
-    if (thumbnail) formData.append('thumbnail', thumbnail);
+    if (formData.thumbnail) {
+      formDataToSend.append('thumbnail', formData.thumbnail);
+    }
 
     try {
-      const response = await axiosPrivate.post('/courses', formData, {
+      const response = await axiosPrivate.post('/courses', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       if (response.status === 200) {
-        toast(response.data.message);
+        toast.success(response.data.message);
         const data = response.data.data;
         localStorage.setItem('courseInfo', JSON.stringify(data));
         onSubmitSuccess();
       } else {
-        toast(response.data.message, { type: 'error' });
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast(error.response?.data?.message || 'Error occurred', {
-        type: 'error',
-      });
+      toast.error(error.response?.data?.message || 'Error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const inputClassName =
-    'mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm';
-
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}
-    >
-      <div className="px-4 sm:px-6 lg:px-8 py-8">
-        <Loader isLoading={isLoading} />
-        <div className="mx-48 border border-slate-300 rounded-lg">
-          <form
-            onSubmit={handleOnSubmit}
-            className="bg-white shadow-xl rounded-lg overflow-hidden"
-          >
-            <div className="px-6 py-4">
-              <h2 className="text-2xl font-bold text-center text-slate-700 mb-6">
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: 3,
+            overflow: 'hidden',
+            position: 'relative'
+          }}
+        >
+          {/* Loading Overlay */}
+          {isLoading && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
+
+          <Box component="form" onSubmit={handleSubmit}>
+            {/* Header */}
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, #5BCEC9 0%, #14919B 100%)',
+                color: 'white',
+                p: 1,
+                textAlign: 'center'
+              }}
+            >
+              <Typography variant="h6" component="h1" fontWeight="bold">
                 Tạo khóa học mới
-              </h2>
-              <div className="space-y-3">
-                <div>
-                  <label
-                    htmlFor="category"
-                    className="block text-sm font-medium text-slate-700 mb-1"
-                  >
-                    Danh mục
-                  </label>
-                  <select
-                    id="category"
-                    name="category"
-                    onChange={handleCategoryChange}
-                    defaultValue=""
-                    className={inputClassName}
-                  >
-                    <option value="">Chọn danh mục</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.name}>
-                        {category.name}
-                      </option>
-                    ))}
-                    <option value="new">Thêm danh mục mới</option>
-                  </select>
-                </div>
+              </Typography>
+            </Box>
 
-                {showNewCategory && (
-                  <div>
-                    <label
-                      htmlFor="newCategory"
-                      className="block text-sm font-medium text-slate-700 mb-1"
+            {/* Form Content */}
+            <Box sx={{ p: 4 }}>
+              <Grid container spacing={3}>
+                {/* Category */}
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel>Danh mục</InputLabel>
+                    <Select
+                      value={formData.category}
+                      label="Danh mục"
+                      onChange={handleInputChange('category')}
                     >
-                      Tên danh mục mới
-                    </label>
-                    <input
-                      id="newCategory"
-                      name="newCategory"
-                      type="text"
+                      <MenuItem value="">Chọn danh mục</MenuItem>
+                      {categories.map((category) => (
+                        <MenuItem key={category.id} value={category.name}>
+                          {category.name}
+                        </MenuItem>
+                      ))}
+                      <MenuItem value="new">Thêm danh mục mới</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {/* New Category */}
+                <Grid item xs={12}>
+                  <Collapse in={showNewCategory}>
+                    <TextField
+                      fullWidth
+                      label="Tên danh mục mới"
+                      value={formData.newCategory}
+                      onChange={handleInputChange('newCategory')}
                       placeholder="Nhập tên danh mục mới"
-                      className={inputClassName}
                     />
-                  </div>
-                )}
+                  </Collapse>
+                </Grid>
 
-                <div>
-                  <label
-                    htmlFor="courseName"
-                    className="block text-sm font-medium text-slate-700 mb-1"
-                  >
-                    Tên khóa học
-                  </label>
-                  <input
-                    id="courseName"
-                    name="courseName"
-                    type="text"
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Mã môn học"
+                    value={formData.courseCode}
+                    onChange={handleInputChange('courseCode')}
+                    placeholder="Ví dụ: CS101, MATH201"
+                    inputProps={{ 
+                      style: { textTransform: 'uppercase' } // Tự động chuyển thành chữ hoa
+                    }}
+                    helperText="Mã môn học nên ngắn gọn và duy nhất"
+                  />
+                </Grid>
+
+                {/* Course Name */}
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Tên khóa học"
+                    value={formData.courseName}
+                    onChange={handleInputChange('courseName')}
                     placeholder="Nhập tên khóa học"
-                    className={inputClassName}
-                    required
                   />
-                </div>
+                </Grid>
 
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium text-slate-700 mb-1"
-                  >
-                    Mô tả
-                  </label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    rows={3}
+
+                {/* Description */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    required
+                    multiline
+                    rows={4}
+                    label="Mô tả"
+                    value={formData.description}
+                    onChange={handleInputChange('description')}
                     placeholder="Nhập mô tả khóa học"
-                    className={inputClassName}
-                    required
                   />
-                </div>
+                </Grid>
 
-                <div>
-                  <label
-                    htmlFor="startDate"
-                    className="block text-sm font-medium text-slate-700 mb-1"
-                  >
-                    Ngày bắt đầu
-                  </label>
+                {/* Start Date */}
+                <Grid item xs={12} md={6}>
                   <DatePicker
+                    label="Ngày bắt đầu"
                     value={startDate}
                     onChange={(newValue) => setStartDate(newValue)}
-                    inputFormat="dd-MM-yyyy"
-                    className='w-full rounded-xl'
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        required
-                        fullWidth
-                        size="medium"
-                        className="bg-slate-100 rounded-md shadow-sm"
+                    format="dd/MM/yyyy"
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        required: true,
+                      }
+                    }}
+                  />
+                </Grid>
+
+                {/* State */}
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Trạng thái</InputLabel>
+                    <Select
+                      value={formData.state}
+                      label="Trạng thái"
+                      onChange={handleInputChange('state')}
+                    >
+                      <MenuItem value="OPEN">OPEN</MenuItem>
+                      <MenuItem value="CLOSED">CLOSED</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {/* Thumbnail Upload */}
+                <Grid item xs={12}>
+                  <Box>
+                    <Typography variant="subtitle1" gutterBottom>
+                      Ảnh nền
+                    </Typography>
+                    <Button
+                      component="label"
+                      variant="outlined"
+                      startIcon={<CloudUploadIcon />}
+                      sx={{
+                        width: '100%',
+                        height: 56,
+                        borderStyle: 'dashed',
+                        borderWidth: 2
+                      }}
+                    >
+                      {formData.thumbnail ? formData.thumbnail.name : 'Chọn ảnh nền'}
+                      <VisuallyHiddenInput
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
                       />
-                    )}
-                  />
-                </div>
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
 
-                <div>
-                  <label
-                    htmlFor="state"
-                    className="block text-sm font-medium text-slate-700 mb-1"
-                  >
-                    Trạng thái
-                  </label>
-                  <select
-                    id="state"
-                    name="state"
-                    defaultValue="OPEN"
-                    className={inputClassName}
-                  >
-                    <option value="OPEN">OPEN</option>
-                    <option value="CLOSED">CLOSED</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="thumbnail"
-                    className="block text-sm font-medium text-slate-700 mb-1"
-                  >
-                    Ảnh nền
-                  </label>
-                  <input
-                    id="thumbnail"
-                    name="thumbnail"
-                    type="file"
-                    accept="image/*"
-                    className={`${inputClassName} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primaryDark file:text-white`}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="px-6 py-4 bg-slate-50 text-center">
-              <button
+            {/* Footer */}
+            <Box
+              sx={{
+                backgroundColor: '#f8fafc',
+                p: 3,
+                display: 'flex',
+                justifyContent: 'center'
+              }}
+            >
+              <Button
                 type="submit"
-                className="py-3 w-64 px-6  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
-    shadow-md hover:shadow-lg text-white rounded-lg transition-colors"
+                variant="contained"
+                size="large"
+                startIcon={<SaveIcon />}
+                disabled={isLoading}
+                sx={{
+                  minWidth: 200,
+                  py: 1.5,
+                  background: 'linear-gradient(135deg, #5BCEC9 0%, #14919B 100%)',
+                  boxShadow: 2,
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #5BCEC9 0%, #14919B 100%)',
+                    boxShadow: 4,
+                  },
+                  '&:disabled': {
+                    background: '#ccc',
+                  }
+                }}
               >
-                Tạo khóa học
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Tạo khóa học'}
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
+      </Container>
     </LocalizationProvider>
   );
 };

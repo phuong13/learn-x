@@ -11,7 +11,9 @@ import Typography from '@mui/material/Typography';
 import TopicSkeleton from "@components/ui/TopicSkeleton";
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
-import {RippleButton} from "@components/ui/ripple-button.jsx";
+import { RippleButton } from "@components/ui/ripple-button.jsx";
+import { MessageCircle } from 'lucide-react';
+
 const modalStyle = {
   position: 'absolute',
   top: '50%',
@@ -72,19 +74,20 @@ const Container = () => {
     <div className="flex flex-col gap-4 p-4 h-full focus:outline-none" tabIndex={-1}>
       {forumId ? (
         <RippleButton
-                     onClick={() => setShowPopup(true)}
+          onClick={() => setShowPopup(true)}
 
         >
           {t("forum.create_topic")}
         </RippleButton>
       ) : (
-        <div className="text-lg text-center text-slate-600 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
+        <div className="flex flex-col items-center justify-center text-lg text-center text-slate-600 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
+          <MessageCircle className="text-primaryDark w-16 h-16 mb-2 animate-bounce"/>
           {t("forum.please_select_forum")}
         </div>
       )}
 
       {loading ? (
-         <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6">
+        <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6">
           {Array.from({ length: 3 }).map((_, index) => (
             <TopicSkeleton key={index} />
           ))}
@@ -104,6 +107,7 @@ const Container = () => {
       ) : (
         forumId && (
           <div className="text-center mt-6 text-slate-600 font-semibold">
+
             {t("forum.no_topics")}
           </div>
         )

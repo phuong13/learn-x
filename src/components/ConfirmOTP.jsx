@@ -156,8 +156,8 @@ export default function ConfirmOTP() {
 
     return (
         <>
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-                <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-400">
+                <div className="p-8 bg-white rounded-xl shadow-md w-full max-w-lg">
                     <Loader isLoading={isLoading} />
                     <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Xác nhận tài khoản</h2>
                     <form ref={formRef} onSubmit={handleSubmitOTP} className="space-y-6">

@@ -25,7 +25,7 @@ export default function CourseFilter({ onSearch }) {
 
     return (
         <div className='flex-col flex w-full gap-y-2'>
-            <div className='text-slate-600 font-semibold text-xl'>
+            <div className='text-slate-600 font-semibold text-xl py-2'>
                 {authUser.role === "TEACHER" ? t('manage_courses') : t('my_courses')}
             </div>
             <div className="flex flex-col sm:flex-row gap-2 items-center mb-2 w-full">

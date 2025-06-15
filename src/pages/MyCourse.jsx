@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-
 import CourseCard from '../components/CourseCard';
 import CourseCardSkeleton from '../components/ui/CourseCardSkeleton';
-
+import { GraduationCap } from 'lucide-react';
 import CourseFilter from '../components/CourseFilter';
 import CourseService from '../services/courses/course.service';
 import { useAuth } from '@hooks/useAuth.js';
@@ -67,7 +66,10 @@ const MyCourse = () => {
                 ) : (
                     <>
                         {!(courses?.length > 0) && (
-                            <div className="text-center justify-center">Bạn chưa đăng ký khóa học nào!</div>
+                            <div className="flex flex-col items-center justify-center my-20 text-slate-600 font-semibold">
+                                <GraduationCap className='h-16 w-16 animate-bounce' />
+                                Bạn chưa đăng ký khóa học nào!
+                            </div>
                         )}
                         <div className="grid grid-cols-4 gap-4 mt-4">
                             {Array.isArray(courses) &&

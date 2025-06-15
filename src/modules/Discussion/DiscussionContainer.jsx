@@ -13,6 +13,8 @@ import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { RippleButton } from "@components/ui/ripple-button.jsx";
 import { useForum } from '../../store/useForum';
+import { MessageCircle } from 'lucide-react';
+
 
 const modalStyle = {
   position: 'absolute',
@@ -87,7 +89,8 @@ const DiscussionContainer = ({ forumId }) => {
 
         </div>
       ) : (
-        <div className="text-lg text-center text-slate-600 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
+        <div className="flex flex-col items-center justify-center text-lg text-center text-slate-600 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
+          <MessageCircle className="text-primaryDark w-12 h-12 mb-2 animate-bounce"/>
           {t("forum.please_select_forum")}
         </div>
       )
