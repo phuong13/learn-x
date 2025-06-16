@@ -117,9 +117,9 @@ const StudentRegisteredLayout = () => {
     };
 
 
-     const handleSumbit = async () => {
-        setPending(true); 
-         handleClose();
+    const handleSumbit = async () => {
+        setPending(true);
+        handleClose();
         try {
             const textArea = document.querySelector('textarea');
             const value = textArea.value;
@@ -148,11 +148,11 @@ const StudentRegisteredLayout = () => {
             toast.error('Có lỗi xảy ra khi gửi!', { type: 'error' });
         } finally {
             setPending(false); // Kết thúc loading
-           
+
         }
     };
 
-   const handleDeleteStudent = async (students) => {
+    const handleDeleteStudent = async (students) => {
         setPending(true); // Bắt đầu loading khi xóa
         try {
             const response = await axiosPrivate.post(`/course-registrations/remove/${courseId}/list-email`, {
@@ -199,7 +199,7 @@ const StudentRegisteredLayout = () => {
             )}
 
 
-            <Dialog open={showModal} onClose={handleClose} maxWidth="sm" fullWidth hideBackdrop={false}>
+            <Dialog open={showModal} onClose={handleClose} maxWidth="sm" fullWidth hideBackdrop={false} sx={{ '& .MuiDialog-paper': { borderRadius: '16px' } }}>
                 <div className="relative bg-white rounded-lg shadow-xl">
                     <DialogTitle className="text-xl font-bold mb-4">Thêm sinh viên</DialogTitle>
                     <button onClick={handleClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
@@ -214,14 +214,15 @@ const StudentRegisteredLayout = () => {
                                 className="w-full p-2 border border-gray-300 rounded"
                             />
                             <textarea
-                                placeholder="Student Details"
+                                placeholder="Thêm email hoặc MSSV của sinh viên (mỗi email hoặc MSSV trên một dòng)"
                                 className="w-full p-2 border border-gray-300 rounded resize-none h-32"
                                 value={emailList.join('\n')}
                                 onChange={handleTextareaChange}></textarea>
                             <button
                                 onClick={handleSumbit}
                                 className="w-full py-2 px-4  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
-    shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors">
+                                        shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors"
+                            >
                                 Gửi
                             </button>
                         </div>

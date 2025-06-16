@@ -15,13 +15,18 @@ import {
   Grid,
   Collapse,
   CircularProgress,
-  styled
+  styled,
+  IconButton,
+  Card,
+  CardContent
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import { axiosPrivate } from '../axios/axios';
 
@@ -44,13 +49,17 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
     courseName: '',
     courseCode: '',
     description: '',
-    state: 'OPEN',
     thumbnail: null
   });
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Thêm state cho outcomes
+  const [outcomes, setOutcomes] = useState([
+    { code: '', description: '' }
+  ]);
 
   useEffect(() => {
     axiosPrivate.get('/categories')
@@ -72,6 +81,24 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
     setFormData(prev => ({ ...prev, thumbnail: file }));
   };
 
+  // Hàm xử lý outcomes
+  const handleOutcomeChange = (index, field, value) => {
+    const newOutcomes = [...outcomes];
+    newOutcomes[index][field] = value;
+    setOutcomes(newOutcomes);
+  };
+
+  const addOutcome = () => {
+    setOutcomes([...outcomes, { code: '', description: '' }]);
+  };
+
+  const removeOutcome = (index) => {
+    if (outcomes.length > 1) {
+      const newOutcomes = outcomes.filter((_, i) => i !== index);
+      setOutcomes(newOutcomes);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -83,7 +110,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
       description: formData.description,
       startDate: startDate,
       categoryName: formData.category === 'new' ? formData.newCategory : formData.category,
-      state: formData.state,
+      outcomes: outcomes.filter(outcome => outcome.code && outcome.description) // Lọc outcomes có đủ thông tin
     };
 
     formDataToSend.append(
@@ -209,7 +236,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                     onChange={handleInputChange('courseCode')}
                     placeholder="Ví dụ: CS101, MATH201"
                     inputProps={{ 
-                      style: { textTransform: 'uppercase' } // Tự động chuyển thành chữ hoa
+                      style: { textTransform: 'uppercase' }
                     }}
                     helperText="Mã môn học nên ngắn gọn và duy nhất"
                   />
@@ -226,7 +253,6 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                     placeholder="Nhập tên khóa học"
                   />
                 </Grid>
-
 
                 {/* Description */}
                 <Grid item xs={12}>
@@ -258,19 +284,66 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                   />
                 </Grid>
 
-                {/* State */}
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Trạng thái</InputLabel>
-                    <Select
-                      value={formData.state}
-                      label="Trạng thái"
-                      onChange={handleInputChange('state')}
-                    >
-                      <MenuItem value="OPEN">OPEN</MenuItem>
-                      <MenuItem value="CLOSED">CLOSED</MenuItem>
-                    </Select>
-                  </FormControl>
+                {/* Outcomes Section */}
+                <Grid item xs={12}>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      Chuẩn đầu ra (Learning Outcomes)
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={addOutcome}
+                        sx={{ ml: 'auto' }}
+                      >
+                        Thêm chuẩn đầu ra
+                      </Button>
+                    </Typography>
+                    
+                    {outcomes.map((outcome, index) => (
+                      <Card key={index} sx={{ mb: 2, border: '1px solid #e0e0e0' }}>
+                        <CardContent>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                            <Box sx={{ flex: 1 }}>
+                              <Grid container spacing={2}>
+                                <Grid item xs={12} md={3}>
+                                  <TextField
+                                    fullWidth
+                                    label={`Mã chuẩn đầu ra ${index + 1}`}
+                                    value={outcome.code}
+                                    onChange={(e) => handleOutcomeChange(index, 'code', e.target.value)}
+                                    placeholder="Ví dụ: CLO1, PLO2"
+                                    size="small"
+                                  />
+                                </Grid>
+                                <Grid item xs={12} md={9}>
+                                  <TextField
+                                    fullWidth
+                                    label="Mô tả chuẩn đầu ra"
+                                    value={outcome.description}
+                                    onChange={(e) => handleOutcomeChange(index, 'description', e.target.value)}
+                                    placeholder="Mô tả chi tiết về chuẩn đầu ra này"
+                                    multiline
+                                    rows={2}
+                                    size="small"
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                            {outcomes.length > 1 && (
+                              <IconButton
+                                onClick={() => removeOutcome(index)}
+                                color="error"
+                                size="small"
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            )}
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </Box>
                 </Grid>
 
                 {/* Thumbnail Upload */}

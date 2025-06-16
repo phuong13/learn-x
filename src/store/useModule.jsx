@@ -124,8 +124,6 @@ export const useSubmitModules = () => {
                 }
               }
 
-
-
               const oldQuestions = oldModule?.contents
                 ?.find((item) => item.id === quizId && item.type === 'quiz')
                 ?.questions || [];
@@ -146,6 +144,7 @@ export const useSubmitModules = () => {
                 const questionPayload = {
                   content: q.content || "",
                   quizId,
+                  outcomeId: q.outcomeId || null,
                   ...(q.type !== "fitb" ? { options: q.options } : {}),
                   ...(q.type === "fitb" ? { answerContent: q.answerContent } : {}),
                   ...(q.type === "multiple" ? { answers: q.answer } : (q.type !== "fitb" ? { answer: q.answer } : {})),

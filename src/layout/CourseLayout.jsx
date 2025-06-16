@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { CalendarIcon, Edit, Trash2 } from 'lucide-react';
+import { CalendarIcon, Edit, Trash2, InfoIcon } from 'lucide-react';
 import CourseContent from '../components/CourseContent.jsx';
 import StudentRegisteredLayout from '../components/StudentRegisteredLayout.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Loader from '../components/Loader.jsx';
 import EditCourseInfoModal from '../components/EditCourseInfoModal';
+import CourseInfoModal from '../components/CourseInfoModal';
+
 import DiscussionContainer from '../modules/Discussion/DiscussionContainer.jsx';
 
 
@@ -22,6 +24,8 @@ export default function CoursePageLayout() {
     const [isLoading, setIsLoading] = useState(false);
     const [teacher, setTeacher] = useState(null);
     const [isOpenEditCourseInfoModal, setIsOpenEditCourseInfoModal] = useState(false);
+    const [isOpenCourseInfoModal, setIsOpenCourseInfoModal] = useState(false);
+
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [showNewCategory, setShowNewCategory] = useState(false);
     const [categories, setCategories] = useState([]);
@@ -30,8 +34,10 @@ export default function CoursePageLayout() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [startDate, setStartDate] = useState(new Date());
     const [courseName, setCourseName] = useState('');
+    const [code, setCode] = useState(''); // Thêm state cho code
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
+    const [outcomes, setOutcomes] = useState([]); // Thêm state cho outcomes
     const navigate = useNavigate();
     const { courseId } = useParams();
     const { t } = useTranslation();
@@ -49,41 +55,43 @@ export default function CoursePageLayout() {
         setShowNewCategory(e.target.value === 'new');
     };
     const handleDateSelect = (date) => setStartDate(date);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axiosPrivate.get(`courses/${courseId}`);
-                if (response.status === 200) {
-                    setCourse(response.data.data);
-                    setCourseName(response.data.data.name);
-                    setDescription(response.data.data.description);
-                    setCategory(response.data.data.categoryId);
-                    setStartDate(new Date(response.data.data.startDate));
-                }
-                const teacherResponse = await axiosPrivate.get(`courses/${courseId}/teacher`);
-                if (teacherResponse.status === 200) {
-                    setTeacher(teacherResponse.data.data);
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
+
+
+    const fetchData = async () => {
+        try {
+            const response = await axiosPrivate.get(`courses/${courseId}`);
+            if (response.status === 200) {
+                setCourse(response.data.data);
+                setCourseName(response.data.data.name);
+                setDescription(response.data.data.description);
+                setCategory(response.data.data.categoryId);
+                setStartDate(new Date(response.data.data.startDate));
+                setCode(response.data.data.code);
+                setOutcomes(response.data.data.outcomes); // Lấy outcomes từ response
             }
-        };
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+        }
+    };
+
+    const fetchTeacher = async () => {
+        try {
+            const teacherResponse = await axiosPrivate.get(`courses/${courseId}/teacher`);
+            if (teacherResponse.status === 200) {
+                setTeacher(teacherResponse.data.data);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        fetchTeacher();
         fetchData();
     }, [courseId]);
 
-
-
-    useEffect(() => {
-        axiosPrivate
-            .get('/categories')
-            .then((res) => {
-                setCategories(res.data.data);
-                const categoryInCate = categories?.find((category) => category.id === course.categoryId);
-                setCategory(categoryInCate?.name);
-            })
-            .catch((err) => console.error('Failed to fetch categories:', err));
-    }, [isOpenEditCourseInfoModal]);
 
     const handleDeleteCourse = async () => {
         setIsLoading(true);
@@ -160,7 +168,6 @@ export default function CoursePageLayout() {
         const params = new URLSearchParams();
         params.append('name', courseName);
         params.append('description', description);
-
         params.append('startDate', startDate);
         const urlParams = params.toString();
 
@@ -170,21 +177,53 @@ export default function CoursePageLayout() {
         try {
             const response = await axiosPrivate.patch(`/courses/${courseId}?${urlParams}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            },
+            );
             if (response.status === 200) {
-                toast.success(response.data.message);
-                navigate(0);
+                await handleOutcomesUpdate();
+                toast.success('Cập nhật khóa học và chuẩn đầu ra thành công!');
+                setIsOpenEditCourseInfoModal(false);
+                await fetchData(); // Refresh course data
             } else {
                 toast.error(response.data.message, { type: 'error' });
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            toast(error.response.data.message, { type: 'error' });
+            toast(error.response.data.message, { type: 'error' }); ca
         } finally {
             setIsSubmitting(false);
             setIsOpenEditCourseInfoModal(false);
         }
     };
+    const handleOutcomesUpdate = async () => {
+        try {
+            const validOutcomes = outcomes.filter(outcome => outcome.code && outcome.description);
+
+            const outcomePromises = validOutcomes.map(async (outcome) => {
+                if (outcome.id) {
+                    // Outcome đã tồn tại - sử dụng PATCH
+                    const params = new URLSearchParams();
+                    params.append('code', outcome.code);
+                    params.append('description', outcome.description);
+
+                    return axiosPrivate.patch(`/courses/outcomes/${outcome.id}?${params.toString()}`);
+                } else {
+                    // Outcome mới - sử dụng POST (nếu có API tạo outcome mới)
+                    return axiosPrivate.post(`/courses/${courseId}/outcomes`, {
+                        code: outcome.code,
+                        description: outcome.description
+                    });
+                }
+            });
+
+            await Promise.all(outcomePromises);
+            console.log('All outcomes updated successfully');
+        } catch (error) {
+            console.error('Error updating outcomes:', error);
+            throw error; // Re-throw để xử lý ở level cao hơn
+        }
+    };
+
 
     return (
         <div className="bg-slate-100 min-h-[calc(100vh-170px)] flex flex-col">
@@ -238,6 +277,17 @@ export default function CoursePageLayout() {
                                     <Trash2 className="h-4 w-4" />
                                 </button>
                             )}
+
+                            {
+                                authUser?.role === 'STUDENT' && (
+                                    <button
+                                        onClick={() => setIsOpenCourseInfoModal(true)}
+                                        className="bg-primaryDark text-white bg-red-500 hover:bg-red-700 p-2 rounded-full">
+                                        <InfoIcon className="h-4 w-4" />
+                                    </button>
+                                )
+                            }
+
                         </div>
                     </div>
 
@@ -305,6 +355,8 @@ export default function CoursePageLayout() {
                         setNewCategory={setNewCategory}
                         courseName={courseName}
                         setCourseName={setCourseName}
+                        code={code} // Pass code
+                        setCode={setCode} // Pass setCode
                         description={description}
                         setDescription={setDescription}
                         startDate={startDate}
@@ -314,7 +366,15 @@ export default function CoursePageLayout() {
                         handleImageChange={handleImageChange}
                         course={course}
                         isSubmitting={isSubmitting}
-
+                        outcomes={outcomes} // Pass outcomes
+                        setOutcomes={setOutcomes} // Pass setOutcomes
+                    />
+                )}
+                {isOpenCourseInfoModal && (
+                    <CourseInfoModal
+                        open={isOpenCourseInfoModal}
+                        onClose={() => setIsOpenCourseInfoModal(false)}
+                        course={course}
                     />
                 )}
             </>}

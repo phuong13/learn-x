@@ -20,6 +20,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import FormQuestionBank from './FormQuestionBank';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
+import { useOutcomesByCourseId } from '../store/useOutcomes';
+import { useParams } from 'react-router-dom';
 
 
 export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = false, onSubmit }) {
@@ -33,7 +35,8 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [errors, setErrors] = useState({});
-
+  const { courseId } = useParams();
+  const { outcomes, loading, error } = useOutcomesByCourseId(courseId);
   useEffect(() => {
     if (open) {
       if (isEdit && defaultData) {
@@ -57,6 +60,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
         id: q.id,
         text: q.content,
         type: q.type,
+        outcomeId: q.outcome?.id,
         ...(q.type === 'fitb'
           ? {
             content: q.content || '',
@@ -142,6 +146,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
         quizId: quizData.id,
         content: q.text,
         answerContent: q.answerContent,
+        outcomeId: q.outcomeId || '',
       }
       : {
         id: q.id || `temp-${Date.now().toString()}`,
@@ -156,6 +161,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
               []
             ),
         options: q.answers?.map((a) => a.text),
+        outcomeId: q.outcomeId || '',
       }
     ));
 
@@ -169,6 +175,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       {
         text: '',
         type: 'single',
+        outcomeId: '',
         answers: [
           { text: '', isCorrect: false },
           { text: '', isCorrect: false },
@@ -223,6 +230,7 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
       ...selectedQuestions.map((question) => ({
         // id: question.id,
         text: question.content || question.text,
+        outcomeId: question.outcome?.id || '',
         type:
           question.questionType === 'SINGLE_CHOICE' ? 'single'
             : question.questionType === 'MULTIPLE_CHOICE' ? 'multiple'
@@ -316,9 +324,28 @@ export default function FormQuiz({ open, onClose, defaultData = {}, isEdit = fal
             py: 1,
           }}
           title={
-            <Typography fontWeight="bold">
-              Câu hỏi {qIndex + 1}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography fontWeight="bold">
+                Câu hỏi {qIndex + 1}
+              </Typography>
+              <FormControl size="small" sx={{ minWidth: 200 }}>
+                <InputLabel>Chọn Outcome</InputLabel>
+                <Select
+                  value={q.outcomeId || ''}
+                  label="Chọn Outcome"
+                  onChange={(e) => handleQuestionChange(qIndex, 'outcomeId', e.target.value)}
+                >       
+                  {outcomes?.map((outcome) => (
+                    <MenuItem key={outcome.id} value={outcome.id}>
+                      {outcome.code}
+                    </MenuItem>
+                  ))}
+                </Select>
+
+
+
+              </FormControl>
+            </Box>
           }
           action={
             <Grid container alignItems="center" spacing={1}>

@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, Select, MenuItem, InputLabel, FormControl, List, ListItem, ListItemText, Checkbox, ListItemIcon
 } from '@mui/material';
-import { getQuestionBankByType } from '../store/useQuiz';
-
-
-const QUESTION_TYPES = [
-  { value: 'SINGLE_CHOICE', label: 'Single Choice' },
-  { value: 'MULTIPLE_CHOICE', label: 'Multiple Choice' },
-  { value: 'TRUE_FALSE', label: 'True/False' },
-  { value: 'FILL_IN_THE_BLANK', label: 'Fill in the Blank' },
-];
+import { getQuestionBankByOutcomes } from '../store/useQuiz';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import { useOutcomesByCourseId } from '../store/useOutcomes';
+import { useParams } from 'react-router-dom';
 
 export default function FormQuestionBank({ open, onClose, onSelect }) {
-  const [type, setType] = useState('SINGLE_CHOICE');
   const [selected, setSelected] = useState([]);
-  const { questionBank, loading } = getQuestionBankByType(type);
+  const [selectedOutcomeId, setSelectedOutcomeId] = useState('');
+  const { courseId } = useParams();
+  const { outcomes, loading: loadingOutcomes } = useOutcomesByCourseId(courseId);
+  const { questionBank, loading } = getQuestionBankByOutcomes(selectedOutcomeId);
 
   const handleToggle = (id) => {
     setSelected((prev) =>
@@ -31,7 +29,11 @@ export default function FormQuestionBank({ open, onClose, onSelect }) {
     onClose();
   };
 
-
+  useEffect(() => {
+    if (!loadingOutcomes && outcomes && outcomes.length > 0 && !selectedOutcomeId) {
+      setSelectedOutcomeId(outcomes[0].id);
+    }
+  }, [loadingOutcomes, outcomes, selectedOutcomeId]);
 
 
   return (
@@ -43,21 +45,43 @@ export default function FormQuestionBank({ open, onClose, onSelect }) {
         '& .MuiBackdrop-root': {
           backgroundColor: 'rgba(0,0,0,0.4) !important',
         },
+        '& .MuiDialog-paper': {
+          borderRadius: '16px',
+        },
       }}>
-      <DialogTitle>Chọn câu hỏi từ ngân hàng</DialogTitle>
+      <DialogTitle>
+        Chọn câu hỏi từ ngân hàng
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
         <FormControl fullWidth sx={{ my: 2 }}>
-          <InputLabel>Loại câu hỏi</InputLabel>
+          <InputLabel>Chọn chuẩn đầu ra</InputLabel>
           <Select
-            value={type}
-            label="Loại câu hỏi"
-            onChange={e => setType(e.target.value)}
+            value={selectedOutcomeId}
+            label="Chọn Outcome"
+            onChange={e => setSelectedOutcomeId(e.target.value)}
           >
-            {QUESTION_TYPES.filter(opt => opt.value).map(opt => (
-              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+
+            {outcomes?.map((outcome) => (
+              <MenuItem key={outcome.id} value={outcome.id}>
+                {outcome.code} - {outcome.description}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
+
+
         <List>
           {loading ? (
             <ListItem>
@@ -79,9 +103,9 @@ export default function FormQuestionBank({ open, onClose, onSelect }) {
                     disableRipple
                   />
                 </ListItemIcon>
+
                 <ListItemText
-                  primary={q.content || q.text}
-                  secondary={QUESTION_TYPES.find(t => t.value === q.type)?.label}
+                  primary={`${idx + 1}. ${q.content || q.text}`}
                 />
               </ListItem>
             ))

@@ -38,7 +38,6 @@ function transformQuestionFromApi(raw) {
       .map((opt, index) => selectedAnswerIds.includes(opt.id.optionId) ? index : -1)
       .filter(index => index !== -1);
   }
-
   return {
     id: raw.id,
     type,
@@ -46,6 +45,7 @@ function transformQuestionFromApi(raw) {
     answerContent: raw.answers?.map(a => a.answerContent).join(', '),
     options,
     answer,
+    outcome : raw.outcome
   };
 }
 

@@ -22,7 +22,6 @@ import Loader from './Loader';
 
 export default function Curriculum({ courseName, isEdit, onSubmitSuccess, initialModules = [] }) {
    const [modules, setModules] = useState([]);
-   console.log("🚀 ~ Curriculum ~ modules:", modules)
    const [loading, setLoading] = useState(false);
    const [quizDialog, setQuizDialog] = useState({ open: false, moduleId: null, editData: null });
    const [lectureDialog, setLectureDialog] = useState({ open: false, moduleId: null, editData: null });
