@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, Select, MenuItem, InputLabel, FormControl, List, ListItem, ListItemText, Checkbox, ListItemIcon
+  Button, Select, MenuItem, InputLabel, FormControl, List, ListItem, ListItemText, Checkbox, ListItemIcon, TextField
 } from '@mui/material';
 import { getQuestionBankByOutcomes } from '../store/useQuiz';
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,9 +13,12 @@ export default function FormQuestionBank({ open, onClose, onSelect }) {
   const [selected, setSelected] = useState([]);
   const [selectedOutcomeId, setSelectedOutcomeId] = useState('');
   const { courseId } = useParams();
+  const [filter, setFilter] = useState('');
   const { outcomes, loading: loadingOutcomes } = useOutcomesByCourseId(courseId);
   const { questionBank, loading } = getQuestionBankByOutcomes(selectedOutcomeId);
-
+  const filteredQuestions = (questionBank || []).filter(q =>
+    (q.content || q.text || '').toLowerCase().includes(filter.toLowerCase())
+  );
   const handleToggle = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -69,10 +72,9 @@ export default function FormQuestionBank({ open, onClose, onSelect }) {
           <InputLabel>Chọn chuẩn đầu ra</InputLabel>
           <Select
             value={selectedOutcomeId}
-            label="Chọn Outcome"
+            label="Chọn chuẩn đầu ra "
             onChange={e => setSelectedOutcomeId(e.target.value)}
           >
-
             {outcomes?.map((outcome) => (
               <MenuItem key={outcome.id} value={outcome.id}>
                 {outcome.code} - {outcome.description}
@@ -81,6 +83,14 @@ export default function FormQuestionBank({ open, onClose, onSelect }) {
           </Select>
         </FormControl>
 
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Tìm kiếm nội dung câu hỏi..."
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          sx={{ mb: 2 }}
+        />
 
         <List>
           {loading ? (
@@ -88,32 +98,32 @@ export default function FormQuestionBank({ open, onClose, onSelect }) {
               <ListItemText primary="Đang tải..." />
             </ListItem>
           ) : (
-            (questionBank && questionBank.length > 0 ? questionBank : []).map((q, idx) => (
-              <ListItem
-                key={q.id || idx}
-                button
-                onClick={() => handleToggle(q.id)}
-                selected={selected.includes(q.id)}
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={selected.includes(q.id)}
-                    tabIndex={-1}
-                    disableRipple
-                  />
-                </ListItemIcon>
-
-                <ListItemText
-                  primary={`${idx + 1}. ${q.content || q.text}`}
-                />
+            (!outcomes?.length || !filteredQuestions.length) ? (
+              <ListItem>
+                <ListItemText primary="Ngân hàng câu hỏi đang rỗng." />
               </ListItem>
-            ))
-          )}
-          {!loading && (!questionBank || questionBank.length === 0) && (
-            <ListItem>
-              <ListItemText primary="Không có câu hỏi phù hợp." />
-            </ListItem>
+            ) : (
+              filteredQuestions.map((q, idx) => (
+                <ListItem
+                  key={q.id || idx}
+                  button
+                  onClick={() => handleToggle(q.id)}
+                  selected={selected.includes(q.id)}
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={selected.includes(q.id)}
+                      tabIndex={-1}
+                      disableRipple
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${idx + 1}. ${q.content || q.text}`}
+                  />
+                </ListItem>
+              ))
+            )
           )}
         </List>
       </DialogContent>

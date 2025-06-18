@@ -64,3 +64,33 @@ export const useCourseById = (courseId) => {
 
   return { courseName ,course, loading, error };
 }
+
+
+export const getCourses = () => {
+  const axiosPrivate = useAxiosPrivate();
+  const { authUser } = useAuth();
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!authUser) return;
+
+    const fetchCourses = async () => {
+      try {
+        let endpoint = '/courses';
+        const response = await axiosPrivate.get(endpoint);
+        setCourses(response.data.data);
+      } catch (err) {
+        console.error('Lỗi khi lấy danh sách khóa học:', err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  return { courses, loading, error };
+};

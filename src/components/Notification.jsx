@@ -110,7 +110,7 @@ function Notification() {
                 }}
             >
                 <Paper sx={{ width: '100%' }}>
-                    <Box sx={{ pl: 2, borderBottom: '1px solid #e0e0e0'  }}>
+                    <Box sx={{ p: 1, pl: 2, borderBottom: '1px solid #e0e0e0' }}>
                         <Typography variant="inherit" component="div">
                             Thông báo
                         </Typography>

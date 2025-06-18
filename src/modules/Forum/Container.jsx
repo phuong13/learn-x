@@ -73,15 +73,17 @@ const Container = () => {
   return (
     <div className="flex flex-col gap-4 p-4 h-full focus:outline-none" tabIndex={-1}>
       {forumId ? (
-        <RippleButton
-          onClick={() => setShowPopup(true)}
-
-        >
-          {t("forum.create_topic")}
-        </RippleButton>
+        <div >
+          <RippleButton
+          className='min-w-full'
+            onClick={() => setShowPopup(true)}
+          >
+            {t("forum.create_topic")}
+          </RippleButton>
+        </div>
       ) : (
-        <div className="flex flex-col items-center justify-center text-lg text-center text-slate-600 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
-          <MessageCircle className="text-primaryDark w-16 h-16 mb-2 animate-bounce"/>
+        <div className="flex flex-col items-center justify-center text-lg text-center text-slate-500 font-semibold pt-6 h-full bg-white rounded-lg shadow-md">
+          <MessageCircle className=" w-16 h-16 mb-2 animate-bounce" />
           {t("forum.please_select_forum")}
         </div>
       )}
@@ -93,7 +95,7 @@ const Container = () => {
           ))}
         </div>
       ) : topics.length > 0 && forumId ? (
-        <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6 overflow-y-auto">
+        <div className="flex flex-col gap-4 h-full bg-white rounded-lg shadow-md p-6 overflow-y-auto ">
           {topics.map((topic) => (
             <Topic
               key={topic.id}

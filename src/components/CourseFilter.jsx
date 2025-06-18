@@ -5,6 +5,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function CourseFilter({ onSearch }) {
     const { authUser } = useAuth();
@@ -12,15 +14,25 @@ export default function CourseFilter({ onSearch }) {
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
     const { t } = useTranslation();
 
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
     useEffect(() => {
         if (onSearch) onSearch(searchTerm);
-        // eslint-disable-next-line
     }, [searchTerm]);
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
         setSearchParams(value ? { search: value } : {});
+    };
+
+    const handleAddClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
     };
 
     return (
@@ -46,15 +58,52 @@ export default function CourseFilter({ onSearch }) {
                     }}
                 />
                 {authUser?.role === 'TEACHER' && (
-                    <Link to="/add-course">
+                    <>
                         <button
                             className="ml-2 h-10 px-2 text-base bg-gradient-to-br from-[#5BCEC9] to-[#14919B] shadow-md hover:shadow-lgtext-center text-white rounded-lg  transition-colors flex items-center justify-center gap-1 min-w-44"
                             style={{ lineHeight: 1 }}
+                            onClick={handleAddClick}
                         >
                             <AddIcon className="w-4 h-4" fontSize="small" />
                             Thêm khóa học
                         </button>
-                    </Link>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                        >
+                            <MenuItem
+                                component={Link}
+                                to="/add-course"
+                                onClick={handleClose}
+                                sx={{
+                                    fontWeight: 'bold',
+                                    color: '#64748b', // Tailwind slate-500
+                                    '&:hover': {
+                                        backgroundColor: '#eff6ff', // Tailwind blue-50
+                                        color: '#64748b',
+                                    },
+                                }}
+                            >
+                                Thêm mới
+                            </MenuItem>
+                            <MenuItem
+                                component={Link}
+                                to="/add-course-from-old"
+                                onClick={handleClose}
+                                sx={{
+                                    fontWeight: 'bold',
+                                    color: '#64748b',
+                                    '&:hover': {
+                                        backgroundColor: '#eff6ff',
+                                        color: '#64748b',
+                                    },
+                                }}
+                            >
+                                Thêm từ khoá học cũ
+                            </MenuItem>
+                        </Menu>
+                    </>
                 )}
             </div>
         </div>

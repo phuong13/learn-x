@@ -12,7 +12,7 @@ import AuthService from './services/auth/auth.service';
 import AppLayout from './layout/AppLayout';
 import Quiz from './pages/Quiz';
 import QuizSubmission from './pages/QuizSubmission';
-
+import AddCourseFormOld from './pages/AddCourseFormOld';
 // Lazy-loaded pages
 const MyCourse = lazy(() => import('./pages/MyCourse'));
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -25,9 +25,11 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const DashBoard = lazy(() => import('./pages/DashBoard'));
 const Submission = lazy(() => import('./pages/Submission'));
 const AddCourse = lazy(() => import('./pages/AddCourse'));
+
 const EditCourseContent = lazy(() => import('./components/EditCourseContent'));
 const Grading = lazy(() => import('./pages/Grade'));
 const Forum = lazy(() => import('./pages/Forum'));
+
 
 function App() {
   const navigate = useNavigate();
@@ -83,9 +85,9 @@ function App() {
             <Route path="/submission/:courseId/:assignmentId" element={<Submission />} />
             <Route path="/quiz/:courseId/:quizId" element={<Quiz />} />
             <Route path="/quiz-submission/:courseId/:quizId" element={<QuizSubmission />} />
-
-
             <Route path="/add-course" element={<AddCourse />} />
+            <Route path="/add-course-from-old" element={<AddCourseFormOld />} />
+
             <Route path="/grading/:courseId/:assignmentId" element={<Grading />} />
             <Route path="/logout" element={<Logout />} />
           </Route>

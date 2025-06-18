@@ -17,7 +17,6 @@ const Topic = ({ user, content, createAt, topicId }) => {
 
   const fetchComment = async () => {
     const data = await getTopicComment(topicId);
-    console.log("🚀 ~ fetchComment ~ data:", data)
     setComment(data.data || []);
   };
 
@@ -143,15 +142,21 @@ export default Topic;
 
 const formatDateTime = (dateArray) => {
   const date = new Date(
-    dateArray[0],
-    dateArray[1] - 1,
-    dateArray[2],
-    dateArray[3],
-    dateArray[4],
-    dateArray[5],
-    Math.floor(dateArray[6] / 1_000_000)
+    dateArray[0], // year
+    dateArray[1] - 1, // month
+    dateArray[2], // day
+    dateArray[3], // hour
+    dateArray[4], // minute
+    dateArray[5], // second
+    Math.floor(dateArray[6] / 1_000_000) // millisecond
   );
-  const formatNumber = (num) => String(num).padStart(2, '0');
-  return `${formatNumber(date.getHours())}:${formatNumber(date.getMinutes())}
-     ${formatNumber(date.getDate())}/${formatNumber(date.getMonth() + 1)}/${date.getFullYear()}`;
+
+  return date.toLocaleString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh", // đảm bảo UTC+7
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 };

@@ -42,7 +42,7 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-const CreateCourseForm = ({ onSubmitSuccess }) => {
+const CreateCourseFromOld = ({ oldCourse }) => {
   const [formData, setFormData] = useState({
     category: '',
     newCategory: '',
@@ -53,35 +53,12 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
   });
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [startDate, setStartDate] = useState(null);
-  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Thêm state cho outcomes
+
   const [outcomes, setOutcomes] = useState([
     { code: '', description: '' }
   ]);
 
-  useEffect(() => {
-    axiosPrivate.get('/categories')
-      .then((res) => setCategories(res.data.data))
-      .catch((err) => console.error('Failed to fetch categories:', err));
-  }, []);
-
-  const handleInputChange = (field) => (event) => {
-    const value = event.target.value;
-    setFormData(prev => ({ ...prev, [field]: value }));
-
-    if (field === 'category') {
-      setShowNewCategory(value === 'new');
-    }
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setFormData(prev => ({ ...prev, thumbnail: file }));
-  };
-
-  // Hàm xử lý outcomes
   const handleOutcomeChange = (index, field, value) => {
     const newOutcomes = [...outcomes];
     newOutcomes[index][field] = value;
@@ -99,6 +76,36 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
     }
   };
 
+  // Fill dữ liệu từ oldCourse
+  useEffect(() => {
+    if (oldCourse) {
+      setFormData({
+        category: oldCourse.categoryName || '',
+        newCategory: '',
+        courseName: oldCourse.name || '',
+        courseCode: oldCourse.code || '',
+        description: oldCourse.description || '',
+        thumbnail: null
+      });
+      setStartDate(oldCourse.startDate ? new Date(oldCourse.startDate) : null);
+      setOutcomes(oldCourse.outcomes || []);
+    }
+  }, [oldCourse]);
+
+  const handleInputChange = (field) => (event) => {
+    const value = event.target.value;
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+    if (field === 'category') {
+      setShowNewCategory(value === 'new');
+    }
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setFormData(prev => ({ ...prev, thumbnail: file }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -110,7 +117,8 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
       description: formData.description,
       startDate: startDate,
       categoryName: formData.category === 'new' ? formData.newCategory : formData.category,
-      outcomes: outcomes.filter(outcome => outcome.code && outcome.description) // Lọc outcomes có đủ thông tin
+      outcomes: outcomes,
+      courseId: oldCourse?.id
     };
 
     formDataToSend.append(
@@ -125,15 +133,12 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
     }
 
     try {
-      const response = await axiosPrivate.post('/courses', formDataToSend, {
+      const response = await axiosPrivate.post('/courses/clone', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       if (response.status === 200) {
         toast.success(response.data.message);
-        const data = response.data.data;
-        localStorage.setItem('courseInfo', JSON.stringify(data));
-        onSubmitSuccess();
       } else {
         toast.error(response.data.message);
       }
@@ -187,58 +192,31 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
               }}
             >
               <Typography variant="h6" component="h1" fontWeight="bold">
-                Tạo khóa học mới
+                Tạo khóa học mới từ khoá học cũ
               </Typography>
+              {oldCourse && (
+                <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                  Dựa trên: <b>{oldCourse.name}</b> ({oldCourse.code})
+                </Typography>
+              )}
             </Box>
 
             {/* Form Content */}
             <Box sx={{ p: 4 }}>
               <Grid container spacing={3}>
                 {/* Category */}
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Danh mục</InputLabel>
-                    <Select
-                      value={formData.category}
-                      label="Danh mục"
-                      onChange={handleInputChange('category')}
-                    >
-                      <MenuItem value="">Chọn danh mục</MenuItem>
-                      {categories.map((category) => (
-                        <MenuItem key={category.id} value={category.name}>
-                          {category.name}
-                        </MenuItem>
-                      ))}
-                      <MenuItem value="new">Thêm danh mục mới</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
 
-                {/* New Category */}
-                <Grid item xs={12}>
-                  <Collapse in={showNewCategory}>
-                    <TextField
-                      fullWidth
-                      label="Tên danh mục mới"
-                      value={formData.newCategory}
-                      onChange={handleInputChange('newCategory')}
-                      placeholder="Nhập tên danh mục mới"
-                    />
-                  </Collapse>
-                </Grid>
 
+                {/* Course Code */}
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    required
                     label="Mã môn học"
                     value={formData.courseCode}
                     onChange={handleInputChange('courseCode')}
-                    placeholder="Ví dụ: CS101, MATH201"
-                    inputProps={{ 
+                    inputProps={{
                       style: { textTransform: 'uppercase' }
                     }}
-                    helperText="Mã môn học nên ngắn gọn và duy nhất"
                   />
                 </Grid>
 
@@ -251,6 +229,20 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                     value={formData.courseName}
                     onChange={handleInputChange('courseName')}
                     placeholder="Nhập tên khóa học"
+                  />
+                </Grid>
+
+                {/* Start Date */}
+                <Grid item xs={12} md={6}>
+                  <DatePicker
+                    label="Ngày bắt đầu"
+                    value={startDate}
+                    readOnly
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                      }
+                    }}
                   />
                 </Grid>
 
@@ -268,23 +260,6 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                   />
                 </Grid>
 
-                {/* Start Date */}
-                <Grid item xs={12} md={6}>
-                  <DatePicker
-                    label="Ngày bắt đầu"
-                    value={startDate}
-                    onChange={(newValue) => setStartDate(newValue)}
-                    format="dd/MM/yyyy"
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        required: true,
-                      }
-                    }}
-                  />
-                </Grid>
-
-                {/* Outcomes Section */}
                 <Grid item xs={12}>
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -299,7 +274,11 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                         Thêm chuẩn đầu ra
                       </Button>
                     </Typography>
-                    
+                    {outcomes.length === 0 && (
+                      <Typography variant="body2" color="text.secondary">
+                        Không có chuẩn đầu ra
+                      </Typography>
+                    )}
                     {outcomes.map((outcome, index) => (
                       <Card key={index} sx={{ mb: 2, border: '1px solid #e0e0e0' }}>
                         <CardContent>
@@ -311,7 +290,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                                     fullWidth
                                     label={`Mã chuẩn đầu ra ${index + 1}`}
                                     value={outcome.code}
-                                    onChange={(e) => handleOutcomeChange(index, 'code', e.target.value)}
+                                    onChange={e => handleOutcomeChange(index, 'code', e.target.value)}
                                     placeholder="Ví dụ: CLO1, PLO2"
                                     size="small"
                                   />
@@ -321,7 +300,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                                     fullWidth
                                     label="Mô tả chuẩn đầu ra"
                                     value={outcome.description}
-                                    onChange={(e) => handleOutcomeChange(index, 'description', e.target.value)}
+                                    onChange={e => handleOutcomeChange(index, 'description', e.target.value)}
                                     placeholder="Mô tả chi tiết về chuẩn đầu ra này"
                                     multiline
                                     rows={2}
@@ -352,24 +331,63 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
                     <Typography variant="subtitle1" gutterBottom>
                       Ảnh nền
                     </Typography>
-                    <Button
-                      component="label"
-                      variant="outlined"
-                      startIcon={<CloudUploadIcon />}
-                      sx={{
-                        width: '100%',
-                        height: 56,
-                        borderStyle: 'dashed',
-                        borderWidth: 2
-                      }}
-                    >
-                      {formData.thumbnail ? formData.thumbnail.name : 'Chọn ảnh nền'}
-                      <VisuallyHiddenInput
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                      />
-                    </Button>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                      {(formData.thumbnail || oldCourse?.thumbnail) && (
+                        <Box
+                          sx={{
+                            width: 440,
+                            height: 140,
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            border: '2px solid #e0e0e0',
+                            mb: 1,
+                            background: '#f8fafc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          <img
+                            src={
+                              formData.thumbnail
+                                ? URL.createObjectURL(formData.thumbnail)
+                                : oldCourse?.thumbnail
+                            }
+                            alt="thumbnail"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              display: 'block'
+                            }}
+                          />
+                        </Box>
+                      )}
+                      <Button
+                        component="label"
+                        variant="outlined"
+                        startIcon={<CloudUploadIcon />}
+                        sx={{
+                          width: 240,
+                          borderStyle: 'dashed',
+                          borderWidth: 2,
+                          borderRadius: 2,
+                          background: '#fff',
+                        }}
+                      >
+                        {formData.thumbnail ? 'Đổi ảnh khác' : 'Chọn ảnh nền'}
+                        <VisuallyHiddenInput
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                        />
+                      </Button>
+                      {/* {formData.thumbnail && (
+                        <Typography variant="caption" color="text.secondary">
+                          {formData.thumbnail.name}
+                        </Typography>
+                      )} */}
+                    </Box>
                   </Box>
                 </Grid>
               </Grid>
@@ -414,8 +432,17 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
   );
 };
 
-CreateCourseForm.propTypes = {
-  onSubmitSuccess: PropTypes.func.isRequired,
+CreateCourseFromOld.propTypes = {
+  oldCourse: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    name: PropTypes.string,
+    code: PropTypes.string,
+    description: PropTypes.string,
+    categoryName: PropTypes.string,
+    startDate: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    thumbnail: PropTypes.string,
+    outcomes: PropTypes.array,
+  }),
 };
 
-export default CreateCourseForm;
+export default CreateCourseFromOld;

@@ -176,7 +176,7 @@ const StudentRegisteredLayout = () => {
             <div className="flex justify-end items-center mb-2">
                 {authUser.role === 'TEACHER' && (
                     <button
-                        className="py-2 px-3  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
+                        className="py-1.5 px-2  bg-gradient-to-br from-[#5BCEC9] to-[#14919B]
     shadow-md hover:shadow-lg text-white rounded-lg  hover:bg-secondary transition-colors flex items-center"
                         onClick={handleOpen}>
                         <AddIcon />
@@ -199,9 +199,22 @@ const StudentRegisteredLayout = () => {
             )}
 
 
-            <Dialog open={showModal} onClose={handleClose} maxWidth="sm" fullWidth hideBackdrop={false} sx={{ '& .MuiDialog-paper': { borderRadius: '16px' } }}>
+            <Dialog
+                open={showModal}
+                onClose={handleClose}
+                maxWidth="sm"
+                fullWidth
+                hideBackdrop={false}
+                sx={{ '& .MuiDialog-paper': { borderRadius: '16px' } }}
+                BackdropProps={{
+                    style: {
+                        backdropFilter: 'blur(4px)', // Làm mờ nền
+                        backgroundColor: 'rgba(128, 128, 128, 0.8)', // Có thể chỉnh độ tối nền nếu muốn
+                    }
+                }}
+            >
                 <div className="relative bg-white rounded-lg shadow-xl">
-                    <DialogTitle className="text-xl font-bold mb-4">Thêm sinh viên</DialogTitle>
+                    <DialogTitle className="text-xl font-extrabold mb-4 text-slate-700">Thêm sinh viên</DialogTitle>
                     <button onClick={handleClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
                         <X className="h-6 w-6" />
                     </button>
@@ -211,11 +224,11 @@ const StudentRegisteredLayout = () => {
                                 type="file"
                                 onChange={handleReadFile}
                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-2 border border-slate-400 rounded"
                             />
                             <textarea
                                 placeholder="Thêm email hoặc MSSV của sinh viên (mỗi email hoặc MSSV trên một dòng)"
-                                className="w-full p-2 border border-gray-300 rounded resize-none h-32"
+                                className="w-full p-2 border border-slate-400 rounded resize-none h-32 focus:outline-none"
                                 value={emailList.join('\n')}
                                 onChange={handleTextareaChange}></textarea>
                             <button
