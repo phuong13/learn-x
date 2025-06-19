@@ -24,19 +24,20 @@ const CourseContent = () => {
     const { getModules } = useSubmitModules();
 
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            const { success, modules: fetchedModules } = await getModules(courseId);
-            if (success) {
-                setModules(fetchedModules);
-                setExpandedSections(fetchedModules.map(m => m.id)); // Mở mặc định tất cả modules
+  setIsLoading(true);
 
-            }
-            setIsLoading(false);
-        };
+  getModules(courseId).then(({ success, modules: fetchedModules }) => {
+    if (success) {
+      setModules(fetchedModules);
+      setExpandedSections(fetchedModules.map(m => m.id));
+    }
+    setIsLoading(false);
+  }).catch(error => {
+    console.error(error);
+    setIsLoading(false);
+  });
+}, [courseId]);
 
-        fetchData();
-    }, [courseId]);
 
     const toggleSection = (module) => {
         if (expandedSections.includes(module.id)) {

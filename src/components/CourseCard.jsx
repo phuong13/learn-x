@@ -13,7 +13,7 @@ export default function Component({ id, name, description, thumbnail }) {
           <div className="flex justify-between items-start">
             <div>
               <h2 className="font-bold text-xl mb-2 text-gray-800">{name}</h2>
-              <p className="text-sm">{description}</p>
+              <p className="text-sm  line-clamp-3">{description}</p>
             </div>
           </div>
         </div>

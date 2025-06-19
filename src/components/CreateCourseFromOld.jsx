@@ -27,6 +27,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useCourseById } from '../store/useCourses';
 
 import { axiosPrivate } from '../axios/axios';
 
@@ -43,6 +44,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const CreateCourseFromOld = ({ oldCourse }) => {
+  const { course, loading, error } = useCourseById(oldCourse?.id);
   const [formData, setFormData] = useState({
     category: '',
     newCategory: '',
@@ -76,21 +78,26 @@ const CreateCourseFromOld = ({ oldCourse }) => {
     }
   };
 
-  // Fill dữ liệu từ oldCourse
+  // Fill dữ liệu từ course
   useEffect(() => {
-    if (oldCourse) {
+    if (course) {
       setFormData({
-        category: oldCourse.categoryName || '',
+        category: course.categoryName || 'Danh mục chung',
         newCategory: '',
-        courseName: oldCourse.name || '',
-        courseCode: oldCourse.code || '',
-        description: oldCourse.description || '',
+        courseName: course.name || '',
+        courseCode: course.code || '',
+        description: course.description || '',
         thumbnail: null
       });
-      setStartDate(oldCourse.startDate ? new Date(oldCourse.startDate) : null);
-      setOutcomes(oldCourse.outcomes || []);
+      setStartDate(course.startDate ? new Date(course.startDate) : null);
+      const courseOutcomes = course?.outcomes?.map(outcome => ({
+        code: outcome.code || '',
+        description: outcome.description || ''
+      })) || [{ code: '', description: '' }];
+
+      setOutcomes(courseOutcomes);
     }
-  }, [oldCourse]);
+  }, [course]);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
@@ -118,8 +125,9 @@ const CreateCourseFromOld = ({ oldCourse }) => {
       startDate: startDate,
       categoryName: formData.category === 'new' ? formData.newCategory : formData.category,
       outcomes: outcomes,
-      courseId: oldCourse?.id
+      courseId: course?.id
     };
+    console.log("🚀 ~ handleSubmit ~ courseInfo:", courseInfo)
 
     formDataToSend.append(
       'courseInfo',
@@ -174,7 +182,6 @@ const CreateCourseFromOld = ({ oldCourse }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 1000
               }}
             >
               <CircularProgress />
@@ -194,9 +201,9 @@ const CreateCourseFromOld = ({ oldCourse }) => {
               <Typography variant="h6" component="h1" fontWeight="bold">
                 Tạo khóa học mới từ khoá học cũ
               </Typography>
-              {oldCourse && (
+              {course && (
                 <Typography variant="subtitle2" sx={{ mt: 1 }}>
-                  Dựa trên: <b>{oldCourse.name}</b> ({oldCourse.code})
+                  Dựa trên: <b>{course.name}</b> ({course.code})
                 </Typography>
               )}
             </Box>
@@ -237,7 +244,8 @@ const CreateCourseFromOld = ({ oldCourse }) => {
                   <DatePicker
                     label="Ngày bắt đầu"
                     value={startDate}
-                    readOnly
+                    format='dd/MM/yyyy'
+                    onChange={(newValue) => setStartDate(newValue)}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -263,7 +271,7 @@ const CreateCourseFromOld = ({ oldCourse }) => {
                 <Grid item xs={12}>
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      Chuẩn đầu ra (Learning Outcomes)
+                      Chuẩn đầu ra
                       <Button
                         variant="outlined"
                         size="small"
@@ -332,7 +340,7 @@ const CreateCourseFromOld = ({ oldCourse }) => {
                       Ảnh nền
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                      {(formData.thumbnail || oldCourse?.thumbnail) && (
+                      {(formData.thumbnail || course?.thumbnail) && (
                         <Box
                           sx={{
                             width: 440,
@@ -351,7 +359,7 @@ const CreateCourseFromOld = ({ oldCourse }) => {
                             src={
                               formData.thumbnail
                                 ? URL.createObjectURL(formData.thumbnail)
-                                : oldCourse?.thumbnail
+                                : course?.thumbnail
                             }
                             alt="thumbnail"
                             style={{
@@ -433,7 +441,7 @@ const CreateCourseFromOld = ({ oldCourse }) => {
 };
 
 CreateCourseFromOld.propTypes = {
-  oldCourse: PropTypes.shape({
+  course: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     name: PropTypes.string,
     code: PropTypes.string,

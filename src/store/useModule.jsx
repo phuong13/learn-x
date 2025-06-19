@@ -131,6 +131,7 @@ export const useSubmitModules = () => {
               const currentQuestionIds = [];
 
               for (const q of item.questions) {
+                console.log("🚀 ~ submitModules ~ q:", q)
                 const isNewquestion = !q.id || String(q.id).startsWith("temp-");
                 const endpoint =
                   q.type === "single"
@@ -317,67 +318,71 @@ export const useSubmitModules = () => {
     }
   };
 
-  const getModules = async (courseId) => {
-    try {
-      const response = await axiosPrivate.get(`/courses/${courseId}/modules`);
+  const getModules = (courseId) => {
+  return axiosPrivate.get(`/courses/${courseId}/modules`)
+    .then((response) => {
       const modulesData = response.data.data;
 
-      const formattedModules = await Promise.all(
-        modulesData.map(async (module) => {
-          const [lecturesRes, resourcesRes, assignmentsRes, quizzesRes] = await Promise.all([
+      return Promise.all(
+        modulesData.map((module) => {
+          return Promise.all([
             axiosPrivate.get(`/modules/${module.id}/lectures`),
             axiosPrivate.get(`/modules/${module.id}/resources`),
             axiosPrivate.get(`/modules/${module.id}/assignments`),
             axiosPrivate.get(`/modules/${module.id}/quizzes`),
-          ]);
+          ]).then(([lecturesRes, resourcesRes, assignmentsRes, quizzesRes]) => {
+            const lectures = lecturesRes.data.data.map((lecture) => ({
+              ...lecture,
+              type: 'lecture',
+            }));
 
-          const lectures = lecturesRes.data.data.map((lecture) => ({
-            ...lecture,
-            type: 'lecture',
-          }));
+            const resources = resourcesRes.data.data.map((res) => ({
+              ...res,
+              type: 'resource',
+            }));
 
-          const resources = resourcesRes.data.data.map((res) => ({
-            ...res,
-            type: 'resource',
-          }));
+            const assignments = assignmentsRes.data.data.map((asmt) => ({
+              ...asmt,
+              type: 'assignment',
+            }));
 
-          const assignments = assignmentsRes.data.data.map((asmt) => ({
-            ...asmt,
-            type: 'assignment',
-          }));
+            // Promise.all map quiz + fetch question
+            const quizzesPromise = Promise.all(
+              quizzesRes.data.data.map((quiz) =>
+                axiosPrivate.get(`/quizzes/${quiz.id}/questions`).then((questionsRes) => ({
+                  ...quiz,
+                  type: 'quiz',
+                  questions: questionsRes.data.data,
+                }))
+              )
+            );
 
-          const quizzes = await Promise.all(
-            quizzesRes.data.data.map(async (quiz) => {
-              const questionsRes = await axiosPrivate.get(`/quizzes/${quiz.id}/questions`);
+            return quizzesPromise.then((quizzes) => {
+              const combinedContents = [...lectures, ...resources, ...assignments, ...quizzes];
+              combinedContents.sort((a, b) => {
+                const dateA = parseJavaLocalDateTime(a.createdAt);
+                const dateB = parseJavaLocalDateTime(b.createdAt);
+                return dateA - dateB;
+              });
+
               return {
-                ...quiz,
-                type: 'quiz',
-                questions: questionsRes.data.data,
+                id: module.id,
+                title: module.name,
+                contents: combinedContents,
               };
-            })
-          );
-
-          const combinedContents = [...lectures, ...resources, ...assignments, ...quizzes];
-          combinedContents.sort((a, b) => {
-            const dateA = parseJavaLocalDateTime(a.createdAt);
-            const dateB = parseJavaLocalDateTime(b.createdAt)
-            return dateA - dateB;
+            });
           });
-
-          return {
-            id: module.id,
-            title: module.name,
-            contents: combinedContents,
-          };
-
         })
       );
+    })
+    .then((formattedModules) => {
       return { success: true, modules: formattedModules };
-    } catch (error) {
+    })
+    .catch((error) => {
       console.error(error);
       return { success: false, modules: [] };
-    }
-  };
+    });
+};
 
   return { submitModules, getModules };
 };

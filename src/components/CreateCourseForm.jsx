@@ -53,6 +53,7 @@ const CreateCourseForm = ({ onSubmitSuccess }) => {
   });
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [startDate, setStartDate] = useState(null);
+  console.log("🚀 ~ CreateCourseForm ~ startDate:", startDate)
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   

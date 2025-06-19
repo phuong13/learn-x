@@ -179,7 +179,7 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
 
                             {isStatusDropdownOpen && (
                                 <table className="w-full">
-                                    <tbody>
+                                    <tbody className=''>
                                         <tr className="border-b border-slate-300">
                                             <td className="py-3 font-medium text-slate-700">Thời gian làm bài</td>
                                             <td className="py-3 text-slate-600">
@@ -206,7 +206,7 @@ export default function QuizLayout({ title, courseName, startDate, endDate }) {
                                                 {submission && submission.length > 0 ? (
                                                     <div className="flex flex-col gap-1">
                                                         {submission.map((s, idx) => (
-                                                            <div key={s.id || idx}>
+                                                            <div className='font-bold' key={s.id || idx}>
                                                                 Lần thứ {idx + 1}: {
                                                                     typeof s.score === 'number'
                                                                         ? (Number.isInteger(s.score / 10)

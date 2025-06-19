@@ -117,9 +117,9 @@ export default function Curriculum({ courseName, isEdit, onSubmitSuccess, initia
             mod.id === moduleId
                ? {
                   ...mod,
-                  contents: mod.contents.some(c => c.id === quizData.id)
+                  contents: mod.contents.some(c => c.id === quizData.id && c.type === 'quiz')
                      ? mod.contents.map(c =>
-                        c.id === quizData.id
+                        c.id === quizData.id && c.type === 'quiz'
                            ? { ...quizData, type: 'quiz', questions: questionData }
                            : c
                      )
@@ -146,9 +146,9 @@ export default function Curriculum({ courseName, isEdit, onSubmitSuccess, initia
             mod.id === moduleId
                ? {
                   ...mod,
-                  contents: mod.contents.some(c => c.id === lectureData.id)
+                  contents: mod.contents.some(c => c.id === lectureData.id && c.type === 'lecture')
                      ? mod.contents.map(c =>
-                        c.id === lectureData.id
+                        c.id === lectureData.id && c.type === 'lecture'
                            ? { ...lectureData, type: 'lecture' }
                            : c
                      )
@@ -166,7 +166,6 @@ export default function Curriculum({ courseName, isEdit, onSubmitSuccess, initia
       );
       setLectureDialog({ open: false, moduleId: null, editData: null });
    };
-
    const handleAddResource = (moduleId, resourceData) => {
       let parsedResource = {};
 
@@ -209,9 +208,9 @@ export default function Curriculum({ courseName, isEdit, onSubmitSuccess, initia
             mod.id === moduleId
                ? {
                   ...mod,
-                  contents: mod.contents.some(c => c.id === assignmenrData.id)
+                  contents: mod.contents.some(c => c.id === assignmenrData.id && c.type === 'assignment')
                      ? mod.contents.map(c =>
-                        c.id === assignmenrData.id
+                        c.id === assignmenrData.id && c.type === 'assignment'
                            ? { ...assignmenrData, type: 'assignment' }
                            : c
                      )
@@ -413,11 +412,12 @@ export default function Curriculum({ courseName, isEdit, onSubmitSuccess, initia
          <FormLecture
             open={lectureDialog.open}
             onClose={() => setLectureDialog({ open: false, moduleId: null, editData: null })}
-            onSubmit={(lectureData) =>
+            onSubmit={(lectureData) => {
+               console.log("🚀 ~ Curriculum ~ lectureData:", lectureData)
                handleAddLecture(lectureDialog.moduleId, lectureDialog.editData
                   ? { ...lectureDialog.editData, ...lectureData }
                   : lectureData)
-            }
+            }}
             isEdit={!!lectureDialog.editData}
             defaultData={lectureDialog.editData}
          />
