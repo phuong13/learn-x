@@ -24,7 +24,19 @@ export default function CourseInfoModal({
 
 
 
-  return (
+  return (<>{open && (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(128, 128, 128, 0.8)',
+        zIndex: 1299, // Thấp hơn Dialog một chút
+      }}
+    />
+  )}
     <Dialog
       open={open}
       onClose={onClose}
@@ -36,8 +48,13 @@ export default function CourseInfoModal({
         },
       }}
     >
-      <DialogTitle className="text-2xl font-bold text-center text-slate-800">
-        Thông tin khóa học
+      <DialogTitle className="text-2xl font-bold text-center text-slate-800" sx={{
+        background: 'linear-gradient(135deg, #5BCEC9 0%, #14919B 100%)',
+        color: 'white',
+        p: 1.5,
+        textAlign: 'center',
+        borderRadius: '16px 16px 0 0',
+      }}>        Thông tin khóa học
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -53,7 +70,7 @@ export default function CourseInfoModal({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent >
         <Grid container spacing={3}>
           {/* Mã khóa học */}
           <Grid item xs={12} md={6}>
@@ -141,5 +158,6 @@ export default function CourseInfoModal({
         </Grid>
       </DialogContent>
     </Dialog>
+  </>
   );
 }

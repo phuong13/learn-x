@@ -30,6 +30,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useCourseById } from '../store/useCourses';
 
 import { axiosPrivate } from '../axios/axios';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -56,7 +57,7 @@ const CreateCourseFromOld = ({ oldCourse }) => {
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const navigate = useNavigate();
   const [outcomes, setOutcomes] = useState([
     { code: '', description: '' }
   ]);
@@ -127,7 +128,6 @@ const CreateCourseFromOld = ({ oldCourse }) => {
       outcomes: outcomes,
       courseId: course?.id
     };
-    console.log("🚀 ~ handleSubmit ~ courseInfo:", courseInfo)
 
     formDataToSend.append(
       'courseInfo',
@@ -147,6 +147,7 @@ const CreateCourseFromOld = ({ oldCourse }) => {
 
       if (response.status === 200) {
         toast.success(response.data.message);
+        navigate('/my-course');
       } else {
         toast.error(response.data.message);
       }
@@ -156,6 +157,7 @@ const CreateCourseFromOld = ({ oldCourse }) => {
     } finally {
       setIsLoading(false);
     }
+
   };
 
   return (
